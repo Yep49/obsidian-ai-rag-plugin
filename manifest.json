@@ -1,0 +1,9 @@
+{
+  "id": "obsidian-ai-rag-plugin",
+  "name": "AI RAG + LLM Wiki",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Obsidian AI assistant with advanced RAG and a persistent LLM-maintained Wiki for source ingestion, entity/concept pages, synthesis, indexing, logging, and auditing.",
+  "author": "Yep",
+  "isDesktopOnly": false
+}
