@@ -52,7 +52,7 @@ Query → Analysis → Multi-Recall → Fusion → Rerank → Compression → Re
 ### 安装
 
 1. 下载最新版本
-2. 解压到 `.obsidian/plugins/obsidian-ai-rag-plugin/`
+2. 解压到 `.obsidian/plugins/ai-rag-llm-wiki/`
 3. 在 Obsidian 设置中启用插件
 
 ### 配置
@@ -226,7 +226,7 @@ npm run dev
 
 ```bash
 # 复制文件到 Obsidian 插件目录
-cp main.js manifest.json styles.css "path/to/.obsidian/plugins/obsidian-ai-rag-plugin/"
+cp main.js manifest.json styles.css "path/to/.obsidian/plugins/ai-rag-llm-wiki/"
 ```
 
 ## 📊 性能优化
