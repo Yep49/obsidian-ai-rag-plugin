@@ -1,5 +1,5 @@
 import { OpenAiCompatibleLlmClient } from './ApiClients';
-import { PluginSettings } from '../types/index';
+import { Chunk, PluginSettings } from '../types/index';
 import { JsonMetadataStore } from './Storage';
 import { UserPatternService } from './UserPatternService';
 
@@ -55,7 +55,7 @@ export class QueryAnalysisService {
       : [standaloneQuestion];
 
     // 3. Metadata Filter Inference（推断过滤条件）
-    const inferredFilters = await this.inferFilters(standaloneQuestion);
+    const inferredFilters = this.inferFilters(standaloneQuestion);
 
     return {
       standaloneQuestion,
@@ -140,7 +140,7 @@ Alternative Questions:`;
     return variants;
   }
 
-  private async inferFilters(query: string): Promise<{ tags?: string[]; paths?: string[] } | undefined> {
+  private inferFilters(query: string): { tags?: string[]; paths?: string[] } | undefined {
     // 简单的关键词匹配推断
     const filters: { tags?: string[]; paths?: string[] } = {};
 
@@ -151,7 +151,7 @@ Alternative Questions:`;
     }
 
     // 提取可能的路径
-    const pathMatches = query.match(/(?:in|from|under)\s+([a-zA-Z0-9_\-\/]+)/gi);
+    const pathMatches = query.match(/(?:in|from|under)\s+([a-zA-Z0-9_/-]+)/gi);
     if (pathMatches) {
       filters.paths = pathMatches.map(match => match.split(/\s+/).pop()!);
     }
@@ -161,20 +161,21 @@ Alternative Questions:`;
 
   // 应用过滤器到检索结果
   applyFilters(
-    results: Array<{ id: string; score: number; chunk?: any }>,
+    results: Array<{ id: string; score: number; chunk?: Chunk }>,
     filters?: { tags?: string[]; paths?: string[] }
-  ): Array<{ id: string; score: number; chunk?: any }> {
+  ): Array<{ id: string; score: number; chunk?: Chunk }> {
     if (!filters) {
       return results;
     }
 
     return results.filter(result => {
-      if (!result.chunk) return true;
+      const chunk = result.chunk;
+      if (!chunk) return true;
 
       // 标签过滤
       if (filters.tags && filters.tags.length > 0) {
         const hasMatchingTag = filters.tags.some(tag =>
-          result.chunk.tags?.includes(tag)
+          chunk.tags?.includes(tag)
         );
         if (!hasMatchingTag) return false;
       }
@@ -182,7 +183,7 @@ Alternative Questions:`;
       // 路径过滤
       if (filters.paths && filters.paths.length > 0) {
         const hasMatchingPath = filters.paths.some(path =>
-          result.chunk.path?.includes(path)
+          chunk.path?.includes(path)
         );
         if (!hasMatchingPath) return false;
       }

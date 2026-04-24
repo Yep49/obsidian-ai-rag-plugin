@@ -30,7 +30,7 @@ export class WikiBrowserModal extends Modal {
     contentEl.empty();
     contentEl.addClass('wiki-browser-modal');
 
-    contentEl.createEl('h2', { text: 'Wiki 浏览器' });
+    contentEl.createEl('h2', { text: 'wiki 浏览器' });
 
     // 加载页面
     await this.loadPages();
@@ -69,7 +69,7 @@ export class WikiBrowserModal extends Modal {
     const searchInput = searchContainer.createEl('input', {
       type: 'text',
       placeholder: '搜索页面标题...',
-      attr: { style: 'width: 100%; padding: 8px; border-radius: 6px;' }
+      cls: 'wiki-browser-search-input'
     });
 
     searchInput.addEventListener('input', () => {
@@ -87,7 +87,7 @@ export class WikiBrowserModal extends Modal {
         dropdown
           .addOption('all', '全部')
           .addOption('faq', 'FAQ')
-          .addOption('meta', 'Meta')
+          .addOption('meta', 'meta')
           .addOption('relation', '关系')
           .addOption('source', '来源')
           .addOption('entity', '实体')
@@ -136,46 +136,24 @@ export class WikiBrowserModal extends Modal {
       syntheses: this.pages.filter(p => p.type === 'synthesis').length
     };
 
-    statsContainer.innerHTML = `
-      <div class="wiki-stats-grid">
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">总计</span>
-          <span class="wiki-stat-value">${stats.total}</span>
-        </div>
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">FAQ</span>
-          <span class="wiki-stat-value">${stats.faq}</span>
-        </div>
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">Meta</span>
-          <span class="wiki-stat-value">${stats.meta}</span>
-        </div>
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">关系</span>
-          <span class="wiki-stat-value">${stats.relations}</span>
-        </div>
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">来源</span>
-          <span class="wiki-stat-value">${stats.sources}</span>
-        </div>
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">实体</span>
-          <span class="wiki-stat-value">${stats.entities}</span>
-        </div>
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">概念</span>
-          <span class="wiki-stat-value">${stats.concepts}</span>
-        </div>
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">摘要</span>
-          <span class="wiki-stat-value">${stats.summaries}</span>
-        </div>
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">综合</span>
-          <span class="wiki-stat-value">${stats.syntheses}</span>
-        </div>
-      </div>
-    `;
+    const statsGrid = statsContainer.createDiv({ cls: 'wiki-stats-grid' });
+    const statItems = [
+      ['总计', stats.total],
+      ['FAQ', stats.faq],
+      ['meta', stats.meta],
+      ['关系', stats.relations],
+      ['来源', stats.sources],
+      ['实体', stats.entities],
+      ['概念', stats.concepts],
+      ['摘要', stats.summaries],
+      ['综合', stats.syntheses]
+    ] as const;
+
+    for (const [label, value] of statItems) {
+      const statItem = statsGrid.createDiv({ cls: 'wiki-stat-item' });
+      statItem.createSpan({ cls: 'wiki-stat-label', text: label });
+      statItem.createSpan({ cls: 'wiki-stat-value', text: String(value) });
+    }
   }
 
   /**
@@ -200,7 +178,7 @@ export class WikiBrowserModal extends Modal {
       return;
     }
 
-    const resultCount = container.createDiv({
+    container.createDiv({
       cls: 'wiki-browser-count',
       text: `显示 ${this.filteredPages.length} 个页面`
     });
@@ -212,7 +190,7 @@ export class WikiBrowserModal extends Modal {
       const header = pageCard.createDiv({ cls: 'wiki-browser-card-header' });
       header.createEl('h3', { text: page.title });
 
-      const typeBadge = header.createEl('span', {
+      header.createEl('span', {
         cls: `wiki-browser-badge wiki-browser-badge-${page.type}`,
         text: this.getTypeLabel(page.type)
       });
@@ -263,11 +241,14 @@ export class WikiBrowserModal extends Modal {
       });
 
       copyPathBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(page.path);
-        copyPathBtn.textContent = '已复制！';
-        setTimeout(() => {
-          copyPathBtn.textContent = '复制路径';
-        }, 2000);
+        void navigator.clipboard.writeText(page.path).then(() => {
+          copyPathBtn.textContent = '已复制！';
+          setTimeout(() => {
+            copyPathBtn.textContent = '复制路径';
+          }, 2000);
+        }, error => {
+          console.error('复制路径失败:', error);
+        });
       });
     }
   }
@@ -324,7 +305,7 @@ export class WikiBrowserModal extends Modal {
   private getTypeLabel(type: WikiPageType): string {
     const labels: Record<WikiPageType, string> = {
       faq: 'FAQ',
-      meta: 'Meta',
+      meta: 'meta',
       relation: '关系',
       source: '来源',
       entity: '实体',

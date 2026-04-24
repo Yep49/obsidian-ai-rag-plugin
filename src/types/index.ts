@@ -46,6 +46,17 @@ export interface Chunk {
   endLine: number;
 }
 
+export interface IndexedFileMetadata {
+  path: string;
+  mtime: number;
+  chunkIds: string[];
+}
+
+export interface StoredEmbedding {
+  chunk: { id: string };
+  embedding: number[];
+}
+
 export interface SearchResult {
   chunk: Chunk;
   score: number;

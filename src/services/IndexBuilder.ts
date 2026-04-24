@@ -1,4 +1,5 @@
-﻿import { BuildProgress, BuildResult, Chunk, IndexManifest, PluginSettings } from '../types/index';
+﻿import { TFile } from 'obsidian';
+import { BuildProgress, BuildResult, Chunk, IndexedFileMetadata, IndexManifest, PluginSettings, StoredEmbedding } from '../types/index';
 import { ObsidianVaultScanner, DocumentChunker, extractMetadata, generateChunkId, computeContentHash } from './DocumentProcessing';
 import { OpenAiCompatibleEmbeddingClient } from './ApiClients';
 import { JsonIndexManifestStore, JsonMetadataStore, JsonVectorStore } from './Storage';
@@ -13,7 +14,6 @@ export class IndexBuilder {
   private vectorStore: JsonVectorStore;
   private manifestStore: JsonIndexManifestStore;
   private settings: PluginSettings;
-  private static readonly INVALID_CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 
   constructor(
     scanner: ObsidianVaultScanner,
@@ -35,8 +35,8 @@ export class IndexBuilder {
     const files = (await this.scanner.scanMarkdownFiles())
       .filter(file => !this.isIgnoredPath(file.path));
     const allChunks: Chunk[] = [];
-    const allEmbeddings: Array<{ chunk: { id: string }; embedding: number[] }> = [];
-    const fileMetadata: Array<{ path: string; mtime: number; chunkIds: string[] }> = [];
+    const allEmbeddings: StoredEmbedding[] = [];
+    const fileMetadata: IndexedFileMetadata[] = [];
     const embeddedChunkIds = new Set<string>();
 
     const chunker = new DocumentChunker({
@@ -57,7 +57,7 @@ export class IndexBuilder {
       const content = await this.scanner.readFile(file);
 
       if (this.settings.maxFileChars && content.length > this.settings.maxFileChars) {
-        console.log(`[IndexBuilder] Skip oversized file: ${file.path} (${content.length} chars)`);
+        console.debug(`[IndexBuilder] Skip oversized file: ${file.path} (${content.length} chars)`);
         fileMetadata.push({
           path: file.path,
           mtime: file.stat.mtime,
@@ -87,7 +87,7 @@ export class IndexBuilder {
         .filter(chunk => this.isChunkEmbeddable(chunk.content));
 
       if (rawChunks.length !== chunks.length) {
-        console.log(`[IndexBuilder] Skipped ${rawChunks.length - chunks.length} empty/invalid chunks in ${file.path}`);
+        console.debug(`[IndexBuilder] Skipped ${rawChunks.length - chunks.length} empty/invalid chunks in ${file.path}`);
       }
 
       allChunks.push(...chunks);
@@ -184,19 +184,19 @@ export class IndexBuilder {
     return false;
   }
 
-  async updateFile(file: any) {
+  async updateFile(file: TFile): Promise<void> {
     try {
       if (this.isIgnoredPath(file.path)) {
         await this.deleteFile(file.path);
         return;
       }
 
-      console.log(`IndexBuilder: Updating file ${file.path}`);
+      console.debug(`IndexBuilder: Updating file ${file.path}`);
 
       const content = await this.scanner.readFile(file);
 
       if (this.settings.maxFileChars && content.length > this.settings.maxFileChars) {
-        console.log(`[IndexBuilder] Skip oversized file: ${file.path} (${content.length} chars)`);
+        console.debug(`[IndexBuilder] Skip oversized file: ${file.path} (${content.length} chars)`);
         await this.deleteFile(file.path);
         return;
       }
@@ -241,7 +241,7 @@ export class IndexBuilder {
       allChunks.push(...successfulChunks);
       allEmbeddings.push(...newEmbeddings);
 
-      const fileIndex = allFiles.findIndex((f: any) => f.path === file.path);
+      const fileIndex = allFiles.findIndex(f => f.path === file.path);
       const nextFileMetadata = {
         path: file.path,
         mtime: file.stat.mtime,
@@ -258,16 +258,16 @@ export class IndexBuilder {
       await this.vectorStore.saveEmbeddings(allEmbeddings);
       await this.metadataStore.saveFiles(allFiles);
 
-      console.log(`IndexBuilder: Updated ${file.path} with ${successfulChunks.length} chunks`);
+      console.debug(`IndexBuilder: Updated ${file.path} with ${successfulChunks.length} chunks`);
     } catch (error) {
       console.error(`IndexBuilder: Failed to update ${file.path}:`, error);
       throw error;
     }
   }
 
-  async deleteFile(path: string) {
+  async deleteFile(path: string): Promise<void> {
     try {
-      console.log(`IndexBuilder: Deleting file ${path}`);
+      console.debug(`IndexBuilder: Deleting file ${path}`);
 
       const allChunks = await this.metadataStore.loadChunks();
       const allEmbeddings = await this.vectorStore.loadEmbeddings();
@@ -279,15 +279,15 @@ export class IndexBuilder {
 
       const remainingChunks = allChunks.filter(c => c.path !== path);
       const remainingEmbeddings = allEmbeddings.filter(
-        (e: any) => !chunkIdsToDelete.has(e.chunk.id)
+        e => !chunkIdsToDelete.has(e.chunk.id)
       );
-      const remainingFiles = allFiles.filter((f: any) => f.path !== path);
+      const remainingFiles = allFiles.filter(f => f.path !== path);
 
       await this.metadataStore.saveChunks(remainingChunks);
       await this.vectorStore.saveEmbeddings(remainingEmbeddings);
       await this.metadataStore.saveFiles(remainingFiles);
 
-      console.log(`IndexBuilder: Deleted ${path} (${chunkIdsToDelete.size} chunks)`);
+      console.debug(`IndexBuilder: Deleted ${path} (${chunkIdsToDelete.size} chunks)`);
     } catch (error) {
       console.error(`IndexBuilder: Failed to delete ${path}:`, error);
       throw error;
@@ -297,10 +297,17 @@ export class IndexBuilder {
   private isChunkEmbeddable(content: string): boolean {
     const normalized = (content ?? '')
       .replace(/\r\n?/g, '\n')
-      .replace(IndexBuilder.INVALID_CONTROL_CHARS, ' ')
+      .split('')
+      .map(char => this.isInvalidControlChar(char) ? ' ' : char)
+      .join('')
       .trim();
 
     return normalized.length > 0;
+  }
+
+  private isInvalidControlChar(char: string): boolean {
+    const code = char.charCodeAt(0);
+    return code <= 8 || code === 11 || code === 12 || (code >= 14 && code <= 31) || code === 127;
   }
 
   private isIgnoredPath(path: string): boolean {
@@ -331,8 +338,8 @@ export class IndexBuilder {
         try {
           const embedding = await this.embeddingClient.embed(chunk.content);
           results.push({ chunk, embedding });
-        } catch (itemError: any) {
-          const reason = itemError?.message || String(itemError);
+        } catch (itemError) {
+          const reason = itemError instanceof Error ? itemError.message : String(itemError);
           console.warn(`[IndexBuilder] Skip chunk ${chunk.path}:${chunk.startLine}-${chunk.endLine}. Reason: ${reason}`);
         }
       }

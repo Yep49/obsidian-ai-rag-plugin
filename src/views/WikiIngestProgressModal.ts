@@ -27,7 +27,7 @@ export class WikiIngestProgressModal extends Modal {
     contentEl.empty();
     contentEl.addClass('wiki-ingest-progress-modal');
 
-    contentEl.createEl('h2', { text: 'Wiki 导入进度' });
+    contentEl.createEl('h2', { text: 'wiki 导入进度' });
 
     // 进度条容器
     const progressContainer = contentEl.createDiv({ cls: 'wiki-progress-container' });
@@ -119,7 +119,7 @@ export class WikiIngestProgressModal extends Modal {
 
     this.progressText.textContent = `${current} / ${total}`;
     this.percentageText.textContent = `${percentage}%`;
-    this.progressBar.style.width = `${percentage}%`;
+    this.progressBar.setCssProps({ '--wiki-progress-width': `${percentage}%` });
     this.currentFileText.textContent = `正在处理: ${currentFile}`;
 
     // 计算预估剩余时间
@@ -180,7 +180,7 @@ ${result.conflicts.length > 0 ? `冲突: ${result.conflicts.length}\n${result.co
    * 完成
    */
   complete(summary: string) {
-    this.progressBar.style.width = '100%';
+    this.progressBar.setCssProps({ '--wiki-progress-width': '100%' });
     this.percentageText.textContent = '100%';
     this.currentFileText.textContent = '✅ 导入完成！';
     this.etaText.textContent = '';

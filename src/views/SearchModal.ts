@@ -24,14 +24,14 @@ export class SearchModal extends Modal {
     // 输入区域
     const inputPanel = contentEl.createDiv({ cls: 'ai-rag-panel' });
     this.inputEl = inputPanel.createEl('textarea', {
+      cls: 'ai-rag-search-input',
       placeholder: '输入搜索关键词或问题...'
     });
-    this.inputEl.style.width = '100%';
-    this.inputEl.style.minHeight = '80px';
-    this.inputEl.style.marginBottom = '10px';
 
     const searchBtn = inputPanel.createEl('button', { text: '搜索' });
-    searchBtn.addEventListener('click', () => this.performSearch());
+    searchBtn.addEventListener('click', () => {
+      void this.performSearch();
+    });
 
     // 结果区域
     this.resultsEl = contentEl.createDiv({ cls: 'ai-rag-panel' });
@@ -70,7 +70,7 @@ export class SearchModal extends Modal {
       const resultList = this.resultsEl.createDiv({ cls: 'ai-rag-result-list' });
 
       results.forEach((result, index) => {
-        const card = resultList.createDiv({ cls: 'ai-rag-result-card' });
+        const card = resultList.createDiv({ cls: 'ai-rag-result-card ai-rag-clickable' });
 
         // 标题和分数
         const header = card.createDiv();
@@ -97,7 +97,6 @@ export class SearchModal extends Modal {
         location.setText(`${result.chunk.path}:${result.chunk.startLine}`);
 
         // 点击打开
-        card.style.cursor = 'pointer';
         card.addEventListener('click', () => {
           this.onSelect(result);
           this.close();

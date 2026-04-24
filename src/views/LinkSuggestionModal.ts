@@ -24,7 +24,7 @@ export class LinkSuggestionModal extends Modal {
     contentEl.addClass('ai-rag-link-modal');
     const t = (zh: string, en: string) => this.options.language === 'en' ? en : zh;
 
-    contentEl.createEl('h3', { text: t('发现可关联笔记', 'Suggested Related Notes') });
+    contentEl.createEl('h3', { text: t('发现可关联笔记', 'Suggested related notes') });
     contentEl.createEl('p', { text: `${t('当前笔记', 'Current note')}: ${this.options.sourcePath}` });
 
     const list = contentEl.createDiv({ cls: 'ai-rag-link-suggestion-list' });
@@ -47,22 +47,22 @@ export class LinkSuggestionModal extends Modal {
 
     const actions = contentEl.createDiv({ cls: 'ai-rag-correction-actions' });
     const laterBtn = actions.createEl('button', { text: t('稍后', 'Later') });
-    const selectedBtn = actions.createEl('button', { text: t('关联选中项', 'Link Selected') });
-    const allBtn = actions.createEl('button', { text: t('一键关联全部', 'Link All'), cls: 'mod-cta' });
+    const selectedBtn = actions.createEl('button', { text: t('关联选中项', 'Link selected') });
+    const allBtn = actions.createEl('button', { text: t('一键关联全部', 'Link all'), cls: 'mod-cta' });
 
     laterBtn.addEventListener('click', () => this.close());
 
-    selectedBtn.addEventListener('click', async () => {
+    selectedBtn.addEventListener('click', () => {
       const targets = Array.from(this.selected);
       if (targets.length === 0) {
         new Notice(t('请先至少选择一条关联笔记', 'Please select at least one suggested note'));
         return;
       }
-      await this.apply(targets);
+      void this.apply(targets);
     });
 
-    allBtn.addEventListener('click', async () => {
-      await this.apply(this.options.suggestions.map(item => item.targetPath));
+    allBtn.addEventListener('click', () => {
+      void this.apply(this.options.suggestions.map(item => item.targetPath));
     });
   }
 

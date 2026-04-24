@@ -1,4 +1,4 @@
-import { Citation, LayeredAskResult, PluginSettings } from '../types/index';
+import { Citation, LayeredAskResult, PluginSettings, SearchResult, WikiPage } from '../types/index';
 import { Retriever } from './Retriever';
 import { OpenAiCompatibleLlmClient } from './ApiClients';
 import { LoggingService } from './LoggingService';
@@ -182,7 +182,7 @@ export class RagChatService {
     };
   }
 
-  private buildContext(searchResults: any[], maxChars = this.maxContextChars): string {
+  private buildContext(searchResults: SearchResult[], maxChars = this.maxContextChars): string {
     let context = '';
     let currentLength = 0;
 
@@ -282,7 +282,7 @@ Question: ${question}
 Answer:`;
   }
 
-  private collectRawNotesFromWikiPages(pages: any[]): string[] {
+  private collectRawNotesFromWikiPages(pages: WikiPage[]): string[] {
     const rawNotes: string[] = [];
     for (const page of pages) {
       for (const link of page.links || []) {

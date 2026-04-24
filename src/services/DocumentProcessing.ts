@@ -8,7 +8,7 @@ export class ObsidianVaultScanner {
     this.app = app;
   }
 
-  async scanMarkdownFiles(): Promise<TFile[]> {
+  scanMarkdownFiles(): TFile[] {
     return this.app.vault.getMarkdownFiles();
   }
 
@@ -77,7 +77,6 @@ export interface RawChunk {
 
 export class DocumentChunker {
   private options: ChunkOptions;
-  private static readonly INVALID_CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 
   constructor(options: ChunkOptions) {
     this.options = options;
@@ -149,9 +148,7 @@ export class DocumentChunker {
     sectionPath: string
   ): RawChunk[] {
     const chunks: RawChunk[] = [];
-    const normalizedForCheck = content
-      .replace(DocumentChunker.INVALID_CONTROL_CHARS, ' ')
-      .trim();
+    const normalizedForCheck = this.replaceInvalidControlChars(content).trim();
 
     if (!normalizedForCheck) {
       return chunks;
@@ -170,7 +167,6 @@ export class DocumentChunker {
     }
 
     // 否则按 chunk size 分割
-    let start = 0;
     const lines = content.split('\n');
     let currentLines: string[] = [];
     let currentLength = 0;
@@ -217,6 +213,18 @@ export class DocumentChunker {
 
   private buildSectionPath(headingStack: string[]): string {
     return headingStack.length > 0 ? headingStack.join(' > ') : '';
+  }
+
+  private replaceInvalidControlChars(content: string): string {
+    return content
+      .split('')
+      .map(char => this.isInvalidControlChar(char) ? ' ' : char)
+      .join('');
+  }
+
+  private isInvalidControlChar(char: string): boolean {
+    const code = char.charCodeAt(0);
+    return code <= 8 || code === 11 || code === 12 || (code >= 14 && code <= 31) || code === 127;
   }
 }
 

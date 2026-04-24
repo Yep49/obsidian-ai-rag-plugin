@@ -1,7 +1,7 @@
 {
   "name": "obsidian-ai-rag-plugin",
   "version": "1.0.0",
-  "description": "Advanced Obsidian RAG plugin with a persistent LLM-maintained Wiki layer for compounding knowledge",
+  "description": "Advanced RAG assistant with a persistent LLM-maintained wiki layer for compounding knowledge",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",

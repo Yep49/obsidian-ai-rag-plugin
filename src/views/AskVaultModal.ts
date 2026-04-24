@@ -31,7 +31,7 @@ export class AskVaultModal extends Modal {
     contentEl.empty();
     contentEl.addClass('ai-rag-modal');
 
-    contentEl.createEl('h2', { text: this.plugin.t('知识库提问', 'Ask Vault') });
+    contentEl.createEl('h2', { text: this.plugin.t('知识库提问', 'Ask vault') });
 
     const inputPanel = contentEl.createDiv({ cls: 'ai-rag-panel' });
     this.inputEl = inputPanel.createEl('textarea', {
@@ -98,8 +98,8 @@ export class AskVaultModal extends Modal {
       header.createDiv({
         cls: 'ai-rag-source-chip',
         text: result.sourceLayer === 'faq'
-          ? this.plugin.t('FAQ 直答', 'FAQ Direct Answer')
-          : this.plugin.t('FAQ + Wiki + 向量', 'FAQ + Wiki + Vector')
+          ? this.plugin.t('FAQ 直答', 'FAQ direct answer')
+          : this.plugin.t('FAQ + wiki + 向量', 'FAQ + wiki + vector')
       });
 
       const timings = result.timings;
@@ -107,17 +107,17 @@ export class AskVaultModal extends Modal {
         answerDiv.createDiv({
           cls: 'ai-rag-muted ai-rag-timings',
           text: this.plugin.t(
-            `FAQ ${timings.faq.toFixed(0)}ms · Wiki ${timings.wiki.toFixed(0)}ms · 向量 ${timings.vector.toFixed(0)}ms · LLM ${timings.llm.toFixed(0)}ms · 总计 ${timings.total.toFixed(0)}ms`,
-            `FAQ ${timings.faq.toFixed(0)}ms · Wiki ${timings.wiki.toFixed(0)}ms · Vector ${timings.vector.toFixed(0)}ms · LLM ${timings.llm.toFixed(0)}ms · Total ${timings.total.toFixed(0)}ms`
+            `FAQ ${timings.faq.toFixed(0)}ms · wiki ${timings.wiki.toFixed(0)}ms · 向量 ${timings.vector.toFixed(0)}ms · LLM ${timings.llm.toFixed(0)}ms · 总计 ${timings.total.toFixed(0)}ms`,
+            `FAQ ${timings.faq.toFixed(0)}ms · wiki ${timings.wiki.toFixed(0)}ms · vector ${timings.vector.toFixed(0)}ms · LLM ${timings.llm.toFixed(0)}ms · total ${timings.total.toFixed(0)}ms`
           )
         });
       }
 
       const answerText = answerDiv.createDiv({ cls: 'ai-rag-answer-text markdown-rendered' });
-      await MarkdownRenderer.renderMarkdown(result.answer, answerText, '', this as any);
+      await MarkdownRenderer.render(this.app, result.answer, answerText, '', this.plugin);
 
       if (result.citations.length > 0) {
-        await this.renderCitations(answerDiv, result.citations);
+        this.renderCitations(answerDiv, result.citations);
       }
 
       await this.enhancementService.analyzeUserPattern(question);
@@ -131,14 +131,14 @@ export class AskVaultModal extends Modal {
     }
   }
 
-  private async renderCitations(container: HTMLElement, citations: Citation[]) {
+  private renderCitations(container: HTMLElement, citations: Citation[]): void {
     const citationsDiv = container.createDiv({ cls: 'ai-rag-citation-list' });
     citationsDiv.createEl('h4', { text: this.plugin.t('引用来源', 'Sources') });
 
     const groups: Array<{ title: string; items: Citation[] }> = [
       { title: 'FAQ', items: citations.filter(citation => citation.sourceLayer === 'faq') },
-      { title: 'Wiki', items: citations.filter(citation => citation.sourceLayer === 'wiki') },
-      { title: this.plugin.t('向量', 'Vector'), items: citations.filter(citation => citation.sourceLayer === 'vector') }
+      { title: 'wiki', items: citations.filter(citation => citation.sourceLayer === 'wiki') },
+      { title: this.plugin.t('向量', 'vector'), items: citations.filter(citation => citation.sourceLayer === 'vector') }
     ];
 
     for (const group of groups) {

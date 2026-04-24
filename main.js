@@ -29,10 +29,10 @@ var WikiAuditor_exports = {};
 __export(WikiAuditor_exports, {
   WikiAuditor: () => WikiAuditor
 });
-var import_obsidian18, WikiAuditor;
+var import_obsidian19, WikiAuditor;
 var init_WikiAuditor = __esm({
   "src/services/WikiAuditor.ts"() {
-    import_obsidian18 = require("obsidian");
+    import_obsidian19 = require("obsidian");
     WikiAuditor = class {
       constructor(app, wikiService, llmClient) {
         this.app = app;
@@ -52,7 +52,7 @@ var init_WikiAuditor = __esm({
           dataGaps: []
         };
         report.orphanPages = this.findOrphanPages(pages);
-        report.missingLinks = await this.findMissingLinks(pages);
+        report.missingLinks = this.findMissingLinks(pages);
         const llmChecks = await this.llmAuditPages(pages);
         report.contradictions = llmChecks.contradictions;
         report.outdatedInfo = llmChecks.outdatedInfo;
@@ -92,9 +92,8 @@ var init_WikiAuditor = __esm({
        * 查找缺失的交叉引用
        * 例如：页面 A 提到概念 B，但没有链接到 B 的页面
        */
-      async findMissingLinks(pages) {
+      findMissingLinks(pages) {
         const missingLinks = [];
-        const pageTitles = new Set(pages.map((p) => p.title.toLowerCase()));
         for (const page of pages) {
           const content = page.content.toLowerCase();
           for (const otherPage of pages) {
@@ -354,7 +353,7 @@ ${pagesContext}
 
 ${suggestions.map((s) => `- [[${s}]]`).join("\n")}`;
               const file = this.app.vault.getAbstractFileByPath(orphanPath);
-              if (file && file instanceof import_obsidian18.TFile) {
+              if (file && file instanceof import_obsidian19.TFile) {
                 const content = await this.app.vault.read(file);
                 if (!content.includes("## \u76F8\u5173\u9875\u9762")) {
                   await this.app.vault.modify(file, content + relatedSection);
@@ -414,7 +413,7 @@ ${otherPages.slice(0, 20).map((p) => `- ${p.title} (${p.type})`).join("\n")}
       async addInboundLinks(orphanPath, relatedPaths) {
         for (const relatedPath of relatedPaths.slice(0, 3)) {
           const relatedFile = this.app.vault.getAbstractFileByPath(relatedPath);
-          if (!(relatedFile instanceof import_obsidian18.TFile)) {
+          if (!(relatedFile instanceof import_obsidian19.TFile)) {
             continue;
           }
           const content = await this.app.vault.read(relatedFile);
@@ -439,7 +438,7 @@ __export(main_exports, {
   default: () => AiRagPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian19 = require("obsidian");
+var import_obsidian20 = require("obsidian");
 
 // src/views/SettingTab.ts
 var import_obsidian = require("obsidian");
@@ -492,87 +491,87 @@ var AiRagSettingTab = class extends import_obsidian.PluginSettingTab {
     containerEl.empty();
     const isZh = this.plugin.settings.language !== "en";
     const t = {
-      title: isZh ? "AI RAG \u641C\u7D22\u8BBE\u7F6E" : "AI RAG Search Settings",
+      title: isZh ? "AI RAG \u641C\u7D22\u8BBE\u7F6E" : "AI RAG search settings",
       language: isZh ? "\u8BED\u8A00 / Language" : "Language / \u8BED\u8A00",
       languageDesc: isZh ? "\u9009\u62E9\u8BBE\u7F6E\u9875\u548C\u63D2\u4EF6\u754C\u9762\u8BED\u8A00" : "Choose the settings and plugin UI language",
-      commandLanguage: isZh ? "Obsidian \u547D\u4EE4\u8BED\u8A00" : "Obsidian Command Language",
+      commandLanguage: isZh ? "\u547D\u4EE4\u8BED\u8A00" : "Command language",
       commandLanguageDesc: isZh ? "\u9009\u62E9\u547D\u4EE4\u9762\u677F\u4E2D\u672C\u63D2\u4EF6\u547D\u4EE4\u663E\u793A\u4E2D\u6587\u6216\u82F1\u6587" : "Choose whether this plugin shows command palette commands in Chinese or English",
-      apiSection: isZh ? "API \u914D\u7F6E" : "API Configuration",
+      apiSection: isZh ? "API \u914D\u7F6E" : "API configuration",
       provider: isZh ? "\u670D\u52A1\u5546" : "Provider",
       providerDesc: isZh ? "\u9009\u62E9\u5E38\u7528 API \u670D\u52A1\u5546" : "Pick a common API provider",
       custom: isZh ? "\u81EA\u5B9A\u4E49" : "Custom",
-      apiBaseUrl: isZh ? "API Base URL" : "API Base URL",
+      apiBaseUrl: isZh ? "API base URL" : "API base URL",
       apiBaseUrlDesc: isZh ? "\u804A\u5929 / \u95EE\u7B54 API \u5730\u5740" : "Chat / QA API endpoint URL",
-      apiKey: isZh ? "API \u5BC6\u94A5" : "API Key",
+      apiKey: isZh ? "API \u5BC6\u94A5" : "API key",
       apiKeyDesc: isZh ? "\u4F60\u7684 API \u5BC6\u94A5" : "Your API key",
-      chatModel: isZh ? "\u5BF9\u8BDD\u6A21\u578B" : "Chat Model",
+      chatModel: isZh ? "\u5BF9\u8BDD\u6A21\u578B" : "Chat model",
       chatModelDesc: isZh ? "\u7528\u4E8E\u5BF9\u8BDD / \u95EE\u7B54\u7684\u6A21\u578B" : "Model for chat / QA",
-      customChatModel: isZh ? "\u81EA\u5B9A\u4E49\u5BF9\u8BDD\u6A21\u578B" : "Custom Chat Model",
-      embeddingModel: isZh ? "\u5D4C\u5165\u6A21\u578B" : "Embedding Model",
+      customChatModel: isZh ? "\u81EA\u5B9A\u4E49\u5BF9\u8BDD\u6A21\u578B" : "Custom chat model",
+      embeddingModel: isZh ? "\u5D4C\u5165\u6A21\u578B" : "Embedding model",
       embeddingModelDesc: isZh ? "\u7528\u4E8E\u751F\u6210\u5411\u91CF\u5D4C\u5165\u7684\u6A21\u578B" : "Model for embeddings",
-      customEmbeddingModel: isZh ? "\u81EA\u5B9A\u4E49\u5D4C\u5165\u6A21\u578B" : "Custom Embedding Model",
-      embeddingSection: isZh ? "Embedding \u914D\u7F6E" : "Embedding Configuration",
-      embeddingProvider: isZh ? "Embedding \u670D\u52A1\u5546" : "Embedding Provider",
-      embeddingProviderDesc: isZh ? "\u9009\u62E9 Embedding API \u670D\u52A1\u5546" : "Select embedding API provider",
+      customEmbeddingModel: isZh ? "\u81EA\u5B9A\u4E49\u5D4C\u5165\u6A21\u578B" : "Custom embedding model",
+      embeddingSection: isZh ? "embedding \u914D\u7F6E" : "Embedding configuration",
+      embeddingProvider: isZh ? "embedding \u670D\u52A1\u5546" : "Embedding provider",
+      embeddingProviderDesc: isZh ? "\u9009\u62E9 embedding API \u670D\u52A1\u5546" : "Select embedding API provider",
       embeddingNone: isZh ? "\u4E0D\u4F7F\u7528\uFF08\u8DDF\u968F\u4E0A\u9762\u7684 API\uFF09" : "None (use above API)",
-      embeddingApiBaseUrl: isZh ? "Embedding API Base URL" : "Embedding API Base URL",
-      embeddingApiBaseUrlDesc: isZh ? "Embedding API \u7AEF\u70B9\u5730\u5740" : "Embedding API endpoint URL",
-      embeddingApiKey: isZh ? "Embedding API \u5BC6\u94A5" : "Embedding API Key",
-      embeddingApiKeyDesc: isZh ? "Embedding API \u5BC6\u94A5" : "Embedding API key",
-      embeddingCustomModel: isZh ? "\u81EA\u5B9A\u4E49\u5D4C\u5165\u6A21\u578B" : "Custom Embedding Model",
-      indexSection: isZh ? "\u7D22\u5F15\u8BBE\u7F6E" : "Index Settings",
-      chunkSize: isZh ? "\u5206\u5757\u5927\u5C0F" : "Chunk Size",
+      embeddingApiBaseUrl: isZh ? "embedding API base URL" : "Embedding API base URL",
+      embeddingApiBaseUrlDesc: isZh ? "embedding API \u7AEF\u70B9\u5730\u5740" : "Embedding API endpoint URL",
+      embeddingApiKey: isZh ? "embedding API \u5BC6\u94A5" : "Embedding API key",
+      embeddingApiKeyDesc: isZh ? "embedding API \u5BC6\u94A5" : "Embedding API key",
+      embeddingCustomModel: isZh ? "\u81EA\u5B9A\u4E49\u5D4C\u5165\u6A21\u578B" : "Custom embedding model",
+      indexSection: isZh ? "\u7D22\u5F15\u8BBE\u7F6E" : "Index settings",
+      chunkSize: isZh ? "\u5206\u5757\u5927\u5C0F" : "Chunk size",
       chunkSizeDesc: isZh ? "\u6BCF\u4E2A\u6587\u672C\u5757\u7684\u5B57\u7B26\u6570" : "Characters per chunk",
-      overlap: isZh ? "\u91CD\u53E0\u5B57\u7B26\u6570" : "Overlap Characters",
+      overlap: isZh ? "\u91CD\u53E0\u5B57\u7B26\u6570" : "Overlap characters",
       overlapDesc: isZh ? "\u76F8\u90BB\u6587\u672C\u5757\u4E4B\u95F4\u7684\u91CD\u53E0\u5B57\u7B26\u6570" : "Overlap between adjacent chunks",
-      autoIndex: isZh ? "\u6587\u4EF6\u53D8\u66F4\u65F6\u81EA\u52A8\u7D22\u5F15" : "Auto Index on File Change",
+      autoIndex: isZh ? "\u6587\u4EF6\u53D8\u66F4\u65F6\u81EA\u52A8\u7D22\u5F15" : "Auto index on file change",
       autoIndexDesc: isZh ? "\u6587\u4EF6\u4FEE\u6539\u65F6\u81EA\u52A8\u66F4\u65B0\u7D22\u5F15" : "Update index when files change",
-      searchSection: isZh ? "\u641C\u7D22\u8BBE\u7F6E" : "Search Settings",
-      topK: isZh ? "\u8FD4\u56DE\u7ED3\u679C\u6570\u91CF" : "Top K",
+      searchSection: isZh ? "\u641C\u7D22\u8BBE\u7F6E" : "Search settings",
+      topK: isZh ? "\u8FD4\u56DE\u7ED3\u679C\u6570\u91CF" : "Top k",
       topKDesc: isZh ? "\u6700\u7EC8\u8FD4\u56DE\u7684\u641C\u7D22\u7ED3\u679C\u6570\u91CF" : "Number of final search results",
-      hybridSearch: isZh ? "\u542F\u7528\u6DF7\u5408\u641C\u7D22" : "Enable Hybrid Search",
+      hybridSearch: isZh ? "\u542F\u7528\u6DF7\u5408\u641C\u7D22" : "Enable hybrid search",
       hybridSearchDesc: isZh ? "\u7ED3\u5408\u5411\u91CF\u641C\u7D22\u548C\u5173\u952E\u8BCD\u641C\u7D22" : "Combine vector search and keyword search",
-      maxContext: isZh ? "\u6700\u5927\u4E0A\u4E0B\u6587\u5B57\u7B26\u6570" : "Max Context Characters",
+      maxContext: isZh ? "\u6700\u5927\u4E0A\u4E0B\u6587\u5B57\u7B26\u6570" : "Max context characters",
       maxContextDesc: isZh ? "RAG \u95EE\u7B54\u65F6\u7684\u6700\u5927\u4E0A\u4E0B\u6587\u957F\u5EA6" : "Max context length for RAG QA",
-      answerSection: isZh ? "\u56DE\u7B54\u4E0E\u53CD\u9988\u4F18\u5316" : "Answer and Feedback Tuning",
-      faqThreshold: isZh ? "FAQ \u5F3A\u547D\u4E2D\u9608\u503C" : "FAQ Strong Match Threshold",
+      answerSection: isZh ? "\u56DE\u7B54\u4E0E\u53CD\u9988\u4F18\u5316" : "Answer and feedback tuning",
+      faqThreshold: isZh ? "FAQ \u5F3A\u547D\u4E2D\u9608\u503C" : "FAQ strong match threshold",
       faqThresholdDesc: isZh ? "\u8D8A\u4F4E\u8D8A\u5BB9\u6613\u76F4\u63A5\u4F7F\u7528 FAQ \u76F4\u7B54" : "Lower values make FAQ direct answers easier to trigger",
-      wikiRatio: isZh ? "Wiki \u4E0A\u4E0B\u6587\u6BD4\u4F8B" : "Wiki Context Ratio",
-      wikiRatioDesc: isZh ? "\u5206\u914D\u7ED9 Wiki \u56FE\u8C31\u4E0A\u4E0B\u6587\u7684\u6BD4\u4F8B" : "Portion of context budget reserved for Wiki graph context",
-      vectorRatio: isZh ? "\u5411\u91CF\u4E0A\u4E0B\u6587\u6BD4\u4F8B" : "Vector Context Ratio",
+      wikiRatio: isZh ? "wiki \u4E0A\u4E0B\u6587\u6BD4\u4F8B" : "wiki context ratio",
+      wikiRatioDesc: isZh ? "\u5206\u914D\u7ED9 wiki \u56FE\u8C31\u4E0A\u4E0B\u6587\u7684\u6BD4\u4F8B" : "Portion of context budget reserved for wiki graph context",
+      vectorRatio: isZh ? "\u5411\u91CF\u4E0A\u4E0B\u6587\u6BD4\u4F8B" : "Vector context ratio",
       vectorRatioDesc: isZh ? "\u5206\u914D\u7ED9\u5411\u91CF\u53EC\u56DE\u4E0A\u4E0B\u6587\u7684\u6BD4\u4F8B" : "Portion of context budget reserved for vector recall context",
-      answerTemplate: isZh ? "\u56DE\u7B54\u6A21\u677F" : "Answer Template",
+      answerTemplate: isZh ? "\u56DE\u7B54\u6A21\u677F" : "Answer template",
       answerTemplateDesc: isZh ? "\u7ED3\u6784\u5316\u56DE\u7B54\u66F4\u6E05\u6670\uFF0C\u7B80\u6D01\u56DE\u7B54\u66F4\u7D27\u51D1" : "Structured answers are clearer; concise answers are tighter",
       answerTemplateStructured: isZh ? "\u7ED3\u6784\u5316" : "Structured",
       answerTemplateConcise: isZh ? "\u7B80\u6D01" : "Concise",
-      advancedSection: isZh ? "\u9AD8\u7EA7\u641C\u7D22" : "Advanced Search",
+      advancedSection: isZh ? "\u9AD8\u7EA7\u641C\u7D22" : "Advanced search",
       advancedDesc: isZh ? "\u5305\u542B\u67E5\u8BE2\u5206\u6790\u3001\u591A\u8DEF\u53EC\u56DE\u3001\u91CD\u6392\u5E8F\u3001\u4E0A\u4E0B\u6587\u538B\u7F29\u7B49\u9AD8\u7EA7\u529F\u80FD" : "Includes query analysis, multi-recall, reranking, and context compression",
-      wikiSection: isZh ? "Wiki \u8BBE\u7F6E" : "Wiki Settings",
-      wikiDesc: isZh ? "LLM Wiki\uFF1A\u4F7F\u7528 LLM \u7EF4\u62A4\u7ED3\u6784\u5316\u77E5\u8BC6\u5E93\uFF0C\u6301\u4E45\u5316\u77E5\u8BC6\u79EF\u7D2F" : "LLM Wiki: use an LLM to maintain a structured knowledge base",
-      wikiEnable: isZh ? "\u542F\u7528 Wiki" : "Enable Wiki",
-      wikiEnableDesc: isZh ? "\u542F\u7528\u6301\u4E45 LLM Wiki \u529F\u80FD" : "Enable persistent LLM Wiki support",
-      wikiPath: isZh ? "Wiki \u8DEF\u5F84" : "Wiki Path",
-      wikiPathDesc: isZh ? "Wiki \u76EE\u5F55\u8DEF\u5F84\uFF08\u76F8\u5BF9\u4E8E vault \u6839\u76EE\u5F55\uFF09" : "Wiki directory path relative to the vault root",
-      wikiAutoIngest: isZh ? "\u81EA\u52A8\u5BFC\u5165" : "Auto Ingest",
-      wikiAutoIngestDesc: isZh ? "\u6587\u4EF6\u53D8\u66F4\u540E\u81EA\u52A8\u628A\u975E Wiki \u7B14\u8BB0\u5BFC\u5165\u5230 Wiki\uFF08\u5B9E\u9A8C\u6027\uFF0C\u53EF\u80FD\u6D88\u8017 API\uFF09" : "Automatically ingest changed non-Wiki notes into the Wiki (experimental, may use API credits)",
-      wikiPriority: isZh ? "Wiki \u4F18\u5148\u7EA7" : "Wiki Priority",
-      wikiPriorityDesc: isZh ? "Wiki \u9875\u9762\u5728\u68C0\u7D22\u4E2D\u7684\u6743\u91CD\u63D0\u5347\u500D\u6570\uFF081.0 = \u65E0\u63D0\u5347\uFF09" : "Wiki page priority multiplier in search (1.0 = no boost)"
+      wikiSection: isZh ? "wiki \u8BBE\u7F6E" : "wiki settings",
+      wikiDesc: isZh ? "LLM wiki\uFF1A\u4F7F\u7528 LLM \u7EF4\u62A4\u7ED3\u6784\u5316\u77E5\u8BC6\u5E93\uFF0C\u6301\u4E45\u5316\u77E5\u8BC6\u79EF\u7D2F" : "LLM wiki: use an LLM to maintain a structured knowledge base",
+      wikiEnable: isZh ? "\u542F\u7528 wiki" : "Enable wiki",
+      wikiEnableDesc: isZh ? "\u542F\u7528\u6301\u4E45 LLM wiki \u529F\u80FD" : "Enable persistent LLM wiki support",
+      wikiPath: isZh ? "wiki \u8DEF\u5F84" : "wiki path",
+      wikiPathDesc: isZh ? "wiki \u76EE\u5F55\u8DEF\u5F84\uFF08\u76F8\u5BF9\u4E8E vault \u6839\u76EE\u5F55\uFF09" : "wiki directory path relative to the vault root",
+      wikiAutoIngest: isZh ? "\u81EA\u52A8\u5BFC\u5165" : "Auto ingest",
+      wikiAutoIngestDesc: isZh ? "\u6587\u4EF6\u53D8\u66F4\u540E\u81EA\u52A8\u628A\u975E wiki \u7B14\u8BB0\u5BFC\u5165\u5230 wiki\uFF08\u5B9E\u9A8C\u6027\uFF0C\u53EF\u80FD\u6D88\u8017 API\uFF09" : "Automatically ingest changed non-wiki notes into the wiki (experimental, may use API credits)",
+      wikiPriority: isZh ? "wiki \u4F18\u5148\u7EA7" : "wiki priority",
+      wikiPriorityDesc: isZh ? "wiki \u9875\u9762\u5728\u68C0\u7D22\u4E2D\u7684\u6743\u91CD\u63D0\u5347\u500D\u6570\uFF081.0 = \u65E0\u63D0\u5347\uFF09" : "wiki page priority multiplier in search (1.0 = no boost)"
     };
-    containerEl.createEl("h2", { text: t.title });
-    new import_obsidian.Setting(containerEl).setName(t.language).setDesc(t.languageDesc).addDropdown((dropdown) => dropdown.addOption("zh-CN", "\u4E2D\u6587").addOption("en", "English").setValue(this.plugin.settings.language || "zh-CN").onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.title).setHeading();
+    new import_obsidian.Setting(containerEl).setName(t.language).setDesc(t.languageDesc).addDropdown((dropdown) => dropdown.addOption("zh-CN", "\u4E2D\u6587").addOption("en", "English").setValue(this.plugin.settings.language || "zh-CN").onChange((value) => {
       this.plugin.settings.language = value;
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
       this.plugin.refreshLocalizedCommandLabels();
       new import_obsidian.Notice(value === "zh-CN" ? "\u8BED\u8A00\u5DF2\u5207\u6362\u4E3A\u4E2D\u6587" : "Language switched to English");
       this.display();
     }));
-    new import_obsidian.Setting(containerEl).setName(t.commandLanguage).setDesc(t.commandLanguageDesc).addDropdown((dropdown) => dropdown.addOption("zh-CN", "\u4E2D\u6587").addOption("en", "English").setValue(this.plugin.settings.commandLanguage || this.plugin.settings.language || "zh-CN").onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.commandLanguage).setDesc(t.commandLanguageDesc).addDropdown((dropdown) => dropdown.addOption("zh-CN", "\u4E2D\u6587").addOption("en", "English").setValue(this.plugin.settings.commandLanguage || this.plugin.settings.language || "zh-CN").onChange((value) => {
       this.plugin.settings.commandLanguage = value;
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
       this.plugin.refreshLocalizedCommandLabels();
       new import_obsidian.Notice(value === "zh-CN" ? "\u547D\u4EE4\u8BED\u8A00\u5DF2\u5207\u6362\u4E3A\u4E2D\u6587" : "Command language switched to English");
     }));
-    containerEl.createEl("h3", { text: t.apiSection });
+    new import_obsidian.Setting(containerEl).setName(t.apiSection).setHeading();
     const currentProvider = this.getProviderByBaseUrl(this.plugin.settings.apiBaseUrl);
     new import_obsidian.Setting(containerEl).setName(t.provider).setDesc(t.providerDesc).addDropdown((dropdown) => {
       dropdown.addOption("custom", t.custom);
@@ -580,10 +579,10 @@ var AiRagSettingTab = class extends import_obsidian.PluginSettingTab {
         dropdown.addOption(provider.name, provider.name);
       });
       dropdown.setValue(currentProvider ? currentProvider.name : "custom");
-      dropdown.onChange(async (value) => {
+      dropdown.onChange((value) => {
         if (value === "custom") {
           this.plugin.settings.provider = "custom";
-          await this.plugin.saveSettings();
+          void this.plugin.saveSettings();
           return;
         }
         const provider = this.getProviderByName(value);
@@ -598,20 +597,20 @@ var AiRagSettingTab = class extends import_obsidian.PluginSettingTab {
         if (provider.embeddingModels.length > 0) {
           this.plugin.settings.embeddingModel = provider.embeddingModels[0];
         }
-        await this.plugin.saveSettings();
+        void this.plugin.saveSettings();
         this.plugin.rebuildServices();
         this.display();
       });
     });
-    new import_obsidian.Setting(containerEl).setName(t.apiBaseUrl).setDesc(t.apiBaseUrlDesc).addText((text) => text.setPlaceholder("https://api.openai.com/v1").setValue(this.plugin.settings.apiBaseUrl).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.apiBaseUrl).setDesc(t.apiBaseUrlDesc).addText((text) => text.setPlaceholder("https://api.openai.com/v1").setValue(this.plugin.settings.apiBaseUrl).onChange((value) => {
       this.plugin.settings.apiBaseUrl = value.trim();
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
       this.plugin.rebuildServices();
       this.display();
     }));
-    new import_obsidian.Setting(containerEl).setName(t.apiKey).setDesc(t.apiKeyDesc).addText((text) => text.setPlaceholder("sk-...").setValue(this.plugin.settings.apiKey).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.apiKey).setDesc(t.apiKeyDesc).addText((text) => text.setPlaceholder("sk-...").setValue(this.plugin.settings.apiKey).onChange((value) => {
       this.plugin.settings.apiKey = value.trim();
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
       this.plugin.rebuildServices();
     }));
     new import_obsidian.Setting(containerEl).setName(t.chatModel).setDesc(t.chatModelDesc).addDropdown((dropdown) => {
@@ -621,13 +620,13 @@ var AiRagSettingTab = class extends import_obsidian.PluginSettingTab {
         });
         dropdown.addOption("custom", t.custom);
         dropdown.setValue(currentProvider.models.includes(this.plugin.settings.chatModel) ? this.plugin.settings.chatModel : "custom");
-        dropdown.onChange(async (value) => {
+        dropdown.onChange((value) => {
           if (value === "custom") {
             this.display();
             return;
           }
           this.plugin.settings.chatModel = value;
-          await this.plugin.saveSettings();
+          void this.plugin.saveSettings();
           this.plugin.rebuildServices();
           this.display();
         });
@@ -640,13 +639,13 @@ var AiRagSettingTab = class extends import_obsidian.PluginSettingTab {
       }
     });
     if (!currentProvider || currentProvider.models.length === 0 || !currentProvider.models.includes(this.plugin.settings.chatModel)) {
-      new import_obsidian.Setting(containerEl).setName(t.customChatModel).setDesc(t.chatModelDesc).addText((text) => text.setPlaceholder("gpt-3.5-turbo").setValue(this.plugin.settings.chatModel).onChange(async (value) => {
+      new import_obsidian.Setting(containerEl).setName(t.customChatModel).setDesc(t.chatModelDesc).addText((text) => text.setPlaceholder("gpt-3.5-turbo").setValue(this.plugin.settings.chatModel).onChange((value) => {
         this.plugin.settings.chatModel = value.trim();
-        await this.plugin.saveSettings();
+        void this.plugin.saveSettings();
         this.plugin.rebuildServices();
       }));
     }
-    containerEl.createEl("h3", { text: t.embeddingSection });
+    new import_obsidian.Setting(containerEl).setName(t.embeddingSection).setHeading();
     const currentEmbeddingProvider = this.getProviderByBaseUrl(this.plugin.settings.embeddingApiBaseUrl || "");
     new import_obsidian.Setting(containerEl).setName(t.embeddingProvider).setDesc(t.embeddingProviderDesc).addDropdown((dropdown) => {
       dropdown.addOption("none", t.embeddingNone);
@@ -658,11 +657,11 @@ var AiRagSettingTab = class extends import_obsidian.PluginSettingTab {
       dropdown.addOption("custom", t.custom);
       const selected = !this.plugin.settings.embeddingApiBaseUrl ? "none" : currentEmbeddingProvider ? currentEmbeddingProvider.name : "custom";
       dropdown.setValue(selected);
-      dropdown.onChange(async (value) => {
+      dropdown.onChange((value) => {
         if (value === "none") {
           this.plugin.settings.embeddingApiBaseUrl = "";
           this.plugin.settings.embeddingApiKey = "";
-          await this.plugin.saveSettings();
+          void this.plugin.saveSettings();
           this.plugin.rebuildServices();
           this.display();
           return;
@@ -679,20 +678,20 @@ var AiRagSettingTab = class extends import_obsidian.PluginSettingTab {
         if (provider.embeddingModels.length > 0) {
           this.plugin.settings.embeddingModel = provider.embeddingModels[0];
         }
-        await this.plugin.saveSettings();
+        void this.plugin.saveSettings();
         this.plugin.rebuildServices();
         this.display();
       });
     });
-    new import_obsidian.Setting(containerEl).setName(t.embeddingApiBaseUrl).setDesc(t.embeddingApiBaseUrlDesc).addText((text) => text.setPlaceholder("https://api.siliconflow.cn/v1").setValue(this.plugin.settings.embeddingApiBaseUrl || "").onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.embeddingApiBaseUrl).setDesc(t.embeddingApiBaseUrlDesc).addText((text) => text.setPlaceholder("https://api.siliconflow.cn/v1").setValue(this.plugin.settings.embeddingApiBaseUrl || "").onChange((value) => {
       this.plugin.settings.embeddingApiBaseUrl = value.trim();
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
       this.plugin.rebuildServices();
       this.display();
     }));
-    new import_obsidian.Setting(containerEl).setName(t.embeddingApiKey).setDesc(t.embeddingApiKeyDesc).addText((text) => text.setPlaceholder("sk-...").setValue(this.plugin.settings.embeddingApiKey || "").onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.embeddingApiKey).setDesc(t.embeddingApiKeyDesc).addText((text) => text.setPlaceholder("sk-...").setValue(this.plugin.settings.embeddingApiKey || "").onChange((value) => {
       this.plugin.settings.embeddingApiKey = value.trim();
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
       this.plugin.rebuildServices();
     }));
     new import_obsidian.Setting(containerEl).setName(t.embeddingModel).setDesc(t.embeddingModelDesc).addDropdown((dropdown) => {
@@ -702,13 +701,13 @@ var AiRagSettingTab = class extends import_obsidian.PluginSettingTab {
         });
         dropdown.addOption("custom", t.custom);
         dropdown.setValue(currentEmbeddingProvider.embeddingModels.includes(this.plugin.settings.embeddingModel) ? this.plugin.settings.embeddingModel : "custom");
-        dropdown.onChange(async (value) => {
+        dropdown.onChange((value) => {
           if (value === "custom") {
             this.display();
             return;
           }
           this.plugin.settings.embeddingModel = value;
-          await this.plugin.saveSettings();
+          void this.plugin.saveSettings();
           this.showRebuildWarning(isZh ? "\u5D4C\u5165\u6A21\u578B\u5DF2\u66F4\u6539" : "Embedding model changed");
           this.display();
         });
@@ -721,99 +720,99 @@ var AiRagSettingTab = class extends import_obsidian.PluginSettingTab {
       }
     });
     if (!currentEmbeddingProvider || currentEmbeddingProvider.embeddingModels.length === 0 || !currentEmbeddingProvider.embeddingModels.includes(this.plugin.settings.embeddingModel)) {
-      new import_obsidian.Setting(containerEl).setName(t.customEmbeddingModel).setDesc(t.embeddingModelDesc).addText((text) => text.setPlaceholder("BAAI/bge-m3").setValue(this.plugin.settings.embeddingModel).onChange(async (value) => {
+      new import_obsidian.Setting(containerEl).setName(t.customEmbeddingModel).setDesc(t.embeddingModelDesc).addText((text) => text.setPlaceholder("BAAI/bge-m3").setValue(this.plugin.settings.embeddingModel).onChange((value) => {
         this.plugin.settings.embeddingModel = value.trim();
-        await this.plugin.saveSettings();
+        void this.plugin.saveSettings();
         this.showRebuildWarning(isZh ? "\u5D4C\u5165\u6A21\u578B\u5DF2\u66F4\u6539" : "Embedding model changed");
       }));
     }
-    containerEl.createEl("h3", { text: t.indexSection });
-    new import_obsidian.Setting(containerEl).setName(t.chunkSize).setDesc(t.chunkSizeDesc).addText((text) => text.setPlaceholder("800").setValue(String(this.plugin.settings.chunkSize)).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.indexSection).setHeading();
+    new import_obsidian.Setting(containerEl).setName(t.chunkSize).setDesc(t.chunkSizeDesc).addText((text) => text.setPlaceholder("800").setValue(String(this.plugin.settings.chunkSize)).onChange((value) => {
       this.plugin.settings.chunkSize = parseInt(value) || 800;
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
       this.showRebuildWarning(isZh ? "\u5206\u5757\u5927\u5C0F\u5DF2\u66F4\u6539" : "Chunk size changed");
     }));
-    new import_obsidian.Setting(containerEl).setName(t.overlap).setDesc(t.overlapDesc).addText((text) => text.setPlaceholder("150").setValue(String(this.plugin.settings.overlap)).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.overlap).setDesc(t.overlapDesc).addText((text) => text.setPlaceholder("150").setValue(String(this.plugin.settings.overlap)).onChange((value) => {
       this.plugin.settings.overlap = parseInt(value) || 150;
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
       this.showRebuildWarning(isZh ? "\u91CD\u53E0\u5B57\u7B26\u6570\u5DF2\u66F4\u6539" : "Overlap changed");
     }));
-    new import_obsidian.Setting(containerEl).setName(t.autoIndex).setDesc(t.autoIndexDesc).addToggle((toggle) => toggle.setValue(this.plugin.settings.autoIndexOnFileChange).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.autoIndex).setDesc(t.autoIndexDesc).addToggle((toggle) => toggle.setValue(this.plugin.settings.autoIndexOnFileChange).onChange((value) => {
       this.plugin.settings.autoIndexOnFileChange = value;
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
       this.plugin.syncScheduler();
     }));
-    containerEl.createEl("h3", { text: t.searchSection });
-    new import_obsidian.Setting(containerEl).setName(t.topK).setDesc(t.topKDesc).addText((text) => text.setPlaceholder("6").setValue(String(this.plugin.settings.topK)).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.searchSection).setHeading();
+    new import_obsidian.Setting(containerEl).setName(t.topK).setDesc(t.topKDesc).addText((text) => text.setPlaceholder("6").setValue(String(this.plugin.settings.topK)).onChange((value) => {
       this.plugin.settings.topK = parseInt(value) || 6;
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
     }));
-    new import_obsidian.Setting(containerEl).setName(t.hybridSearch).setDesc(t.hybridSearchDesc).addToggle((toggle) => toggle.setValue(this.plugin.settings.enableHybridSearch).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.hybridSearch).setDesc(t.hybridSearchDesc).addToggle((toggle) => toggle.setValue(this.plugin.settings.enableHybridSearch).onChange((value) => {
       this.plugin.settings.enableHybridSearch = value;
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
     }));
-    new import_obsidian.Setting(containerEl).setName(t.maxContext).setDesc(t.maxContextDesc).addText((text) => text.setPlaceholder("6000").setValue(String(this.plugin.settings.maxContextChars)).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.maxContext).setDesc(t.maxContextDesc).addText((text) => text.setPlaceholder("6000").setValue(String(this.plugin.settings.maxContextChars)).onChange((value) => {
       this.plugin.settings.maxContextChars = parseInt(value) || 6e3;
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
     }));
-    containerEl.createEl("h3", { text: t.answerSection });
-    new import_obsidian.Setting(containerEl).setName(t.faqThreshold).setDesc(t.faqThresholdDesc).addText((text) => text.setPlaceholder("0.88").setValue(String(this.plugin.settings.faqStrongMatchThreshold)).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.answerSection).setHeading();
+    new import_obsidian.Setting(containerEl).setName(t.faqThreshold).setDesc(t.faqThresholdDesc).addText((text) => text.setPlaceholder("0.88").setValue(String(this.plugin.settings.faqStrongMatchThreshold)).onChange((value) => {
       this.plugin.settings.faqStrongMatchThreshold = parseFloat(value) || 0.88;
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
       this.plugin.rebuildServices();
     }));
-    new import_obsidian.Setting(containerEl).setName(t.wikiRatio).setDesc(t.wikiRatioDesc).addText((text) => text.setPlaceholder("0.35").setValue(String(this.plugin.settings.wikiContextRatio)).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.wikiRatio).setDesc(t.wikiRatioDesc).addText((text) => text.setPlaceholder("0.35").setValue(String(this.plugin.settings.wikiContextRatio)).onChange((value) => {
       this.plugin.settings.wikiContextRatio = parseFloat(value) || 0.35;
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
       this.plugin.rebuildServices();
     }));
-    new import_obsidian.Setting(containerEl).setName(t.vectorRatio).setDesc(t.vectorRatioDesc).addText((text) => text.setPlaceholder("0.35").setValue(String(this.plugin.settings.vectorContextRatio)).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.vectorRatio).setDesc(t.vectorRatioDesc).addText((text) => text.setPlaceholder("0.35").setValue(String(this.plugin.settings.vectorContextRatio)).onChange((value) => {
       this.plugin.settings.vectorContextRatio = parseFloat(value) || 0.35;
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
       this.plugin.rebuildServices();
     }));
-    new import_obsidian.Setting(containerEl).setName(t.answerTemplate).setDesc(t.answerTemplateDesc).addDropdown((dropdown) => dropdown.addOption("structured", t.answerTemplateStructured).addOption("concise", t.answerTemplateConcise).setValue(this.plugin.settings.answerTemplate).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.answerTemplate).setDesc(t.answerTemplateDesc).addDropdown((dropdown) => dropdown.addOption("structured", t.answerTemplateStructured).addOption("concise", t.answerTemplateConcise).setValue(this.plugin.settings.answerTemplate).onChange((value) => {
       this.plugin.settings.answerTemplate = value;
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
       this.plugin.rebuildServices();
     }));
-    containerEl.createEl("h3", { text: t.advancedSection });
+    new import_obsidian.Setting(containerEl).setName(t.advancedSection).setHeading();
     containerEl.createEl("p", {
       text: t.advancedDesc,
       cls: "setting-item-description"
     });
-    new import_obsidian.Setting(containerEl).setName(isZh ? "\u542F\u7528\u67E5\u8BE2\u5206\u6790" : "Enable Query Analysis").setDesc(isZh ? "\u72EC\u7ACB\u95EE\u9898\u751F\u6210\u3001\u67E5\u8BE2\u53D8\u4F53\u3001\u8FC7\u6EE4\u5668\u63A8\u65AD" : "Standalone question generation, query variants, and filter inference").addToggle((toggle) => toggle.setValue(true).setDisabled(true));
-    new import_obsidian.Setting(containerEl).setName(isZh ? "\u542F\u7528\u91CD\u6392\u5E8F" : "Enable Reranking").setDesc(isZh ? "\u4F7F\u7528 LLM \u5BF9\u5019\u9009\u7ED3\u679C\u91CD\u65B0\u6392\u5E8F\u4EE5\u63D0\u9AD8\u76F8\u5173\u6027" : "Use an LLM to rerank candidates for better relevance").addToggle((toggle) => toggle.setValue(true).setDisabled(true));
-    new import_obsidian.Setting(containerEl).setName(isZh ? "\u542F\u7528\u4E0A\u4E0B\u6587\u538B\u7F29" : "Enable Context Compression").setDesc(isZh ? "\u7236\u5B50\u6587\u672C\u5757\u3001\u53E5\u5B50\u7A97\u53E3\u3001token \u9884\u7B97\u7BA1\u7406" : "Parent/child blocks, sentence windows, and token budget management").addToggle((toggle) => toggle.setValue(true).setDisabled(true));
-    containerEl.createEl("h3", { text: t.wikiSection });
+    new import_obsidian.Setting(containerEl).setName(isZh ? "\u542F\u7528\u67E5\u8BE2\u5206\u6790" : "Enable query analysis").setDesc(isZh ? "\u72EC\u7ACB\u95EE\u9898\u751F\u6210\u3001\u67E5\u8BE2\u53D8\u4F53\u3001\u8FC7\u6EE4\u5668\u63A8\u65AD" : "Standalone question generation, query variants, and filter inference").addToggle((toggle) => toggle.setValue(true).setDisabled(true));
+    new import_obsidian.Setting(containerEl).setName(isZh ? "\u542F\u7528\u91CD\u6392\u5E8F" : "Enable reranking").setDesc(isZh ? "\u4F7F\u7528 LLM \u5BF9\u5019\u9009\u7ED3\u679C\u91CD\u65B0\u6392\u5E8F\u4EE5\u63D0\u9AD8\u76F8\u5173\u6027" : "Use an LLM to rerank candidates for better relevance").addToggle((toggle) => toggle.setValue(true).setDisabled(true));
+    new import_obsidian.Setting(containerEl).setName(isZh ? "\u542F\u7528\u4E0A\u4E0B\u6587\u538B\u7F29" : "Enable context compression").setDesc(isZh ? "\u7236\u5B50\u6587\u672C\u5757\u3001\u53E5\u5B50\u7A97\u53E3\u3001token \u9884\u7B97\u7BA1\u7406" : "Parent/child blocks, sentence windows, and token budget management").addToggle((toggle) => toggle.setValue(true).setDisabled(true));
+    new import_obsidian.Setting(containerEl).setName(t.wikiSection).setHeading();
     containerEl.createEl("p", {
       text: t.wikiDesc,
       cls: "setting-item-description"
     });
-    new import_obsidian.Setting(containerEl).setName(t.wikiEnable).setDesc(t.wikiEnableDesc).addToggle((toggle) => toggle.setValue(this.plugin.settings.enableWiki).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.wikiEnable).setDesc(t.wikiEnableDesc).addToggle((toggle) => toggle.setValue(this.plugin.settings.enableWiki).onChange((value) => {
       this.plugin.settings.enableWiki = value;
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
       this.plugin.rebuildServices();
       if (value) {
-        new import_obsidian.Notice(isZh ? 'Wiki \u5DF2\u542F\u7528\uFF0C\u8BF7\u8FD0\u884C "Initialize Wiki" \u547D\u4EE4\u521D\u59CB\u5316' : 'Wiki enabled. Run the "Initialize Wiki" command to initialize it.');
+        new import_obsidian.Notice(isZh ? 'wiki \u5DF2\u542F\u7528\uFF0C\u8BF7\u8FD0\u884C "Initialize wiki" \u547D\u4EE4\u521D\u59CB\u5316' : 'wiki enabled. Run the "Initialize wiki" command to initialize it.');
       }
     }));
-    new import_obsidian.Setting(containerEl).setName(t.wikiPath).setDesc(t.wikiPathDesc).addText((text) => text.setPlaceholder("_wiki").setValue(this.plugin.settings.wikiPath).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.wikiPath).setDesc(t.wikiPathDesc).addText((text) => text.setPlaceholder("_wiki").setValue(this.plugin.settings.wikiPath).onChange((value) => {
       this.plugin.settings.wikiPath = value || "_wiki";
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
       this.plugin.rebuildServices();
     }));
-    new import_obsidian.Setting(containerEl).setName(t.wikiAutoIngest).setDesc(t.wikiAutoIngestDesc).addToggle((toggle) => toggle.setValue(this.plugin.settings.wikiAutoIngest).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.wikiAutoIngest).setDesc(t.wikiAutoIngestDesc).addToggle((toggle) => toggle.setValue(this.plugin.settings.wikiAutoIngest).onChange((value) => {
       this.plugin.settings.wikiAutoIngest = value;
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
     }));
-    new import_obsidian.Setting(containerEl).setName(t.wikiPriority).setDesc(t.wikiPriorityDesc).addText((text) => text.setPlaceholder("1.5").setValue(String(this.plugin.settings.wikiPriority)).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(t.wikiPriority).setDesc(t.wikiPriorityDesc).addText((text) => text.setPlaceholder("1.5").setValue(String(this.plugin.settings.wikiPriority)).onChange((value) => {
       this.plugin.settings.wikiPriority = parseFloat(value) || 1.5;
-      await this.plugin.saveSettings();
+      void this.plugin.saveSettings();
     }));
   }
   showRebuildWarning(reason) {
-    new import_obsidian.Notice(`\u26A0\uFE0F ${reason}\u3002\u8BF7\u8FD0\u884C "Build AI Index" \u547D\u4EE4\u91CD\u5EFA\u7D22\u5F15\u4EE5\u5E94\u7528\u65B0\u8BBE\u7F6E\u3002`, 8e3);
+    new import_obsidian.Notice(`\u26A0\uFE0F ${reason}\u3002\u8BF7\u8FD0\u884C "Build AI index" \u547D\u4EE4\u91CD\u5EFA\u7D22\u5F15\u4EE5\u5E94\u7528\u65B0\u8BBE\u7F6E\u3002`, 8e3);
   }
 };
 
@@ -830,17 +829,17 @@ var AiRagSidebarView = class extends import_obsidian2.ItemView {
     return AI_RAG_SIDEBAR_VIEW;
   }
   getDisplayText() {
-    return this.plugin.t("AI RAG \u52A9\u624B", "AI RAG Assistant");
+    return this.plugin.t("AI RAG \u52A9\u624B", "AI RAG assistant");
   }
   getIcon() {
     return "message-circle";
   }
-  async onOpen() {
+  onOpen() {
     const container = this.containerEl.children[1];
     container.empty();
     container.addClass("ai-rag-sidebar");
     const header = container.createDiv({ cls: "ai-rag-sidebar-header" });
-    header.createEl("h4", { text: this.plugin.t("AI RAG \u52A9\u624B", "AI RAG Assistant") });
+    header.createEl("h4", { text: this.plugin.t("AI RAG \u52A9\u624B", "AI RAG assistant") });
     this.chatEl = container.createDiv({ cls: "ai-rag-sidebar-chat" });
     this.renderWelcome();
     const inputContainer = container.createDiv({ cls: "ai-rag-sidebar-input" });
@@ -860,6 +859,7 @@ var AiRagSidebarView = class extends import_obsidian2.ItemView {
         void this.sendMessage();
       }
     });
+    return Promise.resolve();
   }
   renderWelcome() {
     this.chatEl.empty();
@@ -923,7 +923,7 @@ var AiRagSidebarView = class extends import_obsidian2.ItemView {
     });
     const content = bubble.createDiv({ cls: "ai-rag-bubble-content markdown-rendered" });
     if (message.role === "ai") {
-      await import_obsidian2.MarkdownRenderer.renderMarkdown(message.content, content, "", this);
+      await import_obsidian2.MarkdownRenderer.render(this.app, message.content, content, "", this);
     } else {
       content.setText(message.content);
     }
@@ -948,7 +948,7 @@ var AiRagSidebarView = class extends import_obsidian2.ItemView {
           cls: "ai-rag-sidebar-citation-link"
         });
         link.addEventListener("click", () => {
-          this.plugin.openCitation(citation);
+          void this.plugin.openCitation(citation);
         });
         if (index < message.citations.length - 1) {
           citationsDiv.appendText(" ");
@@ -961,7 +961,8 @@ var AiRagSidebarView = class extends import_obsidian2.ItemView {
     this.messages = [];
     this.renderWelcome();
   }
-  async onClose() {
+  onClose() {
+    return Promise.resolve();
   }
 };
 
@@ -980,13 +981,13 @@ var SearchModal = class extends import_obsidian3.Modal {
     contentEl.createEl("h2", { text: "\u8BED\u4E49\u641C\u7D22" });
     const inputPanel = contentEl.createDiv({ cls: "ai-rag-panel" });
     this.inputEl = inputPanel.createEl("textarea", {
+      cls: "ai-rag-search-input",
       placeholder: "\u8F93\u5165\u641C\u7D22\u5173\u952E\u8BCD\u6216\u95EE\u9898..."
     });
-    this.inputEl.style.width = "100%";
-    this.inputEl.style.minHeight = "80px";
-    this.inputEl.style.marginBottom = "10px";
     const searchBtn = inputPanel.createEl("button", { text: "\u641C\u7D22" });
-    searchBtn.addEventListener("click", () => this.performSearch());
+    searchBtn.addEventListener("click", () => {
+      void this.performSearch();
+    });
     this.resultsEl = contentEl.createDiv({ cls: "ai-rag-panel" });
     this.resultsEl.createDiv({
       cls: "ai-rag-empty-state",
@@ -1016,7 +1017,7 @@ var SearchModal = class extends import_obsidian3.Modal {
       }
       const resultList = this.resultsEl.createDiv({ cls: "ai-rag-result-list" });
       results.forEach((result, index) => {
-        const card = resultList.createDiv({ cls: "ai-rag-result-card" });
+        const card = resultList.createDiv({ cls: "ai-rag-result-card ai-rag-clickable" });
         const header = card.createDiv();
         header.createEl("strong", { text: `${index + 1}. ${result.chunk.title}` });
         header.createEl("span", {
@@ -1033,7 +1034,6 @@ var SearchModal = class extends import_obsidian3.Modal {
         snippet.setText(result.snippet || result.chunk.content.slice(0, 200));
         const location = card.createDiv({ cls: "ai-rag-location" });
         location.setText(`${result.chunk.path}:${result.chunk.startLine}`);
-        card.style.cursor = "pointer";
         card.addEventListener("click", () => {
           this.onSelect(result);
           this.close();
@@ -1068,7 +1068,7 @@ var AskVaultModal = class extends import_obsidian4.Modal {
     const { contentEl } = this;
     contentEl.empty();
     contentEl.addClass("ai-rag-modal");
-    contentEl.createEl("h2", { text: this.plugin.t("\u77E5\u8BC6\u5E93\u63D0\u95EE", "Ask Vault") });
+    contentEl.createEl("h2", { text: this.plugin.t("\u77E5\u8BC6\u5E93\u63D0\u95EE", "Ask vault") });
     const inputPanel = contentEl.createDiv({ cls: "ai-rag-panel" });
     this.inputEl = inputPanel.createEl("textarea", {
       placeholder: this.plugin.t("\u5411\u4F60\u7684\u77E5\u8BC6\u5E93\u63D0\u95EE...", "Ask your vault...")
@@ -1125,22 +1125,22 @@ var AskVaultModal = class extends import_obsidian4.Modal {
       this.enhancementService.addFeedbackButtons(actions, correctionContext);
       header.createDiv({
         cls: "ai-rag-source-chip",
-        text: result.sourceLayer === "faq" ? this.plugin.t("FAQ \u76F4\u7B54", "FAQ Direct Answer") : this.plugin.t("FAQ + Wiki + \u5411\u91CF", "FAQ + Wiki + Vector")
+        text: result.sourceLayer === "faq" ? this.plugin.t("FAQ \u76F4\u7B54", "FAQ direct answer") : this.plugin.t("FAQ + wiki + \u5411\u91CF", "FAQ + wiki + vector")
       });
       const timings = result.timings;
       if (timings) {
         answerDiv.createDiv({
           cls: "ai-rag-muted ai-rag-timings",
           text: this.plugin.t(
-            `FAQ ${timings.faq.toFixed(0)}ms \xB7 Wiki ${timings.wiki.toFixed(0)}ms \xB7 \u5411\u91CF ${timings.vector.toFixed(0)}ms \xB7 LLM ${timings.llm.toFixed(0)}ms \xB7 \u603B\u8BA1 ${timings.total.toFixed(0)}ms`,
-            `FAQ ${timings.faq.toFixed(0)}ms \xB7 Wiki ${timings.wiki.toFixed(0)}ms \xB7 Vector ${timings.vector.toFixed(0)}ms \xB7 LLM ${timings.llm.toFixed(0)}ms \xB7 Total ${timings.total.toFixed(0)}ms`
+            `FAQ ${timings.faq.toFixed(0)}ms \xB7 wiki ${timings.wiki.toFixed(0)}ms \xB7 \u5411\u91CF ${timings.vector.toFixed(0)}ms \xB7 LLM ${timings.llm.toFixed(0)}ms \xB7 \u603B\u8BA1 ${timings.total.toFixed(0)}ms`,
+            `FAQ ${timings.faq.toFixed(0)}ms \xB7 wiki ${timings.wiki.toFixed(0)}ms \xB7 vector ${timings.vector.toFixed(0)}ms \xB7 LLM ${timings.llm.toFixed(0)}ms \xB7 total ${timings.total.toFixed(0)}ms`
           )
         });
       }
       const answerText = answerDiv.createDiv({ cls: "ai-rag-answer-text markdown-rendered" });
-      await import_obsidian4.MarkdownRenderer.renderMarkdown(result.answer, answerText, "", this);
+      await import_obsidian4.MarkdownRenderer.render(this.app, result.answer, answerText, "", this.plugin);
       if (result.citations.length > 0) {
-        await this.renderCitations(answerDiv, result.citations);
+        this.renderCitations(answerDiv, result.citations);
       }
       await this.enhancementService.analyzeUserPattern(question);
     } catch (error) {
@@ -1152,13 +1152,13 @@ var AskVaultModal = class extends import_obsidian4.Modal {
       });
     }
   }
-  async renderCitations(container, citations) {
+  renderCitations(container, citations) {
     const citationsDiv = container.createDiv({ cls: "ai-rag-citation-list" });
     citationsDiv.createEl("h4", { text: this.plugin.t("\u5F15\u7528\u6765\u6E90", "Sources") });
     const groups = [
       { title: "FAQ", items: citations.filter((citation) => citation.sourceLayer === "faq") },
-      { title: "Wiki", items: citations.filter((citation) => citation.sourceLayer === "wiki") },
-      { title: this.plugin.t("\u5411\u91CF", "Vector"), items: citations.filter((citation) => citation.sourceLayer === "vector") }
+      { title: "wiki", items: citations.filter((citation) => citation.sourceLayer === "wiki") },
+      { title: this.plugin.t("\u5411\u91CF", "vector"), items: citations.filter((citation) => citation.sourceLayer === "vector") }
     ];
     for (const group of groups) {
       if (group.items.length === 0) {
@@ -1203,7 +1203,7 @@ var IndexBuildProgressModal = class extends import_obsidian5.Modal {
     this.percentEl.setText("0%");
     this.progressEl = contentEl.createDiv({ cls: "ai-rag-progress-track" });
     this.progressBar = this.progressEl.createDiv({ cls: "ai-rag-progress-bar" });
-    this.progressBar.style.width = "0%";
+    this.progressBar.setCssProps({ "--ai-rag-progress-width": "0%" });
     this.fileEl = contentEl.createDiv({ cls: "ai-rag-build-file ai-rag-muted" });
     this.fileEl.setText("\u51C6\u5907\u4E2D...");
     this.metaEl = contentEl.createDiv({ cls: "ai-rag-build-meta" });
@@ -1212,7 +1212,7 @@ var IndexBuildProgressModal = class extends import_obsidian5.Modal {
   updateProgress(progress) {
     const percent = Math.round(progress.current / progress.total * 100);
     this.percentEl.setText(`${percent}%`);
-    this.progressBar.style.width = `${percent}%`;
+    this.progressBar.setCssProps({ "--ai-rag-progress-width": `${percent}%` });
     this.fileEl.setText(`${progress.phase}: ${progress.currentFile}`);
     this.metaEl.empty();
     this.metaEl.createDiv().setText(`\u8FDB\u5EA6: ${progress.current} / ${progress.total}`);
@@ -1224,7 +1224,7 @@ var IndexBuildProgressModal = class extends import_obsidian5.Modal {
       this.statusEl.addClass("is-success");
       this.statusEl.setText("\u2713 \u5B8C\u6210");
       this.percentEl.setText("100%");
-      this.progressBar.style.width = "100%";
+      this.progressBar.setCssProps({ "--ai-rag-progress-width": "100%" });
     } else {
       this.statusEl.addClass("is-error");
       this.statusEl.setText("\u2717 \u5931\u8D25");
@@ -1246,6 +1246,7 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
   constructor(app, wikiBuilder, wikiService, onArchive) {
     super(app);
     this.queryHistory = [];
+    this.markdownRendererComponent = new import_obsidian6.Component();
     this.wikiBuilder = wikiBuilder;
     this.wikiService = wikiService;
     this.onArchive = onArchive;
@@ -1255,7 +1256,8 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
     const { contentEl } = this;
     contentEl.empty();
     contentEl.addClass("wiki-query-modal");
-    contentEl.createEl("h2", { text: "Wiki \u67E5\u8BE2" });
+    this.markdownRendererComponent.load();
+    contentEl.createEl("h2", { text: "wiki \u67E5\u8BE2" });
     if (!this.wikiService.isInitialized()) {
       this.showEmptyState(contentEl);
       return;
@@ -1274,15 +1276,15 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
     });
     const buttonContainer = contentEl.createDiv({ cls: "wiki-query-buttons" });
     const searchButton = buttonContainer.createEl("button", {
-      text: "\u{1F50D} \u641C\u7D22 Wiki",
+      text: "\u{1F50D} \u641C\u7D22 wiki",
       cls: "mod-cta"
     });
     const cancelButton = buttonContainer.createEl("button", {
       text: "\u53D6\u6D88"
     });
     const resultContainer = contentEl.createDiv({ cls: "wiki-query-result" });
-    searchButton.addEventListener("click", async () => {
-      await this.performSearch(input, searchButton, buttonContainer, resultContainer);
+    searchButton.addEventListener("click", () => {
+      void this.performSearch(input, searchButton, buttonContainer, resultContainer);
     });
     cancelButton.addEventListener("click", () => {
       this.close();
@@ -1302,32 +1304,35 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
     if (this.abortController) {
       this.abortController.abort();
     }
+    this.markdownRendererComponent.unload();
   }
   /**
    * 显示空状态
    */
   showEmptyState(contentEl) {
     const emptyState = contentEl.createDiv({ cls: "wiki-empty-state" });
-    emptyState.createEl("h3", { text: "\u{1F4DA} Wiki \u8FD8\u672A\u521D\u59CB\u5316" });
+    emptyState.createEl("h3", { text: "\u{1F4DA} wiki \u8FD8\u672A\u521D\u59CB\u5316" });
     emptyState.createEl("p", { text: "\u70B9\u51FB\u4E0B\u65B9\u6309\u94AE\u5F00\u59CB\u521B\u5EFA\u4F60\u7684\u77E5\u8BC6\u5E93" });
     const initButton = emptyState.createEl("button", {
-      text: "\u{1F680} \u521D\u59CB\u5316 Wiki",
+      text: "\u{1F680} \u521D\u59CB\u5316 wiki",
       cls: "mod-cta"
     });
-    initButton.addEventListener("click", async () => {
+    initButton.addEventListener("click", () => {
       initButton.disabled = true;
       initButton.textContent = "\u23F3 \u521D\u59CB\u5316\u4E2D...";
-      try {
-        await this.wikiService.initializeWikiStructure();
-        new import_obsidian6.Notice("Wiki \u521D\u59CB\u5316\u5B8C\u6210\uFF01");
-        this.close();
-        new WikiQueryModal(this.app, this.wikiBuilder, this.wikiService, this.onArchive).open();
-      } catch (error) {
-        console.error("\u521D\u59CB\u5316\u5931\u8D25:", error);
-        new import_obsidian6.Notice("\u521D\u59CB\u5316\u5931\u8D25");
-        initButton.disabled = false;
-        initButton.textContent = "\u{1F680} \u521D\u59CB\u5316 Wiki";
-      }
+      void (async () => {
+        try {
+          await this.wikiService.initializeWikiStructure();
+          new import_obsidian6.Notice("wiki \u521D\u59CB\u5316\u5B8C\u6210\uFF01");
+          this.close();
+          new WikiQueryModal(this.app, this.wikiBuilder, this.wikiService, this.onArchive).open();
+        } catch (error) {
+          console.error("\u521D\u59CB\u5316\u5931\u8D25:", error);
+          new import_obsidian6.Notice("\u521D\u59CB\u5316\u5931\u8D25");
+          initButton.disabled = false;
+          initButton.textContent = "\u{1F680} \u521D\u59CB\u5316 wiki";
+        }
+      })();
     });
   }
   /**
@@ -1423,7 +1428,7 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
       let errorMsg = "\u67E5\u8BE2\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5";
       if (error instanceof Error) {
         if (error.message.includes("API key") || error.message.includes("401")) {
-          errorMsg = "\u274C API Key \u65E0\u6548\uFF0C\u8BF7\u68C0\u67E5\u8BBE\u7F6E";
+          errorMsg = "\u274C API key \u65E0\u6548\uFF0C\u8BF7\u68C0\u67E5\u8BBE\u7F6E";
         } else if (error.message.includes("timeout") || error.message.includes("ETIMEDOUT")) {
           errorMsg = "\u23F1\uFE0F \u8BF7\u6C42\u8D85\u65F6\uFF0C\u8BF7\u68C0\u67E5\u7F51\u7EDC\u8FDE\u63A5";
         } else if (error.message.includes("quota") || error.message.includes("429")) {
@@ -1442,11 +1447,11 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
         cls: "mod-cta"
       });
       retryButton.addEventListener("click", () => {
-        this.performSearch(input, searchButton, buttonContainer, resultContainer);
+        void this.performSearch(input, searchButton, buttonContainer, resultContainer);
       });
     } finally {
       searchButton.disabled = false;
-      searchButton.textContent = "\u{1F50D} \u641C\u7D22 Wiki";
+      searchButton.textContent = "\u{1F50D} \u641C\u7D22 wiki";
       cancelSearchButton.remove();
       this.abortController = void 0;
     }
@@ -1463,19 +1468,23 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
       cls: "wiki-copy-button"
     });
     copyButton.addEventListener("click", () => {
-      navigator.clipboard.writeText(result.answer);
-      new import_obsidian6.Notice("\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F");
-      copyButton.textContent = "\u2705 \u5DF2\u590D\u5236";
-      setTimeout(() => {
-        copyButton.textContent = "\u{1F4CB} \u590D\u5236";
-      }, 2e3);
+      void navigator.clipboard.writeText(result.answer).then(() => {
+        new import_obsidian6.Notice("\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F");
+        copyButton.textContent = "\u2705 \u5DF2\u590D\u5236";
+        setTimeout(() => {
+          copyButton.textContent = "\u{1F4CB} \u590D\u5236";
+        }, 2e3);
+      }, (error) => {
+        console.error("\u590D\u5236\u5931\u8D25:", error);
+      });
     });
     const answerContent = answerSection.createDiv({ cls: "wiki-answer-content" });
-    await import_obsidian6.MarkdownRenderer.renderMarkdown(
+    await import_obsidian6.MarkdownRenderer.render(
+      this.app,
       result.answer,
       answerContent,
       "",
-      this
+      this.markdownRendererComponent
     );
     if (result.sources.length > 0) {
       const sourcesSection = resultContainer.createDiv({ cls: "wiki-sources-section" });
@@ -1490,7 +1499,7 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
         });
         link.title = source;
         link.addEventListener("click", () => {
-          this.app.workspace.openLinkText(source, "", false);
+          void this.app.workspace.openLinkText(source, "", false);
         });
       }
     }
@@ -1499,12 +1508,12 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
       text: "\u{1F504} \u91CD\u65B0\u751F\u6210",
       cls: "wiki-action-button"
     });
-    regenerateButton.addEventListener("click", async () => {
+    regenerateButton.addEventListener("click", () => {
       const input = this.contentEl.querySelector(".wiki-query-input");
       const searchButton = this.contentEl.querySelector(".wiki-query-buttons button");
       const buttonContainer = this.contentEl.querySelector(".wiki-query-buttons");
       if (input && searchButton && buttonContainer) {
-        await this.performSearch(input, searchButton, buttonContainer, resultContainer);
+        void this.performSearch(input, searchButton, buttonContainer, resultContainer);
       }
     });
     if (result.shouldArchive) {
@@ -1512,26 +1521,28 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
         text: "\u{1F4DD} \u5F52\u6863",
         cls: "mod-cta"
       });
-      archiveButton.addEventListener("click", async () => {
+      archiveButton.addEventListener("click", () => {
         archiveButton.disabled = true;
         archiveButton.textContent = "\u23F3 \u5F52\u6863\u4E2D...";
-        try {
-          const path = await this.wikiBuilder.archiveQuery(
-            question,
-            result.answer,
-            result.sources
-          );
-          new import_obsidian6.Notice("\u5DF2\u5F52\u6863\u5230: " + path);
-          if (this.onArchive) {
-            this.onArchive(path);
+        void (async () => {
+          try {
+            const path = await this.wikiBuilder.archiveQuery(
+              question,
+              result.answer,
+              result.sources
+            );
+            new import_obsidian6.Notice("\u5DF2\u5F52\u6863\u5230: " + path);
+            if (this.onArchive) {
+              this.onArchive(path);
+            }
+            this.close();
+          } catch (error) {
+            console.error("\u5F52\u6863\u5931\u8D25:", error);
+            new import_obsidian6.Notice("\u5F52\u6863\u5931\u8D25");
+            archiveButton.disabled = false;
+            archiveButton.textContent = "\u{1F4DD} \u5F52\u6863";
           }
-          this.close();
-        } catch (error) {
-          console.error("\u5F52\u6863\u5931\u8D25:", error);
-          new import_obsidian6.Notice("\u5F52\u6863\u5931\u8D25");
-          archiveButton.disabled = false;
-          archiveButton.textContent = "\u{1F4DD} \u5F52\u6863";
-        }
+        })();
       });
     }
     const graphButton = actionsContainer.createEl("button", {
@@ -1542,9 +1553,13 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
       if (result.sources.length > 0) {
         const firstSource = result.sources[0];
         const file = this.app.vault.getAbstractFileByPath(firstSource);
-        if (file) {
-          this.app.workspace.getLeaf(false).openFile(file).then(() => {
-            this.app.commands.executeCommandById("graph:open-local");
+        if (file instanceof import_obsidian6.TFile) {
+          const appWithCommands = this.app;
+          void this.app.workspace.getLeaf(false).openFile(file).then(() => {
+            var _a;
+            (_a = appWithCommands.commands) == null ? void 0 : _a.executeCommandById("graph:open-local");
+          }, (error) => {
+            console.error("\u6253\u5F00\u56FE\u8C31\u5931\u8D25:", error);
           });
         } else {
           new import_obsidian6.Notice("\u65E0\u6CD5\u6253\u5F00\u6587\u4EF6");
@@ -1559,9 +1574,9 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
    */
   loadQueryHistory() {
     try {
-      const stored = localStorage.getItem("wiki-query-history");
-      if (stored) {
-        this.queryHistory = JSON.parse(stored);
+      const stored = this.app.loadLocalStorage("wiki-query-history");
+      if (Array.isArray(stored)) {
+        this.queryHistory = stored;
       }
     } catch (error) {
       console.error("\u52A0\u8F7D\u67E5\u8BE2\u5386\u53F2\u5931\u8D25:", error);
@@ -1573,7 +1588,7 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
    */
   saveQueryHistory() {
     try {
-      localStorage.setItem("wiki-query-history", JSON.stringify(this.queryHistory));
+      this.app.saveLocalStorage("wiki-query-history", this.queryHistory);
     } catch (error) {
       console.error("\u4FDD\u5B58\u67E5\u8BE2\u5386\u53F2\u5931\u8D25:", error);
     }
@@ -1609,7 +1624,7 @@ var WikiIngestProgressModal = class extends import_obsidian7.Modal {
     const { contentEl } = this;
     contentEl.empty();
     contentEl.addClass("wiki-ingest-progress-modal");
-    contentEl.createEl("h2", { text: "Wiki \u5BFC\u5165\u8FDB\u5EA6" });
+    contentEl.createEl("h2", { text: "wiki \u5BFC\u5165\u8FDB\u5EA6" });
     const progressContainer = contentEl.createDiv({ cls: "wiki-progress-container" });
     this.percentageText = progressContainer.createDiv({
       cls: "wiki-progress-percentage",
@@ -1676,7 +1691,7 @@ var WikiIngestProgressModal = class extends import_obsidian7.Modal {
     const percentage = total > 0 ? Math.round(current / total * 100) : 0;
     this.progressText.textContent = `${current} / ${total}`;
     this.percentageText.textContent = `${percentage}%`;
-    this.progressBar.style.width = `${percentage}%`;
+    this.progressBar.setCssProps({ "--wiki-progress-width": `${percentage}%` });
     this.currentFileText.textContent = `\u6B63\u5728\u5904\u7406: ${currentFile}`;
     if (current > 0 && current < total) {
       const elapsed = Date.now() - this.startTime;
@@ -1727,7 +1742,7 @@ ${result.conflicts.map((c) => `  - ${c.issue}`).join("\n")}` : ""}
    * 完成
    */
   complete(summary) {
-    this.progressBar.style.width = "100%";
+    this.progressBar.setCssProps({ "--wiki-progress-width": "100%" });
     this.percentageText.textContent = "100%";
     this.currentFileText.textContent = "\u2705 \u5BFC\u5165\u5B8C\u6210\uFF01";
     this.etaText.textContent = "";
@@ -1761,7 +1776,7 @@ var WikiBrowserModal = class extends import_obsidian8.Modal {
     const { contentEl } = this;
     contentEl.empty();
     contentEl.addClass("wiki-browser-modal");
-    contentEl.createEl("h2", { text: "Wiki \u6D4F\u89C8\u5668" });
+    contentEl.createEl("h2", { text: "wiki \u6D4F\u89C8\u5668" });
     await this.loadPages();
     this.createControls(contentEl);
     this.createStats(contentEl);
@@ -1787,7 +1802,7 @@ var WikiBrowserModal = class extends import_obsidian8.Modal {
     const searchInput = searchContainer.createEl("input", {
       type: "text",
       placeholder: "\u641C\u7D22\u9875\u9762\u6807\u9898...",
-      attr: { style: "width: 100%; padding: 8px; border-radius: 6px;" }
+      cls: "wiki-browser-search-input"
     });
     searchInput.addEventListener("input", () => {
       this.searchQuery = searchInput.value.toLowerCase();
@@ -1796,7 +1811,7 @@ var WikiBrowserModal = class extends import_obsidian8.Modal {
     });
     const filterContainer = controlsContainer.createDiv({ cls: "wiki-browser-filters" });
     new import_obsidian8.Setting(filterContainer).setName("\u7C7B\u578B\u7B5B\u9009").addDropdown((dropdown) => {
-      dropdown.addOption("all", "\u5168\u90E8").addOption("faq", "FAQ").addOption("meta", "Meta").addOption("relation", "\u5173\u7CFB").addOption("source", "\u6765\u6E90").addOption("entity", "\u5B9E\u4F53").addOption("concept", "\u6982\u5FF5").addOption("summary", "\u6458\u8981").addOption("synthesis", "\u7EFC\u5408").setValue(this.currentFilter).onChange((value) => {
+      dropdown.addOption("all", "\u5168\u90E8").addOption("faq", "FAQ").addOption("meta", "meta").addOption("relation", "\u5173\u7CFB").addOption("source", "\u6765\u6E90").addOption("entity", "\u5B9E\u4F53").addOption("concept", "\u6982\u5FF5").addOption("summary", "\u6458\u8981").addOption("synthesis", "\u7EFC\u5408").setValue(this.currentFilter).onChange((value) => {
         this.currentFilter = value;
         this.applyFilters();
         this.refreshPageList();
@@ -1826,46 +1841,23 @@ var WikiBrowserModal = class extends import_obsidian8.Modal {
       summaries: this.pages.filter((p) => p.type === "summary").length,
       syntheses: this.pages.filter((p) => p.type === "synthesis").length
     };
-    statsContainer.innerHTML = `
-      <div class="wiki-stats-grid">
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">\u603B\u8BA1</span>
-          <span class="wiki-stat-value">${stats.total}</span>
-        </div>
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">FAQ</span>
-          <span class="wiki-stat-value">${stats.faq}</span>
-        </div>
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">Meta</span>
-          <span class="wiki-stat-value">${stats.meta}</span>
-        </div>
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">\u5173\u7CFB</span>
-          <span class="wiki-stat-value">${stats.relations}</span>
-        </div>
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">\u6765\u6E90</span>
-          <span class="wiki-stat-value">${stats.sources}</span>
-        </div>
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">\u5B9E\u4F53</span>
-          <span class="wiki-stat-value">${stats.entities}</span>
-        </div>
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">\u6982\u5FF5</span>
-          <span class="wiki-stat-value">${stats.concepts}</span>
-        </div>
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">\u6458\u8981</span>
-          <span class="wiki-stat-value">${stats.summaries}</span>
-        </div>
-        <div class="wiki-stat-item">
-          <span class="wiki-stat-label">\u7EFC\u5408</span>
-          <span class="wiki-stat-value">${stats.syntheses}</span>
-        </div>
-      </div>
-    `;
+    const statsGrid = statsContainer.createDiv({ cls: "wiki-stats-grid" });
+    const statItems = [
+      ["\u603B\u8BA1", stats.total],
+      ["FAQ", stats.faq],
+      ["meta", stats.meta],
+      ["\u5173\u7CFB", stats.relations],
+      ["\u6765\u6E90", stats.sources],
+      ["\u5B9E\u4F53", stats.entities],
+      ["\u6982\u5FF5", stats.concepts],
+      ["\u6458\u8981", stats.summaries],
+      ["\u7EFC\u5408", stats.syntheses]
+    ];
+    for (const [label, value] of statItems) {
+      const statItem = statsGrid.createDiv({ cls: "wiki-stat-item" });
+      statItem.createSpan({ cls: "wiki-stat-label", text: label });
+      statItem.createSpan({ cls: "wiki-stat-value", text: String(value) });
+    }
   }
   /**
    * 创建页面列表
@@ -1886,7 +1878,7 @@ var WikiBrowserModal = class extends import_obsidian8.Modal {
       });
       return;
     }
-    const resultCount = container.createDiv({
+    container.createDiv({
       cls: "wiki-browser-count",
       text: `\u663E\u793A ${this.filteredPages.length} \u4E2A\u9875\u9762`
     });
@@ -1894,7 +1886,7 @@ var WikiBrowserModal = class extends import_obsidian8.Modal {
       const pageCard = container.createDiv({ cls: "wiki-browser-card" });
       const header = pageCard.createDiv({ cls: "wiki-browser-card-header" });
       header.createEl("h3", { text: page.title });
-      const typeBadge = header.createEl("span", {
+      header.createEl("span", {
         cls: `wiki-browser-badge wiki-browser-badge-${page.type}`,
         text: this.getTypeLabel(page.type)
       });
@@ -1933,11 +1925,14 @@ var WikiBrowserModal = class extends import_obsidian8.Modal {
         text: "\u590D\u5236\u8DEF\u5F84"
       });
       copyPathBtn.addEventListener("click", () => {
-        navigator.clipboard.writeText(page.path);
-        copyPathBtn.textContent = "\u5DF2\u590D\u5236\uFF01";
-        setTimeout(() => {
-          copyPathBtn.textContent = "\u590D\u5236\u8DEF\u5F84";
-        }, 2e3);
+        void navigator.clipboard.writeText(page.path).then(() => {
+          copyPathBtn.textContent = "\u5DF2\u590D\u5236\uFF01";
+          setTimeout(() => {
+            copyPathBtn.textContent = "\u590D\u5236\u8DEF\u5F84";
+          }, 2e3);
+        }, (error) => {
+          console.error("\u590D\u5236\u8DEF\u5F84\u5931\u8D25:", error);
+        });
       });
     }
   }
@@ -1983,7 +1978,7 @@ var WikiBrowserModal = class extends import_obsidian8.Modal {
   getTypeLabel(type) {
     const labels = {
       faq: "FAQ",
-      meta: "Meta",
+      meta: "meta",
       relation: "\u5173\u7CFB",
       source: "\u6765\u6E90",
       entity: "\u5B9E\u4F53",
@@ -2010,7 +2005,7 @@ var ObsidianVaultScanner = class {
   constructor(app) {
     this.app = app;
   }
-  async scanMarkdownFiles() {
+  scanMarkdownFiles() {
     return this.app.vault.getMarkdownFiles();
   }
   async readFile(file) {
@@ -2044,7 +2039,7 @@ function extractMetadata(content, filename) {
     links: Array.from(links)
   };
 }
-var _DocumentChunker = class {
+var DocumentChunker = class {
   constructor(options) {
     this.options = options;
   }
@@ -2094,7 +2089,7 @@ var _DocumentChunker = class {
   }
   splitSection(content, startLine, endLine, heading, sectionPath) {
     const chunks = [];
-    const normalizedForCheck = content.replace(_DocumentChunker.INVALID_CONTROL_CHARS, " ").trim();
+    const normalizedForCheck = this.replaceInvalidControlChars(content).trim();
     if (!normalizedForCheck) {
       return chunks;
     }
@@ -2108,7 +2103,6 @@ var _DocumentChunker = class {
       });
       return chunks;
     }
-    let start = 0;
     const lines = content.split("\n");
     let currentLines = [];
     let currentLength = 0;
@@ -2146,9 +2140,14 @@ var _DocumentChunker = class {
   buildSectionPath(headingStack) {
     return headingStack.length > 0 ? headingStack.join(" > ") : "";
   }
+  replaceInvalidControlChars(content) {
+    return content.split("").map((char) => this.isInvalidControlChar(char) ? " " : char).join("");
+  }
+  isInvalidControlChar(char) {
+    const code = char.charCodeAt(0);
+    return code <= 8 || code === 11 || code === 12 || code >= 14 && code <= 31 || code === 127;
+  }
 };
-var DocumentChunker = _DocumentChunker;
-DocumentChunker.INVALID_CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 function generateChunkId(path, startLine, content) {
   const hash = (str) => {
     let h = 0;
@@ -2173,7 +2172,7 @@ function computeContentHash(content) {
 // src/services/IndexBuilder.ts
 var INDEX_VERSION = "0.2.0";
 var SPLITTER_VERSION = "heading-paragraph-length-v2";
-var _IndexBuilder = class {
+var IndexBuilder = class {
   constructor(scanner, embeddingClient, metadataStore, vectorStore, manifestStore, settings) {
     this.scanner = scanner;
     this.embeddingClient = embeddingClient;
@@ -2203,7 +2202,7 @@ var _IndexBuilder = class {
       });
       const content = await this.scanner.readFile(file);
       if (this.settings.maxFileChars && content.length > this.settings.maxFileChars) {
-        console.log(`[IndexBuilder] Skip oversized file: ${file.path} (${content.length} chars)`);
+        console.debug(`[IndexBuilder] Skip oversized file: ${file.path} (${content.length} chars)`);
         fileMetadata.push({
           path: file.path,
           mtime: file.stat.mtime,
@@ -2228,7 +2227,7 @@ var _IndexBuilder = class {
         endLine: raw.endLine + 1
       })).filter((chunk) => this.isChunkEmbeddable(chunk.content));
       if (rawChunks.length !== chunks.length) {
-        console.log(`[IndexBuilder] Skipped ${rawChunks.length - chunks.length} empty/invalid chunks in ${file.path}`);
+        console.debug(`[IndexBuilder] Skipped ${rawChunks.length - chunks.length} empty/invalid chunks in ${file.path}`);
       }
       allChunks.push(...chunks);
       fileMetadata.push({
@@ -2310,10 +2309,10 @@ var _IndexBuilder = class {
         await this.deleteFile(file.path);
         return;
       }
-      console.log(`IndexBuilder: Updating file ${file.path}`);
+      console.debug(`IndexBuilder: Updating file ${file.path}`);
       const content = await this.scanner.readFile(file);
       if (this.settings.maxFileChars && content.length > this.settings.maxFileChars) {
-        console.log(`[IndexBuilder] Skip oversized file: ${file.path} (${content.length} chars)`);
+        console.debug(`[IndexBuilder] Skip oversized file: ${file.path} (${content.length} chars)`);
         await this.deleteFile(file.path);
         return;
       }
@@ -2363,7 +2362,7 @@ var _IndexBuilder = class {
       await this.metadataStore.saveChunks(allChunks);
       await this.vectorStore.saveEmbeddings(allEmbeddings);
       await this.metadataStore.saveFiles(allFiles);
-      console.log(`IndexBuilder: Updated ${file.path} with ${successfulChunks.length} chunks`);
+      console.debug(`IndexBuilder: Updated ${file.path} with ${successfulChunks.length} chunks`);
     } catch (error) {
       console.error(`IndexBuilder: Failed to update ${file.path}:`, error);
       throw error;
@@ -2371,7 +2370,7 @@ var _IndexBuilder = class {
   }
   async deleteFile(path) {
     try {
-      console.log(`IndexBuilder: Deleting file ${path}`);
+      console.debug(`IndexBuilder: Deleting file ${path}`);
       const allChunks = await this.metadataStore.loadChunks();
       const allEmbeddings = await this.vectorStore.loadEmbeddings();
       const allFiles = await this.metadataStore.loadFiles();
@@ -2386,15 +2385,19 @@ var _IndexBuilder = class {
       await this.metadataStore.saveChunks(remainingChunks);
       await this.vectorStore.saveEmbeddings(remainingEmbeddings);
       await this.metadataStore.saveFiles(remainingFiles);
-      console.log(`IndexBuilder: Deleted ${path} (${chunkIdsToDelete.size} chunks)`);
+      console.debug(`IndexBuilder: Deleted ${path} (${chunkIdsToDelete.size} chunks)`);
     } catch (error) {
       console.error(`IndexBuilder: Failed to delete ${path}:`, error);
       throw error;
     }
   }
   isChunkEmbeddable(content) {
-    const normalized = (content != null ? content : "").replace(/\r\n?/g, "\n").replace(_IndexBuilder.INVALID_CONTROL_CHARS, " ").trim();
+    const normalized = (content != null ? content : "").replace(/\r\n?/g, "\n").split("").map((char) => this.isInvalidControlChar(char) ? " " : char).join("").trim();
     return normalized.length > 0;
+  }
+  isInvalidControlChar(char) {
+    const code = char.charCodeAt(0);
+    return code <= 8 || code === 11 || code === 12 || code >= 14 && code <= 31 || code === 127;
   }
   isIgnoredPath(path) {
     const wikiPath = (this.settings.wikiPath || "_wiki").replace(/^\/+|\/+$/g, "") || "_wiki";
@@ -2421,7 +2424,7 @@ var _IndexBuilder = class {
           const embedding = await this.embeddingClient.embed(chunk.content);
           results.push({ chunk, embedding });
         } catch (itemError) {
-          const reason = (itemError == null ? void 0 : itemError.message) || String(itemError);
+          const reason = itemError instanceof Error ? itemError.message : String(itemError);
           console.warn(`[IndexBuilder] Skip chunk ${chunk.path}:${chunk.startLine}-${chunk.endLine}. Reason: ${reason}`);
         }
       }
@@ -2429,8 +2432,6 @@ var _IndexBuilder = class {
     }
   }
 };
-var IndexBuilder = _IndexBuilder;
-IndexBuilder.INVALID_CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 
 // src/services/FusionService.ts
 var FusionService = class {
@@ -2563,7 +2564,7 @@ var LexicalSearchService = class {
     return scores.slice(0, topK);
   }
   tokenize(text) {
-    return text.split(/[\s,，。！？、；：""''（）\[\]]+/).filter((word) => word.length > 0);
+    return text.split(/[\s,，。！？、；：""''（）[\]]+/).filter((word) => word.length > 0);
   }
   computeBM25(queryTerms, docTerms, totalDocs) {
     const k1 = 1.5;
@@ -3026,7 +3027,7 @@ var IndexScheduler = class {
     this.app.vault.on("modify", this.handleModify);
     this.app.vault.on("delete", this.handleDelete);
     this.app.vault.on("rename", this.handleRename);
-    console.log("IndexScheduler: File watching started");
+    console.debug("IndexScheduler: File watching started");
   }
   onFileCreate(file) {
     var _a;
@@ -3060,6 +3061,7 @@ var IndexScheduler = class {
   queueUpdate(file, type) {
     this.updateQueue.set(file.path, {
       file,
+      path: file.path,
       type,
       timestamp: Date.now()
     });
@@ -3074,7 +3076,7 @@ var IndexScheduler = class {
   }
   queueDeleteByPath(path) {
     this.updateQueue.set(path, {
-      file: { path },
+      path,
       type: "delete",
       timestamp: Date.now()
     });
@@ -3096,14 +3098,14 @@ var IndexScheduler = class {
     try {
       const updates = Array.from(this.updateQueue.values());
       this.updateQueue.clear();
-      console.log(`IndexScheduler: Processing ${updates.length} updates`);
+      console.debug(`IndexScheduler: Processing ${updates.length} updates`);
       for (let i = 0; i < updates.length; i += this.BATCH_SIZE) {
         const batch = updates.slice(i, i + this.BATCH_SIZE);
         await Promise.all(
           batch.map((update) => this.processUpdate(update))
         );
       }
-      console.log("IndexScheduler: Queue processed");
+      console.debug("IndexScheduler: Queue processed");
     } catch (error) {
       console.error("IndexScheduler: Error processing queue:", error);
     } finally {
@@ -3115,14 +3117,16 @@ var IndexScheduler = class {
       switch (update.type) {
         case "create":
         case "modify":
-          await this.indexBuilder.updateFile(update.file);
+          if (update.file) {
+            await this.indexBuilder.updateFile(update.file);
+          }
           break;
         case "delete":
-          await this.indexBuilder.deleteFile(update.file.path);
+          await this.indexBuilder.deleteFile(update.path);
           break;
       }
     } catch (error) {
-      console.error(`IndexScheduler: Error processing ${update.type} for ${update.file.path}:`, error);
+      console.error(`IndexScheduler: Error processing ${update.type} for ${update.path}:`, error);
     }
   }
   // 手动触发处理（用于测试）
@@ -3143,7 +3147,7 @@ var IndexScheduler = class {
     this.app.vault.off("delete", this.handleDelete);
     this.app.vault.off("rename", this.handleRename);
     this.updateQueue.clear();
-    console.log("IndexScheduler: Disposed");
+    console.debug("IndexScheduler: Disposed");
   }
   isDisposed() {
     return this.disposed;
@@ -3154,7 +3158,7 @@ var IndexScheduler = class {
 };
 
 // src/services/EnhancementService.ts
-var import_obsidian12 = require("obsidian");
+var import_obsidian13 = require("obsidian");
 
 // src/services/UserPatternService.ts
 var UserPatternService = class {
@@ -3314,7 +3318,7 @@ var UserPatternService = class {
       "who",
       "which"
     ]);
-    return text.toLowerCase().split(/[\s,，。！？、；：""''（）\[\]]+/).filter((word) => word.length > 1 && !stopWords.has(word)).slice(0, 10);
+    return text.toLowerCase().split(/[\s,，。！？、；：""''（）[\]]+/).filter((word) => word.length > 1 && !stopWords.has(word)).slice(0, 10);
   }
   // 提取问题模板
   extractQuestionTemplate(question) {
@@ -3390,7 +3394,7 @@ var ObsidianJsonFileAdapter = class {
   async mkdir(path) {
     try {
       await this.app.vault.adapter.mkdir(path);
-    } catch (error) {
+    } catch (e) {
     }
   }
 };
@@ -3512,7 +3516,7 @@ var CorrectionModal = class extends import_obsidian10.Modal {
     contentEl.empty();
     contentEl.addClass("ai-rag-correction-modal");
     const t = (zh, en) => this.options.language === "en" ? en : zh;
-    contentEl.createEl("h3", { text: t("\u7EA0\u6B63\u7B54\u6848", "Correct Answer") });
+    contentEl.createEl("h3", { text: t("\u7EA0\u6B63\u7B54\u6848", "Correct answer") });
     contentEl.createEl("p", { text: `${t("\u539F\u95EE\u9898", "Question")}: ${this.options.question}`, cls: "ai-rag-correction-question" });
     this.correctionEl = contentEl.createEl("textarea", {
       cls: "ai-rag-correction-textarea",
@@ -3551,7 +3555,7 @@ var CorrectionModal = class extends import_obsidian10.Modal {
     const cancelBtn = actions.createEl("button", { text: t("\u53D6\u6D88", "Cancel") });
     const submitBtn = actions.createEl("button", { text: t("\u4FDD\u5B58\u5230 FAQ", "Save to FAQ"), cls: "mod-cta" });
     cancelBtn.addEventListener("click", () => this.close());
-    submitBtn.addEventListener("click", async () => {
+    submitBtn.addEventListener("click", () => {
       const correction = this.correctionEl.value.trim();
       if (!correction) {
         new import_obsidian10.Notice(t("\u8BF7\u8F93\u5165\u6B63\u786E\u7B54\u6848", "Please enter the corrected answer"));
@@ -3559,16 +3563,18 @@ var CorrectionModal = class extends import_obsidian10.Modal {
       }
       submitBtn.disabled = true;
       submitBtn.setText(t("\u4FDD\u5B58\u4E2D...", "Saving..."));
-      try {
-        await this.options.onSubmit(correction, Array.from(this.selectedNotes));
-        new import_obsidian10.Notice(t("\u5DF2\u52A0\u5165 FAQ\uFF0C\u4E0B\u6B21\u540C\u7C7B\u95EE\u9898\u4F1A\u4F18\u5148\u76F4\u7B54", "Added to FAQ. Similar questions will prefer direct FAQ answers."));
-        this.close();
-      } catch (error) {
-        console.error("\u4FDD\u5B58 FAQ \u5931\u8D25:", error);
-        new import_obsidian10.Notice(t(`\u4FDD\u5B58 FAQ \u5931\u8D25: ${error instanceof Error ? error.message : String(error)}`, `Saving FAQ failed: ${error instanceof Error ? error.message : String(error)}`));
-        submitBtn.disabled = false;
-        submitBtn.setText(t("\u4FDD\u5B58\u5230 FAQ", "Save to FAQ"));
-      }
+      void (async () => {
+        try {
+          await this.options.onSubmit(correction, Array.from(this.selectedNotes));
+          new import_obsidian10.Notice(t("\u5DF2\u52A0\u5165 FAQ\uFF0C\u4E0B\u6B21\u540C\u7C7B\u95EE\u9898\u4F1A\u4F18\u5148\u76F4\u7B54", "Added to FAQ. Similar questions will prefer direct FAQ answers."));
+          this.close();
+        } catch (error) {
+          console.error("\u4FDD\u5B58 FAQ \u5931\u8D25:", error);
+          new import_obsidian10.Notice(t(`\u4FDD\u5B58 FAQ \u5931\u8D25: ${error instanceof Error ? error.message : String(error)}`, `Saving FAQ failed: ${error instanceof Error ? error.message : String(error)}`));
+          submitBtn.disabled = false;
+          submitBtn.setText(t("\u4FDD\u5B58\u5230 FAQ", "Save to FAQ"));
+        }
+      })();
     });
     this.correctionEl.focus();
   }
@@ -3638,7 +3644,7 @@ var TuningProposalModal = class extends import_obsidian11.Modal {
     contentEl.empty();
     contentEl.addClass("ai-rag-tuning-modal");
     const t = (zh, en) => this.options.language === "en" ? en : zh;
-    contentEl.createEl("h3", { text: t("\u5EFA\u8BAE\u8C03\u6574\u53C2\u6570", "Suggested Parameter Tuning") });
+    contentEl.createEl("h3", { text: t("\u5EFA\u8BAE\u8C03\u6574\u53C2\u6570", "Suggested parameter tuning") });
     contentEl.createEl("p", { text: this.options.proposal.summary });
     const metrics = contentEl.createDiv({ cls: "ai-rag-muted" });
     metrics.setText(
@@ -3662,27 +3668,220 @@ var TuningProposalModal = class extends import_obsidian11.Modal {
     const actions = contentEl.createDiv({ cls: "ai-rag-correction-actions" });
     const laterBtn = actions.createEl("button", { text: t("\u7A0D\u540E\u5904\u7406", "Later") });
     const applyBtn = actions.createEl("button", { text: t("\u5E94\u7528\u5EFA\u8BAE", "Apply suggestion"), cls: "mod-cta" });
-    laterBtn.addEventListener("click", async () => {
-      await this.options.onDismiss();
-      this.close();
+    laterBtn.addEventListener("click", () => {
+      void this.options.onDismiss().then(() => {
+        this.close();
+      }, (error) => {
+        console.error("Dismiss tuning proposal failed:", error);
+      });
     });
-    applyBtn.addEventListener("click", async () => {
+    applyBtn.addEventListener("click", () => {
       applyBtn.disabled = true;
       applyBtn.setText(t("\u5E94\u7528\u4E2D...", "Applying..."));
-      try {
-        const { reportPath } = await this.options.onApply();
-        new import_obsidian11.Notice(t(`\u5DF2\u5E94\u7528\u5EFA\u8BAE\uFF0C\u62A5\u544A\u5DF2\u751F\u6210: ${reportPath}`, `Applied suggestion. Report generated: ${reportPath}`));
-        this.close();
-      } catch (error) {
-        console.error("\u5E94\u7528\u8C03\u53C2\u5EFA\u8BAE\u5931\u8D25:", error);
-        new import_obsidian11.Notice(t(`\u5E94\u7528\u5931\u8D25: ${error instanceof Error ? error.message : String(error)}`, `Apply failed: ${error instanceof Error ? error.message : String(error)}`));
-        applyBtn.disabled = false;
-        applyBtn.setText(t("\u5E94\u7528\u5EFA\u8BAE", "Apply suggestion"));
-      }
+      void (async () => {
+        try {
+          const { reportPath } = await this.options.onApply();
+          new import_obsidian11.Notice(t(`\u5DF2\u5E94\u7528\u5EFA\u8BAE\uFF0C\u62A5\u544A\u5DF2\u751F\u6210: ${reportPath}`, `Applied suggestion. Report generated: ${reportPath}`));
+          this.close();
+        } catch (error) {
+          console.error("\u5E94\u7528\u8C03\u53C2\u5EFA\u8BAE\u5931\u8D25:", error);
+          new import_obsidian11.Notice(t(`\u5E94\u7528\u5931\u8D25: ${error instanceof Error ? error.message : String(error)}`, `Apply failed: ${error instanceof Error ? error.message : String(error)}`));
+          applyBtn.disabled = false;
+          applyBtn.setText(t("\u5E94\u7528\u5EFA\u8BAE", "Apply suggestion"));
+        }
+      })();
     });
   }
   onClose() {
     this.contentEl.empty();
+  }
+};
+
+// src/services/ApiClients.ts
+var import_obsidian12 = require("obsidian");
+function getErrorMessage(error) {
+  return error instanceof Error ? error.message : String(error);
+}
+var OpenAiCompatibleHttpClient = class {
+  constructor(baseUrl, apiKey) {
+    this.MAX_RETRIES = 3;
+    this.RETRY_DELAY = 1e3;
+    this.TIMEOUT = 3e4;
+    this.baseUrl = baseUrl.replace(/\/$/, "");
+    this.apiKey = apiKey;
+  }
+  async post(endpoint, body, retryCount = 0) {
+    var _a;
+    const url = `${this.baseUrl}${endpoint}`;
+    let timeoutId;
+    try {
+      console.debug(`[API] Request: ${url}`);
+      const timeout = new Promise((_, reject) => {
+        timeoutId = window.setTimeout(() => {
+          reject(new Error(`API request timed out after ${this.TIMEOUT / 1e3}s.`));
+        }, this.TIMEOUT);
+      });
+      const response = await Promise.race([
+        (0, import_obsidian12.requestUrl)({
+          url,
+          method: "POST",
+          contentType: "application/json",
+          headers: {
+            "Authorization": `Bearer ${this.apiKey}`
+          },
+          body: JSON.stringify(body),
+          throw: false
+        }),
+        timeout
+      ]);
+      if (timeoutId !== void 0) {
+        window.clearTimeout(timeoutId);
+      }
+      if (response.status >= 400) {
+        const errorJson = response.json;
+        const errorText = response.text;
+        const errorDetail = ((_a = errorJson == null ? void 0 : errorJson.error) == null ? void 0 : _a.message) || (errorJson == null ? void 0 : errorJson.message) || errorText || "Unknown API error";
+        console.error(`[API] Error ${response.status}: ${errorDetail}`);
+        if (response.status === 429 && retryCount < this.MAX_RETRIES) {
+          await this.sleep(this.RETRY_DELAY * (retryCount + 1));
+          return this.post(endpoint, body, retryCount + 1);
+        }
+        if (response.status >= 500 && retryCount < this.MAX_RETRIES) {
+          await this.sleep(this.RETRY_DELAY);
+          return this.post(endpoint, body, retryCount + 1);
+        }
+        if (response.status === 401) {
+          throw new Error(`API authentication failed: ${errorDetail}`);
+        }
+        if (response.status === 403) {
+          throw new Error(`API permission denied: ${errorDetail}`);
+        }
+        if (response.status === 404) {
+          throw new Error(`API endpoint not found (${this.baseUrl}): ${errorDetail}`);
+        }
+        throw new Error(`API request failed (${response.status}): ${errorDetail}`);
+      }
+      return response.json;
+    } catch (error) {
+      if (timeoutId !== void 0) {
+        window.clearTimeout(timeoutId);
+      }
+      const message = getErrorMessage(error);
+      if (message.includes("timed out")) {
+        if (retryCount < this.MAX_RETRIES) {
+          await this.sleep(this.RETRY_DELAY);
+          return this.post(endpoint, body, retryCount + 1);
+        }
+      }
+      if (message.includes("requestUrl") || message.includes("Network") || message.includes("Failed")) {
+        if (retryCount < this.MAX_RETRIES) {
+          await this.sleep(this.RETRY_DELAY);
+          return this.post(endpoint, body, retryCount + 1);
+        }
+        throw new Error(`Network error while connecting to ${this.baseUrl}.`);
+      }
+      throw error;
+    }
+  }
+  sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+};
+var OpenAiCompatibleEmbeddingClient = class {
+  constructor(httpClient, model) {
+    this.MAX_TOKENS = 512;
+    this.CHARS_PER_TOKEN = 2;
+    this.httpClient = httpClient;
+    this.model = model;
+  }
+  normalizeText(text) {
+    return (text != null ? text : "").replace(/\r\n?/g, "\n").split("").map((char) => this.isInvalidControlChar(char) ? " " : char).join("").trim();
+  }
+  isInvalidControlChar(char) {
+    const code = char.charCodeAt(0);
+    return code <= 8 || code === 11 || code === 12 || code >= 14 && code <= 31 || code === 127;
+  }
+  truncateText(text) {
+    const normalized = this.normalizeText(text);
+    const maxChars = this.MAX_TOKENS * this.CHARS_PER_TOKEN;
+    if (normalized.length <= maxChars) {
+      return normalized;
+    }
+    console.warn(`[Embedding] Text too long (${normalized.length}), truncated to ${maxChars}.`);
+    return normalized.substring(0, maxChars);
+  }
+  async embed(text) {
+    var _a;
+    const preparedText = this.truncateText(text);
+    if (!preparedText) {
+      throw new Error("Embedding input is empty after normalization.");
+    }
+    const response = await this.httpClient.post("/embeddings", {
+      model: this.model,
+      input: preparedText
+    });
+    if (!Array.isArray(response == null ? void 0 : response.data) || !((_a = response.data[0]) == null ? void 0 : _a.embedding)) {
+      throw new Error("Embedding API returned unexpected response format.");
+    }
+    return response.data[0].embedding;
+  }
+  async embedBatch(texts) {
+    var _a, _b, _c;
+    const preparedTexts = texts.map((t) => this.truncateText(t));
+    if (preparedTexts.length === 0) {
+      return [];
+    }
+    if (preparedTexts.some((t) => !t)) {
+      throw new Error("Batch embedding contains empty input after normalization.");
+    }
+    try {
+      const response = await this.httpClient.post("/embeddings", {
+        model: this.model,
+        input: preparedTexts
+      });
+      if (!Array.isArray(response == null ? void 0 : response.data) || response.data.length !== preparedTexts.length) {
+        throw new Error(
+          `Embedding API returned ${(_b = (_a = response == null ? void 0 : response.data) == null ? void 0 : _a.length) != null ? _b : 0} vectors for ${preparedTexts.length} inputs.`
+        );
+      }
+      return response.data.map((item) => item.embedding);
+    } catch (error) {
+      console.warn("[Embedding] Batch request failed, fallback to per-item mode.", error);
+      const results = [];
+      for (let i = 0; i < preparedTexts.length; i++) {
+        try {
+          const response = await this.httpClient.post("/embeddings", {
+            model: this.model,
+            input: preparedTexts[i]
+          });
+          if (!Array.isArray(response == null ? void 0 : response.data) || !((_c = response.data[0]) == null ? void 0 : _c.embedding)) {
+            throw new Error("Invalid response format.");
+          }
+          results.push(response.data[0].embedding);
+        } catch (itemError) {
+          throw new Error(`Embedding fallback failed at item ${i + 1}/${preparedTexts.length}: ${getErrorMessage(itemError)}`);
+        }
+      }
+      return results;
+    }
+  }
+};
+var OpenAiCompatibleLlmClient = class {
+  constructor(httpClient, model) {
+    this.httpClient = httpClient;
+    this.model = model;
+  }
+  async chat(messages, temperature = 0.7) {
+    const response = await this.httpClient.post("/chat/completions", {
+      model: this.model,
+      messages,
+      temperature
+    });
+    return response.choices[0].message.content;
+  }
+  async chatStream(messages, onChunk, temperature = 0.7) {
+    const fullResponse = await this.chat(messages, temperature);
+    onChunk(fullResponse);
   }
 };
 
@@ -3709,11 +3908,14 @@ var EnhancementService = class {
       text: this.t("\u590D\u5236", "Copy"),
       cls: "ai-rag-copy-button"
     });
-    copyBtn.addEventListener("click", async () => {
-      await navigator.clipboard.writeText(text);
-      new import_obsidian12.Notice(this.t("\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F", "Copied to clipboard"));
-      copyBtn.textContent = this.t("\u5DF2\u590D\u5236", "Copied");
-      window.setTimeout(() => copyBtn.textContent = this.t("\u590D\u5236", "Copy"), 1600);
+    copyBtn.addEventListener("click", () => {
+      void navigator.clipboard.writeText(text).then(() => {
+        new import_obsidian13.Notice(this.t("\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F", "Copied to clipboard"));
+        copyBtn.textContent = this.t("\u5DF2\u590D\u5236", "Copied");
+        window.setTimeout(() => copyBtn.textContent = this.t("\u590D\u5236", "Copy"), 1600);
+      }, (error) => {
+        console.error("Copy failed:", error);
+      });
     });
     return copyBtn;
   }
@@ -3751,16 +3953,22 @@ var EnhancementService = class {
       text: this.t("\u4E0D\u6EE1\u610F", "Not Helpful"),
       cls: "ai-rag-feedback-button ai-rag-feedback-button-negative"
     });
-    positiveBtn.addEventListener("click", async () => {
-      await this.recordFeedbackEvent(context, 1);
-      new import_obsidian12.Notice(this.t("\u5DF2\u8BB0\u5F55\u6EE1\u610F\u53CD\u9988", "Positive feedback saved"));
+    positiveBtn.addEventListener("click", () => {
+      void this.recordFeedbackEvent(context, 1).then(() => {
+        new import_obsidian13.Notice(this.t("\u5DF2\u8BB0\u5F55\u6EE1\u610F\u53CD\u9988", "Positive feedback saved"));
+      }, (error) => {
+        console.error("Saving positive feedback failed:", error);
+      });
     });
-    negativeBtn.addEventListener("click", async () => {
-      const proposal = await this.recordFeedbackEvent(context, -1);
-      new import_obsidian12.Notice(this.t("\u5DF2\u8BB0\u5F55\u4E0D\u6EE1\u610F\u53CD\u9988", "Negative feedback saved"));
-      if (proposal) {
-        this.openTuningProposalModal(proposal);
-      }
+    negativeBtn.addEventListener("click", () => {
+      void this.recordFeedbackEvent(context, -1).then((proposal) => {
+        new import_obsidian13.Notice(this.t("\u5DF2\u8BB0\u5F55\u4E0D\u6EE1\u610F\u53CD\u9988", "Negative feedback saved"));
+        if (proposal) {
+          this.openTuningProposalModal(proposal);
+        }
+      }, (error) => {
+        console.error("Saving negative feedback failed:", error);
+      });
     });
     return { positive: positiveBtn, negative: negativeBtn };
   }
@@ -3777,7 +3985,7 @@ var EnhancementService = class {
     let linkedContent = "";
     if (cleanLinkedNotes.length > 0) {
       const file = this.app.vault.getAbstractFileByPath(cleanLinkedNotes[0]);
-      if (file instanceof import_obsidian12.TFile) {
+      if (file instanceof import_obsidian13.TFile) {
         linkedContent = await this.app.vault.read(file);
       }
     }
@@ -3858,7 +4066,7 @@ var EnhancementService = class {
       return null;
     }
     const file = this.app.vault.getAbstractFileByPath(filePath);
-    if (!(file instanceof import_obsidian12.TFile) || file.extension !== "md") {
+    if (!(file instanceof import_obsidian13.TFile) || file.extension !== "md") {
       return null;
     }
     const content = await this.app.vault.read(file);
@@ -4053,15 +4261,19 @@ ${relatedWikiPages}
     return proposal || null;
   }
   openTuningProposalModal(proposal) {
+    const feedbackTuningService = this.plugin.feedbackTuningService;
+    if (!feedbackTuningService) {
+      return;
+    }
     const modal = new TuningProposalModal(this.app, {
       proposal,
       language: this.plugin.settings.language,
       onApply: async () => {
-        const result = await this.plugin.feedbackTuningService.applyProposal(proposal.id);
+        const result = await feedbackTuningService.applyProposal(proposal.id);
         return { reportPath: result.reportPath };
       },
       onDismiss: async () => {
-        await this.plugin.feedbackTuningService.dismissProposal(proposal.id);
+        await feedbackTuningService.dismissProposal(proposal.id);
       }
     });
     modal.open();
@@ -4128,36 +4340,15 @@ ${relatedWikiPages}
     const settings = this.plugin.settings;
     const baseUrl = (settings.embeddingApiBaseUrl || settings.apiBaseUrl).replace(/\/$/, "");
     const apiKey = settings.embeddingApiKey || settings.apiKey;
-    const response = await fetch(baseUrl + "/embeddings", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: settings.embeddingModel,
-        input: text
-      })
-    });
-    const data = await response.json();
-    return data.data[0].embedding;
+    const httpClient = new OpenAiCompatibleHttpClient(baseUrl, apiKey);
+    const embeddingClient = new OpenAiCompatibleEmbeddingClient(httpClient, settings.embeddingModel);
+    return embeddingClient.embed(text);
   }
   async callLLM(prompt) {
     const settings = this.plugin.settings;
-    const response = await fetch(settings.apiBaseUrl + "/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${settings.apiKey}`
-      },
-      body: JSON.stringify({
-        model: settings.chatModel,
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.3
-      })
-    });
-    const data = await response.json();
-    return data.choices[0].message.content;
+    const httpClient = new OpenAiCompatibleHttpClient(settings.apiBaseUrl, settings.apiKey);
+    const llmClient = new OpenAiCompatibleLlmClient(httpClient, settings.chatModel);
+    return llmClient.chat([{ role: "user", content: prompt }], 0.3);
   }
   async readJSON(path) {
     try {
@@ -4180,7 +4371,7 @@ ${relatedWikiPages}
 };
 
 // src/services/WikiService.ts
-var import_obsidian13 = require("obsidian");
+var import_obsidian14 = require("obsidian");
 var WIKI_PAGE_FOLDERS = {
   source: "sources",
   entity: "entities",
@@ -4285,31 +4476,6 @@ var WikiService = class {
     await this.ensureIndexFile();
     await this.ensureLogFile();
     await this.ensureSchemaFile();
-    await this.checkGitRepository();
-  }
-  /**
-   * 检查是否是 Git 仓库，并提示用户
-   */
-  async checkGitRepository() {
-    try {
-      const vaultPath = this.app.vault.adapter.basePath;
-      if (!vaultPath || typeof require === "undefined") {
-        return;
-      }
-      const { exec } = require("child_process");
-      const { promisify } = require("util");
-      const execAsync = promisify(exec);
-      await execAsync("git rev-parse --git-dir", { cwd: vaultPath });
-      console.log("\u2713 \u68C0\u6D4B\u5230 Git \u4ED3\u5E93");
-    } catch (error) {
-      console.warn("\u26A0\uFE0F \u672A\u68C0\u6D4B\u5230 Git \u4ED3\u5E93");
-      console.warn("\u5EFA\u8BAE: Wiki \u7CFB\u7EDF\u5EFA\u8BAE\u4F7F\u7528 Git \u8FDB\u884C\u7248\u672C\u63A7\u5236");
-      console.warn("\u4F60\u53EF\u4EE5\u8FD0\u884C\u4EE5\u4E0B\u547D\u4EE4\u521D\u59CB\u5316 Git:");
-      console.warn("  git init");
-      console.warn("  git add .");
-      console.warn('  git commit -m "Initial Wiki setup"');
-      console.warn("\u6216\u8005\u5B89\u88C5 Obsidian Git \u63D2\u4EF6\u4EE5\u83B7\u5F97\u66F4\u597D\u7684\u96C6\u6210\u4F53\u9A8C");
-    }
   }
   /**
    * 确保 index.md 存在
@@ -4385,7 +4551,7 @@ var WikiService = class {
     const existingFile = this.app.vault.getAbstractFileByPath(filePath);
     let frontmatter;
     let isUpdate = false;
-    if (existingFile && existingFile instanceof import_obsidian13.TFile) {
+    if (existingFile && existingFile instanceof import_obsidian14.TFile) {
       const existingContent = await this.app.vault.read(existingFile);
       const existingFrontmatter = this.parseFrontmatter(existingContent);
       frontmatter = {
@@ -4404,7 +4570,7 @@ var WikiService = class {
       };
     }
     const fullContent = this.buildPageContent(title, frontmatter, content);
-    if (existingFile && existingFile instanceof import_obsidian13.TFile) {
+    if (existingFile && existingFile instanceof import_obsidian14.TFile) {
       await this.app.vault.modify(existingFile, fullContent);
     } else {
       await this.app.vault.create(filePath, fullContent);
@@ -4521,7 +4687,7 @@ ${content}`;
    */
   async readPage(path) {
     const file = this.app.vault.getAbstractFileByPath(path);
-    if (!file || !(file instanceof import_obsidian13.TFile)) {
+    if (!file || !(file instanceof import_obsidian14.TFile)) {
       return null;
     }
     const content = await this.app.vault.read(file);
@@ -4564,7 +4730,7 @@ ${content}`;
   async updateIndex(entries) {
     const indexPath = `${this.wikiPath}/index.md`;
     const indexFile = this.app.vault.getAbstractFileByPath(indexPath);
-    if (!indexFile || !(indexFile instanceof import_obsidian13.TFile)) {
+    if (!indexFile || !(indexFile instanceof import_obsidian14.TFile)) {
       await this.ensureIndexFile();
       return;
     }
@@ -4664,7 +4830,7 @@ ${content}`;
   async addLogEntry(entry) {
     const logPath = `${this.wikiPath}/log.md`;
     const logFile = this.app.vault.getAbstractFileByPath(logPath);
-    if (!logFile || !(logFile instanceof import_obsidian13.TFile)) {
+    if (!logFile || !(logFile instanceof import_obsidian14.TFile)) {
       await this.ensureLogFile();
       return;
     }
@@ -4717,9 +4883,9 @@ ${entry.details}
     for (const folder of folders) {
       const folderPath = `${this.wikiPath}/${folder}`;
       const folderObj = this.app.vault.getAbstractFileByPath(folderPath);
-      if (folderObj && folderObj instanceof import_obsidian13.TFolder) {
+      if (folderObj && folderObj instanceof import_obsidian14.TFolder) {
         for (const file of folderObj.children) {
-          if (file instanceof import_obsidian13.TFile && file.extension === "md") {
+          if (file instanceof import_obsidian14.TFile && file.extension === "md") {
             const page = await this.readPage(file.path);
             if (page) {
               pages.push(page);
@@ -4763,11 +4929,11 @@ ${entry.details}
       this.wikiPath,
       ...Object.values(WIKI_PAGE_FOLDERS).map((folder) => `${this.wikiPath}/${folder}`)
     ];
-    return requiredPaths.every((path) => this.app.vault.getAbstractFileByPath(path) instanceof import_obsidian13.TFolder);
+    return requiredPaths.every((path) => this.app.vault.getAbstractFileByPath(path) instanceof import_obsidian14.TFolder);
   }
   async ensureFolder(path) {
     const existing = this.app.vault.getAbstractFileByPath(path);
-    if (existing instanceof import_obsidian13.TFolder) {
+    if (existing instanceof import_obsidian14.TFolder) {
       return;
     }
     await this.app.vault.createFolder(path);
@@ -4879,7 +5045,7 @@ ${entry.details}
 };
 
 // src/services/WikiBuilder.ts
-var import_obsidian14 = require("obsidian");
+var import_obsidian15 = require("obsidian");
 
 // src/services/LlmRetryService.ts
 var LlmRetryService = class {
@@ -5119,8 +5285,9 @@ Please check the LLM prompt and response format.`
   static extractAndValidate(text, expectedKeys) {
     const json = this.extract(text);
     if (!this.validate(json, expectedKeys)) {
+      const gotKeys = json && typeof json === "object" ? Object.keys(json).join(", ") : typeof json;
       throw new Error(
-        `Extracted JSON is missing required keys. Expected: ${expectedKeys.join(", ")}. Got: ${Object.keys(json).join(", ")}`
+        `Extracted JSON is missing required keys. Expected: ${expectedKeys.join(", ")}. Got: ${gotKeys}`
       );
     }
     return json;
@@ -5128,7 +5295,7 @@ Please check the LLM prompt and response format.`
   /**
    * 安全提取（返回默认值而不是抛出错误）
    */
-  static extractSafe(text, defaultValue = null) {
+  static extractSafe(text, defaultValue) {
     try {
       return this.extract(text);
     } catch (error) {
@@ -5169,7 +5336,7 @@ var WikiBuilder = class {
       return skipped;
     }
     const file = this.app.vault.getAbstractFileByPath(filePath);
-    if (!file || !(file instanceof import_obsidian14.TFile)) {
+    if (!file || !(file instanceof import_obsidian15.TFile)) {
       throw new Error(`\u6587\u4EF6\u4E0D\u5B58\u5728: ${filePath}`);
     }
     if (!options.force && this.ingestState && await this.ingestState.shouldSkip(filePath)) {
@@ -5387,7 +5554,7 @@ ${incomingContent.substring(0, 4e3)}
       if (merged && typeof merged.content === "string") {
         return {
           content: merged.content,
-          conflicts: Array.isArray(merged.conflicts) ? merged.conflicts : []
+          conflicts: Array.isArray(merged.conflicts) ? merged.conflicts.filter((item) => typeof item === "string") : []
         };
       }
     } catch (error) {
@@ -5431,12 +5598,12 @@ ${incomingContent}`.trim(),
     let claudeRules = "";
     const claudeMdPath = `${wikiPath}/CLAUDE.md`;
     const claudeMdFile = this.app.vault.getAbstractFileByPath(claudeMdPath);
-    if (claudeMdFile && claudeMdFile instanceof import_obsidian14.TFile) {
+    if (claudeMdFile && claudeMdFile instanceof import_obsidian15.TFile) {
       claudeRules = await this.app.vault.read(claudeMdFile);
     }
     let indexContext = "";
     const indexFile = this.app.vault.getAbstractFileByPath(`${wikiPath}/index.md`);
-    if (indexFile && indexFile instanceof import_obsidian14.TFile) {
+    if (indexFile && indexFile instanceof import_obsidian15.TFile) {
       indexContext = (await this.app.vault.read(indexFile)).substring(0, 3e3);
     }
     const candidateWikiPages = await this.findCandidateWikiPages(filePath, content);
@@ -5547,7 +5714,7 @@ ${claudeRules ? "6. \u4E25\u683C\u9075\u5B88\u4E0A\u8FF0 Wiki \u7EF4\u62A4\u89C4
     const pages = this.wikiGraphSearch ? await this.wikiGraphSearch.search(query, 6) : await this.wikiService.searchWiki(query);
     return pages.filter((page) => page.path !== filePath).slice(0, 6);
   }
-  async findCandidateRawNotes(filePath, content) {
+  findCandidateRawNotes(filePath, content) {
     const files = this.app.vault.getMarkdownFiles().filter((file) => file.path !== filePath && !this.wikiService.isWikiFile(file.path));
     const tokens = this.extractSearchTerms(`${filePath}
 ${content}`);
@@ -5589,7 +5756,7 @@ ${content}`);
         if (interactiveMode && i < filePaths.length - 1 && interactiveCallback) {
           const shouldContinue = await interactiveCallback(result);
           if (!shouldContinue) {
-            console.log("\u7528\u6237\u505C\u6B62\u4E86\u6279\u91CF\u5BFC\u5165");
+            console.debug("\u7528\u6237\u505C\u6B62\u4E86\u6279\u91CF\u5BFC\u5165");
             break;
           }
         }
@@ -5658,7 +5825,7 @@ ${page.content.substring(0, 1200)}
     let claudeRules = "";
     const claudeMdPath = `${this.wikiService.getWikiPath()}/CLAUDE.md`;
     const claudeMdFile = this.app.vault.getAbstractFileByPath(claudeMdPath);
-    if (claudeMdFile && claudeMdFile instanceof import_obsidian14.TFile) {
+    if (claudeMdFile && claudeMdFile instanceof import_obsidian15.TFile) {
       claudeRules = await this.app.vault.read(claudeMdFile);
     }
     const prompt = `\u57FA\u4E8E\u4EE5\u4E0B Wiki \u9875\u9762\u56DE\u7B54\u95EE\u9898\u3002
@@ -5706,10 +5873,12 @@ ${context}
       );
       try {
         const result = JsonExtractor.extractAndValidate(response, ["answer", "shouldArchive"]);
+        const answer = typeof result.answer === "string" ? result.answer : response;
+        const shouldArchive = typeof result.shouldArchive === "boolean" ? result.shouldArchive : this.shouldArchiveQuestion(question, answer);
         return {
-          answer: result.answer,
+          answer,
           sources,
-          shouldArchive: result.shouldArchive || false
+          shouldArchive
         };
       } catch (extractError) {
         console.warn("JSON \u63D0\u53D6\u5931\u8D25\uFF0C\u4F7F\u7528\u539F\u59CB\u54CD\u5E94:", extractError);
@@ -5789,7 +5958,7 @@ ${page.content.substring(0, 1500)}
     let claudeRules = "";
     const claudeMdPath = `${this.wikiService.getWikiPath()}/CLAUDE.md`;
     const claudeMdFile = this.app.vault.getAbstractFileByPath(claudeMdPath);
-    if (claudeMdFile && claudeMdFile instanceof import_obsidian14.TFile) {
+    if (claudeMdFile && claudeMdFile instanceof import_obsidian15.TFile) {
       claudeRules = await this.app.vault.read(claudeMdFile);
     }
     const prompt = `\u4F60\u662F\u4E00\u4E2A\u77E5\u8BC6\u5E93\u7BA1\u7406\u5458\u3002\u8BF7\u57FA\u4E8E\u4EE5\u4E0B\u76F8\u5173\u9875\u9762\uFF0C\u751F\u6210\u4E00\u4E2A\u5173\u4E8E "${topic}" \u7684\u7EFC\u5408\u6027\u4E3B\u9898\u6458\u8981\u3002
@@ -5835,10 +6004,12 @@ ${claudeRules ? "5. \u4E25\u683C\u9075\u5B88\u4E0A\u8FF0 Wiki \u7EF4\u62A4\u89C4
         "keyPoints",
         "content"
       ]);
+      const title = typeof result.title === "string" ? result.title : topic;
+      const content = typeof result.content === "string" ? result.content : response;
       const path = await this.wikiService.createOrUpdatePage(
         "summary",
-        result.title,
-        result.content,
+        title,
+        content,
         category,
         sources.length
       );
@@ -5847,7 +6018,7 @@ ${claudeRules ? "5. \u4E25\u683C\u9075\u5B88\u4E0A\u8FF0 Wiki \u7EF4\u62A4\u89C4
         timestamp: Date.now(),
         date: today,
         action: "summary",
-        title: result.title,
+        title,
         details: `- \u751F\u6210\u4E3B\u9898\u6458\u8981
 - \u7EFC\u5408 ${sources.length} \u4E2A\u6765\u6E90
 - \u4E3B\u9898: ${topic}`
@@ -6260,7 +6431,7 @@ ${page.content}`.toLowerCase();
 };
 
 // src/services/SensitivityService.ts
-var import_obsidian15 = require("obsidian");
+var import_obsidian16 = require("obsidian");
 var _SensitivityService = class {
   constructor(app, wikiService) {
     this.app = app;
@@ -6325,7 +6496,7 @@ SensitivityService.SENSITIVE_PATTERNS = [
   /身份证/,
   /银行卡/
 ];
-var SensitiveDecisionModal = class extends import_obsidian15.Modal {
+var SensitiveDecisionModal = class extends import_obsidian16.Modal {
   constructor(app, path, resolveDecision) {
     super(app);
     this.resolved = false;
@@ -6724,7 +6895,7 @@ ${recentEvents.map((event) => `- ${new Date(event.createdAt).toLocaleString()} |
 };
 
 // src/services/NoteLinkService.ts
-var import_obsidian16 = require("obsidian");
+var import_obsidian17 = require("obsidian");
 var RELATED_NOTES_HEADINGS = ["## \u76F8\u5173\u7B14\u8BB0", "## Related Notes"];
 var NoteLinkService = class {
   constructor(app, isWikiPath) {
@@ -6734,7 +6905,7 @@ var NoteLinkService = class {
   }
   async buildSuggestions(filePath, meta) {
     const sourceFile = this.app.vault.getAbstractFileByPath(filePath);
-    if (!(sourceFile instanceof import_obsidian16.TFile)) {
+    if (!(sourceFile instanceof import_obsidian17.TFile)) {
       return [];
     }
     const existingLinks = await this.getRelatedLinks(filePath);
@@ -6760,7 +6931,7 @@ var NoteLinkService = class {
     }
     for (const wikiPath of meta.suggestedRelatedWikiPages || []) {
       const wikiFile = this.app.vault.getAbstractFileByPath(wikiPath);
-      if (!(wikiFile instanceof import_obsidian16.TFile)) {
+      if (!(wikiFile instanceof import_obsidian17.TFile)) {
         continue;
       }
       const wikiContent = await this.app.vault.read(wikiFile);
@@ -6798,7 +6969,7 @@ var NoteLinkService = class {
     for (const targetPath of request.targetPaths) {
       const sourceFile = this.app.vault.getAbstractFileByPath(request.sourcePath);
       const targetFile = this.app.vault.getAbstractFileByPath(targetPath);
-      if (!(sourceFile instanceof import_obsidian16.TFile) || !(targetFile instanceof import_obsidian16.TFile)) {
+      if (!(sourceFile instanceof import_obsidian17.TFile) || !(targetFile instanceof import_obsidian17.TFile)) {
         skipped.add(targetPath);
         continue;
       }
@@ -6814,7 +6985,7 @@ var NoteLinkService = class {
   }
   async getRelatedLinks(filePath) {
     const file = this.app.vault.getAbstractFileByPath(filePath);
-    if (!(file instanceof import_obsidian16.TFile)) {
+    if (!(file instanceof import_obsidian17.TFile)) {
       return [];
     }
     const content = await this.app.vault.read(file);
@@ -6881,185 +7052,6 @@ ${renderedSection}
   }
 };
 
-// src/services/ApiClients.ts
-var OpenAiCompatibleHttpClient = class {
-  constructor(baseUrl, apiKey) {
-    this.MAX_RETRIES = 3;
-    this.RETRY_DELAY = 1e3;
-    this.TIMEOUT = 3e4;
-    this.baseUrl = baseUrl.replace(/\/$/, "");
-    this.apiKey = apiKey;
-  }
-  async post(endpoint, body, retryCount = 0) {
-    var _a;
-    const url = `${this.baseUrl}${endpoint}`;
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT);
-      console.log(`[API] Request: ${url}`);
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${this.apiKey}`
-        },
-        body: JSON.stringify(body),
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
-      if (!response.ok) {
-        let errorDetail = response.statusText;
-        let errorText = "";
-        try {
-          errorText = await response.text();
-          const errorJson = JSON.parse(errorText);
-          errorDetail = ((_a = errorJson == null ? void 0 : errorJson.error) == null ? void 0 : _a.message) || (errorJson == null ? void 0 : errorJson.message) || errorText || response.statusText;
-        } catch (e) {
-          if (errorText) {
-            errorDetail = errorText;
-          }
-        }
-        console.error(`[API] Error ${response.status}: ${errorDetail}`);
-        if (response.status === 429 && retryCount < this.MAX_RETRIES) {
-          await this.sleep(this.RETRY_DELAY * (retryCount + 1));
-          return this.post(endpoint, body, retryCount + 1);
-        }
-        if (response.status >= 500 && retryCount < this.MAX_RETRIES) {
-          await this.sleep(this.RETRY_DELAY);
-          return this.post(endpoint, body, retryCount + 1);
-        }
-        if (response.status === 401) {
-          throw new Error(`API authentication failed: ${errorDetail}`);
-        }
-        if (response.status === 403) {
-          throw new Error(`API permission denied: ${errorDetail}`);
-        }
-        if (response.status === 404) {
-          throw new Error(`API endpoint not found (${this.baseUrl}): ${errorDetail}`);
-        }
-        throw new Error(`API request failed (${response.status}): ${errorDetail}`);
-      }
-      return await response.json();
-    } catch (error) {
-      if ((error == null ? void 0 : error.name) === "AbortError") {
-        if (retryCount < this.MAX_RETRIES) {
-          await this.sleep(this.RETRY_DELAY);
-          return this.post(endpoint, body, retryCount + 1);
-        }
-        throw new Error(`API request timed out after ${this.TIMEOUT / 1e3}s.`);
-      }
-      const message = String((error == null ? void 0 : error.message) || error);
-      if (message.includes("fetch") || message.includes("Failed to fetch")) {
-        if (retryCount < this.MAX_RETRIES) {
-          await this.sleep(this.RETRY_DELAY);
-          return this.post(endpoint, body, retryCount + 1);
-        }
-        throw new Error(`Network error while connecting to ${this.baseUrl}.`);
-      }
-      throw error;
-    }
-  }
-  sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-};
-var _OpenAiCompatibleEmbeddingClient = class {
-  constructor(httpClient, model) {
-    this.MAX_TOKENS = 512;
-    this.CHARS_PER_TOKEN = 2;
-    this.httpClient = httpClient;
-    this.model = model;
-  }
-  normalizeText(text) {
-    return (text != null ? text : "").replace(/\r\n?/g, "\n").replace(_OpenAiCompatibleEmbeddingClient.INVALID_CONTROL_CHARS, " ").trim();
-  }
-  truncateText(text) {
-    const normalized = this.normalizeText(text);
-    const maxChars = this.MAX_TOKENS * this.CHARS_PER_TOKEN;
-    if (normalized.length <= maxChars) {
-      return normalized;
-    }
-    console.warn(`[Embedding] Text too long (${normalized.length}), truncated to ${maxChars}.`);
-    return normalized.substring(0, maxChars);
-  }
-  async embed(text) {
-    var _a;
-    const preparedText = this.truncateText(text);
-    if (!preparedText) {
-      throw new Error("Embedding input is empty after normalization.");
-    }
-    const response = await this.httpClient.post("/embeddings", {
-      model: this.model,
-      input: preparedText
-    });
-    if (!Array.isArray(response == null ? void 0 : response.data) || !((_a = response.data[0]) == null ? void 0 : _a.embedding)) {
-      throw new Error("Embedding API returned unexpected response format.");
-    }
-    return response.data[0].embedding;
-  }
-  async embedBatch(texts) {
-    var _a, _b, _c;
-    const preparedTexts = texts.map((t) => this.truncateText(t));
-    if (preparedTexts.length === 0) {
-      return [];
-    }
-    if (preparedTexts.some((t) => !t)) {
-      throw new Error("Batch embedding contains empty input after normalization.");
-    }
-    try {
-      const response = await this.httpClient.post("/embeddings", {
-        model: this.model,
-        input: preparedTexts
-      });
-      if (!Array.isArray(response == null ? void 0 : response.data) || response.data.length !== preparedTexts.length) {
-        throw new Error(
-          `Embedding API returned ${(_b = (_a = response == null ? void 0 : response.data) == null ? void 0 : _a.length) != null ? _b : 0} vectors for ${preparedTexts.length} inputs.`
-        );
-      }
-      return response.data.map((item) => item.embedding);
-    } catch (error) {
-      console.warn("[Embedding] Batch request failed, fallback to per-item mode.", error);
-      const results = [];
-      for (let i = 0; i < preparedTexts.length; i++) {
-        try {
-          const response = await this.httpClient.post("/embeddings", {
-            model: this.model,
-            input: preparedTexts[i]
-          });
-          if (!Array.isArray(response == null ? void 0 : response.data) || !((_c = response.data[0]) == null ? void 0 : _c.embedding)) {
-            throw new Error("Invalid response format.");
-          }
-          results.push(response.data[0].embedding);
-        } catch (itemError) {
-          const msg = (itemError == null ? void 0 : itemError.message) || String(itemError);
-          throw new Error(`Embedding fallback failed at item ${i + 1}/${preparedTexts.length}: ${msg}`);
-        }
-      }
-      return results;
-    }
-  }
-};
-var OpenAiCompatibleEmbeddingClient = _OpenAiCompatibleEmbeddingClient;
-OpenAiCompatibleEmbeddingClient.INVALID_CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
-var OpenAiCompatibleLlmClient = class {
-  constructor(httpClient, model) {
-    this.httpClient = httpClient;
-    this.model = model;
-  }
-  async chat(messages, temperature = 0.7) {
-    const response = await this.httpClient.post("/chat/completions", {
-      model: this.model,
-      messages,
-      temperature
-    });
-    return response.choices[0].message.content;
-  }
-  async chatStream(messages, onChunk, temperature = 0.7) {
-    const fullResponse = await this.chat(messages, temperature);
-    onChunk(fullResponse);
-  }
-};
-
 // src/services/QueryAnalysisService.ts
 var QueryAnalysisService = class {
   constructor(llmClient, metadataStore, getSettings, userPatternService) {
@@ -7077,7 +7069,7 @@ var QueryAnalysisService = class {
     }
     const standaloneQuestion = shouldUseAdvancedAnalysis ? await this.generateStandaloneQuestion(query, conversationHistory) : query;
     const queryVariants = shouldUseAdvancedAnalysis ? await this.generateQueryVariants(standaloneQuestion) : [standaloneQuestion];
-    const inferredFilters = await this.inferFilters(standaloneQuestion);
+    const inferredFilters = this.inferFilters(standaloneQuestion);
     return {
       standaloneQuestion,
       queryVariants,
@@ -7152,13 +7144,13 @@ Alternative Questions:`;
     }
     return variants;
   }
-  async inferFilters(query) {
+  inferFilters(query) {
     const filters = {};
     const tagMatches = query.match(/#([a-zA-Z0-9_\u4e00-\u9fa5]+)/g);
     if (tagMatches) {
       filters.tags = tagMatches.map((tag) => tag.substring(1));
     }
-    const pathMatches = query.match(/(?:in|from|under)\s+([a-zA-Z0-9_\-\/]+)/gi);
+    const pathMatches = query.match(/(?:in|from|under)\s+([a-zA-Z0-9_/-]+)/gi);
     if (pathMatches) {
       filters.paths = pathMatches.map((match) => match.split(/\s+/).pop());
     }
@@ -7170,13 +7162,14 @@ Alternative Questions:`;
       return results;
     }
     return results.filter((result) => {
-      if (!result.chunk)
+      const chunk = result.chunk;
+      if (!chunk)
         return true;
       if (filters.tags && filters.tags.length > 0) {
         const hasMatchingTag = filters.tags.some(
           (tag) => {
             var _a;
-            return (_a = result.chunk.tags) == null ? void 0 : _a.includes(tag);
+            return (_a = chunk.tags) == null ? void 0 : _a.includes(tag);
           }
         );
         if (!hasMatchingTag)
@@ -7186,7 +7179,7 @@ Alternative Questions:`;
         const hasMatchingPath = filters.paths.some(
           (path) => {
             var _a;
-            return (_a = result.chunk.path) == null ? void 0 : _a.includes(path);
+            return (_a = chunk.path) == null ? void 0 : _a.includes(path);
           }
         );
         if (!hasMatchingPath)
@@ -7679,8 +7672,8 @@ var LoggingService = class {
 };
 
 // src/views/LinkSuggestionModal.ts
-var import_obsidian17 = require("obsidian");
-var LinkSuggestionModal = class extends import_obsidian17.Modal {
+var import_obsidian18 = require("obsidian");
+var LinkSuggestionModal = class extends import_obsidian18.Modal {
   constructor(app, options) {
     super(app);
     this.selected = /* @__PURE__ */ new Set();
@@ -7692,7 +7685,7 @@ var LinkSuggestionModal = class extends import_obsidian17.Modal {
     contentEl.empty();
     contentEl.addClass("ai-rag-link-modal");
     const t = (zh, en) => this.options.language === "en" ? en : zh;
-    contentEl.createEl("h3", { text: t("\u53D1\u73B0\u53EF\u5173\u8054\u7B14\u8BB0", "Suggested Related Notes") });
+    contentEl.createEl("h3", { text: t("\u53D1\u73B0\u53EF\u5173\u8054\u7B14\u8BB0", "Suggested related notes") });
     contentEl.createEl("p", { text: `${t("\u5F53\u524D\u7B14\u8BB0", "Current note")}: ${this.options.sourcePath}` });
     const list = contentEl.createDiv({ cls: "ai-rag-link-suggestion-list" });
     this.options.suggestions.forEach((item) => {
@@ -7712,19 +7705,19 @@ var LinkSuggestionModal = class extends import_obsidian17.Modal {
     });
     const actions = contentEl.createDiv({ cls: "ai-rag-correction-actions" });
     const laterBtn = actions.createEl("button", { text: t("\u7A0D\u540E", "Later") });
-    const selectedBtn = actions.createEl("button", { text: t("\u5173\u8054\u9009\u4E2D\u9879", "Link Selected") });
-    const allBtn = actions.createEl("button", { text: t("\u4E00\u952E\u5173\u8054\u5168\u90E8", "Link All"), cls: "mod-cta" });
+    const selectedBtn = actions.createEl("button", { text: t("\u5173\u8054\u9009\u4E2D\u9879", "Link selected") });
+    const allBtn = actions.createEl("button", { text: t("\u4E00\u952E\u5173\u8054\u5168\u90E8", "Link all"), cls: "mod-cta" });
     laterBtn.addEventListener("click", () => this.close());
-    selectedBtn.addEventListener("click", async () => {
+    selectedBtn.addEventListener("click", () => {
       const targets = Array.from(this.selected);
       if (targets.length === 0) {
-        new import_obsidian17.Notice(t("\u8BF7\u5148\u81F3\u5C11\u9009\u62E9\u4E00\u6761\u5173\u8054\u7B14\u8BB0", "Please select at least one suggested note"));
+        new import_obsidian18.Notice(t("\u8BF7\u5148\u81F3\u5C11\u9009\u62E9\u4E00\u6761\u5173\u8054\u7B14\u8BB0", "Please select at least one suggested note"));
         return;
       }
-      await this.apply(targets);
+      void this.apply(targets);
     });
-    allBtn.addEventListener("click", async () => {
-      await this.apply(this.options.suggestions.map((item) => item.targetPath));
+    allBtn.addEventListener("click", () => {
+      void this.apply(this.options.suggestions.map((item) => item.targetPath));
     });
   }
   onClose() {
@@ -7734,11 +7727,11 @@ var LinkSuggestionModal = class extends import_obsidian17.Modal {
     const t = (zh, en) => this.options.language === "en" ? en : zh;
     try {
       await this.options.onApply(targetPaths);
-      new import_obsidian17.Notice(t("\u5DF2\u5E94\u7528\u53CC\u5411\u94FE\u63A5", "Bidirectional links applied"));
+      new import_obsidian18.Notice(t("\u5DF2\u5E94\u7528\u53CC\u5411\u94FE\u63A5", "Bidirectional links applied"));
       this.close();
     } catch (error) {
       console.error("\u5E94\u7528\u53CC\u5411\u94FE\u63A5\u5931\u8D25:", error);
-      new import_obsidian17.Notice(t(`\u5E94\u7528\u53CC\u5411\u94FE\u63A5\u5931\u8D25: ${error instanceof Error ? error.message : String(error)}`, `Applying bidirectional links failed: ${error instanceof Error ? error.message : String(error)}`));
+      new import_obsidian18.Notice(t(`\u5E94\u7528\u53CC\u5411\u94FE\u63A5\u5931\u8D25: ${error instanceof Error ? error.message : String(error)}`, `Applying bidirectional links failed: ${error instanceof Error ? error.message : String(error)}`));
     }
   }
 };
@@ -7770,7 +7763,7 @@ var DEFAULT_SETTINGS = {
   vectorContextRatio: 0.35,
   answerTemplate: "structured"
 };
-var AiRagPlugin = class extends import_obsidian19.Plugin {
+var AiRagPlugin = class extends import_obsidian20.Plugin {
   constructor() {
     super(...arguments);
     this.schedulerBound = false;
@@ -7792,29 +7785,33 @@ var AiRagPlugin = class extends import_obsidian19.Plugin {
     this.syncScheduler();
     this.addSettingTab(new AiRagSettingTab(this.app, this));
     this.registerView(AI_RAG_SIDEBAR_VIEW, (leaf) => new AiRagSidebarView(leaf, this));
-    this.addRibbonIcon("message-circle", this.t("AI RAG \u52A9\u624B", "AI RAG Assistant"), () => {
+    this.addRibbonIcon("message-circle", this.t("AI RAG \u52A9\u624B", "AI RAG assistant"), () => {
       void this.activateSidebarView();
     });
     this.registerEvent(
       this.app.workspace.on("file-menu", (menu, file) => {
-        if (file instanceof import_obsidian19.TFile && file.extension === "md") {
+        if (file instanceof import_obsidian20.TFile && file.extension === "md") {
           if (this.settings.enableWiki && !this.isInsideWiki(file.path)) {
             menu.addItem((item) => {
-              item.setTitle(this.t("\u5BFC\u5165\u5230 Wiki", "Ingest to Wiki")).setIcon("book-plus").onClick(async () => {
-                await this.ingestNoteWithFeedback(file.path, true);
+              item.setTitle(this.t("\u5BFC\u5165\u5230 wiki", "Ingest to wiki")).setIcon("book-plus").onClick(() => {
+                void this.ingestNoteWithFeedback(file.path, true);
               });
             });
           }
           menu.addItem((item) => {
-            item.setTitle("\u5728\u6B64\u6587\u4EF6\u4E2D\u8BED\u4E49\u641C\u7D22").setIcon("search").onClick(async () => {
-              if (!this.settings.apiKey) {
-                new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API Key");
-                return;
-              }
-              if (!await this.ensureIndexReady()) {
-                return;
-              }
-              new SearchModal(this.app, this.retriever, (result) => this.openSearchResult(result)).open();
+            item.setTitle("\u5728\u6B64\u6587\u4EF6\u4E2D\u8BED\u4E49\u641C\u7D22").setIcon("search").onClick(() => {
+              void (async () => {
+                if (!this.settings.apiKey) {
+                  new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API key");
+                  return;
+                }
+                if (!await this.ensureIndexReady()) {
+                  return;
+                }
+                new SearchModal(this.app, this.retriever, (result) => {
+                  void this.openSearchResult(result);
+                }).open();
+              })();
             });
           });
         }
@@ -7824,24 +7821,24 @@ var AiRagPlugin = class extends import_obsidian19.Plugin {
     this.registerEvent(this.app.vault.on("modify", (file) => this.scheduleWikiAutoIngest(file)));
     this.addCommand({
       id: "open-ai-rag-sidebar",
-      name: this.commandT("\u6253\u5F00 AI RAG \u4FA7\u8FB9\u680F", "Open AI RAG Sidebar"),
+      name: this.commandT("\u6253\u5F00 AI RAG \u4FA7\u8FB9\u680F", "Open AI RAG sidebar"),
       callback: () => {
         void this.activateSidebarView();
       }
     });
     this.addCommand({
       id: "build-ai-index",
-      name: this.commandT("\u6784\u5EFA AI \u7D22\u5F15", "Build AI Index"),
+      name: this.commandT("\u6784\u5EFA AI \u7D22\u5F15", "Build AI index"),
       callback: async () => {
         if (!this.settings.apiKey) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API Key\u3002");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API key\u3002");
           return;
         }
         if (this.indexBuildInProgress) {
           if (this.indexBuildModal) {
             this.indexBuildModal.open();
           }
-          new import_obsidian19.Notice("AI \u7D22\u5F15\u6B63\u5728\u6784\u5EFA\u4E2D\u3002");
+          new import_obsidian20.Notice("AI \u7D22\u5F15\u6B63\u5728\u6784\u5EFA\u4E2D\u3002");
           return;
         }
         await this.runFullIndexBuild();
@@ -7849,116 +7846,118 @@ var AiRagPlugin = class extends import_obsidian19.Plugin {
     });
     this.addCommand({
       id: "semantic-search",
-      name: this.commandT("\u8BED\u4E49\u641C\u7D22", "Semantic Search"),
-      hotkeys: [{ modifiers: ["Mod", "Shift"], key: "s" }],
+      name: this.commandT("\u8BED\u4E49\u641C\u7D22", "Semantic search"),
       callback: async () => {
         if (!this.settings.apiKey) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API Key\u3002");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API key\u3002");
           return;
         }
         if (!await this.ensureIndexReady()) {
           return;
         }
-        new SearchModal(this.app, this.retriever, (result) => this.openSearchResult(result)).open();
+        new SearchModal(this.app, this.retriever, (result) => {
+          void this.openSearchResult(result);
+        }).open();
       }
     });
     this.addCommand({
       id: "ask-vault",
-      name: this.commandT("\u77E5\u8BC6\u5E93\u63D0\u95EE", "Ask Vault"),
-      hotkeys: [{ modifiers: ["Mod", "Shift"], key: "a" }],
-      callback: async () => {
+      name: this.commandT("\u77E5\u8BC6\u5E93\u63D0\u95EE", "Ask vault"),
+      callback: () => {
         if (!this.settings.apiKey) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API Key\u3002");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API key\u3002");
           return;
         }
-        new AskVaultModal(this.app, this, this.ragChat, this.enhancementService, (citation) => this.openCitation(citation)).open();
+        new AskVaultModal(this.app, this, this.ragChat, this.enhancementService, (citation) => {
+          void this.openCitation(citation);
+        }).open();
       }
     });
     this.addCommand({
       id: "build-meta-index",
-      name: this.commandT("\u6784\u5EFA\u5143\u6570\u636E\u7D22\u5F15", "Build Meta Index (AI Summary)"),
+      name: this.commandT("\u6784\u5EFA\u5143\u6570\u636E\u7D22\u5F15", "Build meta index (AI summary)"),
       callback: async () => {
         if (!this.settings.apiKey) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API Key\u3002");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API key\u3002");
           return;
         }
         await this.enhancementService.buildMetaIndex((current, total, file) => {
-          new import_obsidian19.Notice(`\u6B63\u5728\u5206\u6790: ${file} (${current}/${total})`);
+          new import_obsidian20.Notice(`\u6B63\u5728\u5206\u6790: ${file} (${current}/${total})`);
         });
-        new import_obsidian19.Notice("\u5143\u6570\u636E\u7D22\u5F15\u6784\u5EFA\u5B8C\u6210\uFF01");
+        new import_obsidian20.Notice("\u5143\u6570\u636E\u7D22\u5F15\u6784\u5EFA\u5B8C\u6210\uFF01");
       }
     });
     this.addCommand({
       id: "show-index-queue",
-      name: this.commandT("\u663E\u793A\u7D22\u5F15\u961F\u5217\u72B6\u6001\uFF08\u8C03\u8BD5\uFF09", "Show Index Queue Status (Debug)"),
+      name: this.commandT("\u663E\u793A\u7D22\u5F15\u961F\u5217\u72B6\u6001\uFF08\u8C03\u8BD5\uFF09", "Show index queue status (debug)"),
       callback: () => {
         const queueSize = this.indexScheduler.getQueueSize();
         const isEnabled = this.settings.autoIndexOnFileChange;
-        new import_obsidian19.Notice(
-          `Auto Index: ${isEnabled ? "Enabled" : "Disabled"}
-Queue Size: ${queueSize}`,
+        new import_obsidian20.Notice(
+          `Auto index: ${isEnabled ? "enabled" : "disabled"}
+Queue size: ${queueSize}`,
           5e3
         );
       }
     });
     this.addCommand({
       id: "flush-index-queue",
-      name: this.commandT("\u7ACB\u5373\u5904\u7406\u7D22\u5F15\u961F\u5217\uFF08\u8C03\u8BD5\uFF09", "Flush Index Queue (Debug)"),
+      name: this.commandT("\u7ACB\u5373\u5904\u7406\u7D22\u5F15\u961F\u5217\uFF08\u8C03\u8BD5\uFF09", "Flush index queue (debug)"),
       callback: async () => {
-        new import_obsidian19.Notice("Flushing index queue...");
+        new import_obsidian20.Notice("Flushing index queue...");
         await this.indexScheduler.flush();
-        new import_obsidian19.Notice("Index queue flushed!");
+        new import_obsidian20.Notice("Index queue flushed!");
       }
     });
     this.addCommand({
       id: "show-user-pattern-stats",
-      name: this.commandT("\u663E\u793A\u7528\u6237\u63D0\u95EE\u6A21\u5F0F\u7EDF\u8BA1", "Show User Pattern Stats"),
+      name: this.commandT("\u663E\u793A\u7528\u6237\u63D0\u95EE\u6A21\u5F0F\u7EDF\u8BA1", "Show user pattern stats"),
       callback: async () => {
         const stats = await this.enhancementService.getUserPatternStats();
         const frequentTerms = await this.enhancementService.getFrequentTerms(5);
-        new import_obsidian19.Notice(
-          `User Pattern Stats:
-Total Questions: ${stats.totalQuestions}
-Unique Terms: ${stats.uniqueTerms}
-Trigger Words: ${stats.triggerWords}
+        new import_obsidian20.Notice(
+          `User pattern stats:
+Total questions: ${stats.totalQuestions}
+Unique terms: ${stats.uniqueTerms}
+Trigger words: ${stats.triggerWords}
 Templates: ${stats.templates}
-Top Terms: ${frequentTerms.join(", ")}`,
+Top terms: ${frequentTerms.join(", ")}`,
           1e4
         );
       }
     });
     this.addCommand({
       id: "show-eval-metrics",
-      name: this.commandT("\u663E\u793A\u8BC4\u6D4B\u6307\u6807", "Show Evaluation Metrics"),
+      name: this.commandT("\u663E\u793A\u8BC4\u6D4B\u6307\u6807", "Show evaluation metrics"),
       callback: async () => {
         const adapter = new ObsidianJsonFileAdapter(this.app);
         const basePath = `${this.app.vault.configDir}/plugins/${this.manifest.id}/data`;
         const loggingService = new LoggingService(adapter, basePath);
         const metrics = await loggingService.calculateMetrics();
         const stats = await loggingService.getStats();
-        new import_obsidian19.Notice(
-          `Evaluation Metrics:
-Retrieval Relevance: ${(metrics.retrievalRelevance * 100).toFixed(1)}%
+        new import_obsidian20.Notice(
+          `Evaluation metrics:
+Retrieval relevance: ${(metrics.retrievalRelevance * 100).toFixed(1)}%
 Groundedness: ${(metrics.groundedness * 100).toFixed(1)}%
-Citation Accuracy: ${(metrics.citationAccuracy * 100).toFixed(1)}%
-Avg Response Time: ${metrics.responseTime.toFixed(0)}ms
+Citation accuracy: ${(metrics.citationAccuracy * 100).toFixed(1)}%
+Avg response time: ${metrics.responseTime.toFixed(0)}ms
 
-Total Queries: ${stats.totalQueries}
-Correction Rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
+Total queries: ${stats.totalQueries}
+Correction rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
           15e3
         );
       }
     });
     this.addCommand({
       id: "show-query-logs",
-      name: this.commandT("\u663E\u793A\u6700\u8FD1\u67E5\u8BE2\u65E5\u5FD7", "Show Recent Query Logs"),
+      name: this.commandT("\u663E\u793A\u6700\u8FD1\u67E5\u8BE2\u65E5\u5FD7", "Show recent query logs"),
       callback: async () => {
         const adapter = new ObsidianJsonFileAdapter(this.app);
         const basePath = `${this.app.vault.configDir}/plugins/${this.manifest.id}/data`;
         const loggingService = new LoggingService(adapter, basePath);
         const stats = await loggingService.getStats();
-        new import_obsidian19.Notice(
-          `Recent Queries:
+        new import_obsidian20.Notice(
+          `Recent queries:
 ` + stats.recentQueries.slice(0, 5).map((q, i) => `${i + 1}. ${q}`).join("\n"),
           1e4
         );
@@ -7966,56 +7965,62 @@ Correction Rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
     });
     this.addCommand({
       id: "init-wiki",
-      name: this.commandT("\u521D\u59CB\u5316 Wiki", "Initialize Wiki"),
+      name: this.commandT("\u521D\u59CB\u5316 wiki", "Initialize wiki"),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 wiki \u529F\u80FD");
+          return;
+        }
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
           return;
         }
         try {
-          await this.wikiService.initializeWikiStructure();
-          new import_obsidian19.Notice("Wiki \u521D\u59CB\u5316\u5B8C\u6210\uFF01");
+          await wikiServices.wikiService.initializeWikiStructure();
+          new import_obsidian20.Notice("wiki \u521D\u59CB\u5316\u5B8C\u6210\uFF01");
         } catch (error) {
-          console.error("Wiki \u521D\u59CB\u5316\u5931\u8D25:", error);
-          new import_obsidian19.Notice("Wiki \u521D\u59CB\u5316\u5931\u8D25");
+          console.error("wiki \u521D\u59CB\u5316\u5931\u8D25:", error);
+          new import_obsidian20.Notice("wiki \u521D\u59CB\u5316\u5931\u8D25");
         }
       }
     });
     this.addCommand({
       id: "wiki-query",
-      name: this.commandT("\u67E5\u8BE2 Wiki", "Query Wiki"),
-      hotkeys: [{ modifiers: ["Mod", "Shift"], key: "w" }],
-      callback: async () => {
+      name: this.commandT("\u67E5\u8BE2 wiki", "Query wiki"),
+      callback: () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 wiki \u529F\u80FD");
           return;
         }
-        if (!this.wikiService.isInitialized()) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u521D\u59CB\u5316 Wiki\uFF08\u8FD0\u884C Initialize Wiki \u547D\u4EE4\uFF09");
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
+          return;
+        }
+        if (!wikiServices.wikiService.isInitialized()) {
+          new import_obsidian20.Notice("\u8BF7\u5148\u521D\u59CB\u5316 wiki\uFF08\u8FD0\u884C Initialize wiki \u547D\u4EE4\uFF09");
           return;
         }
         new WikiQueryModal(
           this.app,
-          this.wikiBuilder,
-          this.wikiService,
+          wikiServices.wikiBuilder,
+          wikiServices.wikiService,
           (path) => {
-            this.app.workspace.openLinkText(path, "", false);
+            void this.app.workspace.openLinkText(path, "", false);
           }
         ).open();
       }
     });
     this.addCommand({
       id: "wiki-ingest-current",
-      name: this.commandT("\u5BFC\u5165\u5F53\u524D\u7B14\u8BB0\u5230 Wiki", "Ingest Current Note to Wiki"),
-      hotkeys: [{ modifiers: ["Mod", "Shift"], key: "i" }],
+      name: this.commandT("\u5BFC\u5165\u5F53\u524D\u7B14\u8BB0\u5230 wiki", "Ingest current note to wiki"),
       callback: async () => {
         const activeFile = this.app.workspace.getActiveFile();
         if (!activeFile) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u6253\u5F00\u4E00\u4E2A\u7B14\u8BB0");
+          new import_obsidian20.Notice("\u8BF7\u5148\u6253\u5F00\u4E00\u4E2A\u7B14\u8BB0");
           return;
         }
         if (this.isInsideWiki(activeFile.path)) {
-          new import_obsidian19.Notice("\u4E0D\u80FD\u5BFC\u5165 Wiki \u9875\u9762");
+          new import_obsidian20.Notice("\u4E0D\u80FD\u5BFC\u5165 wiki \u9875\u9762");
           return;
         }
         await this.ingestNoteWithFeedback(activeFile.path, true);
@@ -8023,15 +8028,15 @@ Correction Rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
     });
     this.addCommand({
       id: "wiki-reingest-current",
-      name: this.commandT("\u91CD\u65B0\u5BFC\u5165\u5F53\u524D\u7B14\u8BB0\u5230 Wiki", "Re-ingest Current Note to Wiki"),
+      name: this.commandT("\u91CD\u65B0\u5BFC\u5165\u5F53\u524D\u7B14\u8BB0\u5230 wiki", "Re-ingest current note to wiki"),
       callback: async () => {
         const activeFile = this.app.workspace.getActiveFile();
         if (!activeFile) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u6253\u5F00\u4E00\u4E2A\u7B14\u8BB0");
+          new import_obsidian20.Notice("\u8BF7\u5148\u6253\u5F00\u4E00\u4E2A\u7B14\u8BB0");
           return;
         }
         if (this.isInsideWiki(activeFile.path)) {
-          new import_obsidian19.Notice("\u4E0D\u80FD\u5BFC\u5165 Wiki \u9875\u9762");
+          new import_obsidian20.Notice("\u4E0D\u80FD\u5BFC\u5165 wiki \u9875\u9762");
           return;
         }
         await this.ingestNoteWithFeedback(activeFile.path, true);
@@ -8039,27 +8044,31 @@ Correction Rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
     });
     this.addCommand({
       id: "wiki-batch-ingest",
-      name: this.commandT("\u4E00\u952E\u5BFC\u5165\u5168\u90E8\u7B14\u8BB0\u5230 Wiki", "Batch Ingest All Notes to Wiki"),
+      name: this.commandT("\u4E00\u952E\u5BFC\u5165\u5168\u90E8\u7B14\u8BB0\u5230 wiki", "Batch ingest all notes to wiki"),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 wiki \u529F\u80FD");
+          return;
+        }
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
           return;
         }
         if (!this.settings.apiKey) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API Key");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API key");
           return;
         }
         const files = this.app.vault.getMarkdownFiles();
         let filePaths = files.filter((f) => !this.isInsideWiki(f.path)).map((f) => f.path);
         filePaths = await this.filterProcessableFiles(filePaths, false);
         if (filePaths.length === 0) {
-          new import_obsidian19.Notice("\u6CA1\u6709\u53EF\u5BFC\u5165\u7684\u7B14\u8BB0");
+          new import_obsidian20.Notice("\u6CA1\u6709\u53EF\u5BFC\u5165\u7684\u7B14\u8BB0");
           return;
         }
         const progressModal = new WikiIngestProgressModal(this.app);
         progressModal.open();
         try {
-          const result = await this.wikiBuilder.batchIngest(
+          const result = await wikiServices.wikiBuilder.batchIngest(
             filePaths,
             (current, total, file) => {
               progressModal.updateProgress(current, total, file);
@@ -8079,41 +8088,45 @@ Correction Rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
           progressModal.complete(summary);
         } catch (error) {
           console.error("\u6279\u91CF\u5BFC\u5165\u5931\u8D25:", error);
-          new import_obsidian19.Notice("\u6279\u91CF\u5BFC\u5165\u5931\u8D25");
+          new import_obsidian20.Notice("\u6279\u91CF\u5BFC\u5165\u5931\u8D25");
           progressModal.close();
         }
       }
     });
     this.addCommand({
       id: "wiki-batch-ingest-interactive",
-      name: this.commandT("\u4EA4\u4E92\u5F0F\u6279\u91CF\u5BFC\u5165 Wiki", "Batch Ingest (Interactive Mode)"),
+      name: this.commandT("\u4EA4\u4E92\u5F0F\u6279\u91CF\u5BFC\u5165 wiki", "Batch ingest (interactive mode)"),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 wiki \u529F\u80FD");
+          return;
+        }
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
           return;
         }
         if (!this.settings.apiKey) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API Key");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API key");
           return;
         }
         const files = this.app.vault.getMarkdownFiles();
         let filePaths = files.filter((f) => !this.isInsideWiki(f.path)).map((f) => f.path);
         filePaths = await this.filterProcessableFiles(filePaths, false);
         if (filePaths.length === 0) {
-          new import_obsidian19.Notice("\u6CA1\u6709\u53EF\u5BFC\u5165\u7684\u7B14\u8BB0");
+          new import_obsidian20.Notice("\u6CA1\u6709\u53EF\u5BFC\u5165\u7684\u7B14\u8BB0");
           return;
         }
         const progressModal = new WikiIngestProgressModal(this.app, true);
         progressModal.open();
         try {
-          const result = await this.wikiBuilder.batchIngest(
+          const result = await wikiServices.wikiBuilder.batchIngest(
             filePaths,
             (current, total, file) => {
               progressModal.updateProgress(current, total, file);
             },
             true,
-            async (fileResult) => {
-              return await progressModal.showFileResult(fileResult);
+            (fileResult) => {
+              return progressModal.showFileResult(fileResult);
             },
             { force: false }
           );
@@ -8128,26 +8141,30 @@ Correction Rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
           progressModal.complete(summary);
         } catch (error) {
           console.error("\u6279\u91CF\u5BFC\u5165\u5931\u8D25:", error);
-          new import_obsidian19.Notice("\u6279\u91CF\u5BFC\u5165\u5931\u8D25");
+          new import_obsidian20.Notice("\u6279\u91CF\u5BFC\u5165\u5931\u8D25");
           progressModal.close();
         }
       }
     });
     this.addCommand({
       id: "wiki-stats",
-      name: this.commandT("\u663E\u793A Wiki \u7EDF\u8BA1", "Show Wiki Stats"),
+      name: this.commandT("\u663E\u793A wiki \u7EDF\u8BA1", "Show wiki stats"),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 wiki \u529F\u80FD");
           return;
         }
-        if (!this.wikiService.isInitialized()) {
-          new import_obsidian19.Notice("Wiki \u5C1A\u672A\u521D\u59CB\u5316");
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
           return;
         }
-        const stats = await this.wikiService.getStats();
-        new import_obsidian19.Notice(
-          `Wiki \u7EDF\u8BA1:
+        if (!wikiServices.wikiService.isInitialized()) {
+          new import_obsidian20.Notice("wiki \u5C1A\u672A\u521D\u59CB\u5316");
+          return;
+        }
+        const stats = await wikiServices.wikiService.getStats();
+        new import_obsidian20.Notice(
+          `wiki \u7EDF\u8BA1:
 FAQ: ${stats.faq}
 Meta: ${stats.meta}
 \u5173\u7CFB: ${stats.relations}
@@ -8163,40 +8180,47 @@ Meta: ${stats.meta}
     });
     this.addCommand({
       id: "wiki-browse",
-      name: this.commandT("\u6D4F\u89C8 Wiki", "Browse Wiki"),
-      hotkeys: [{ modifiers: ["Mod", "Shift"], key: "b" }],
-      callback: async () => {
+      name: this.commandT("\u6D4F\u89C8 wiki", "Browse wiki"),
+      callback: () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 wiki \u529F\u80FD");
           return;
         }
-        if (!this.wikiService.isInitialized()) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u521D\u59CB\u5316 Wiki");
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
+          return;
+        }
+        if (!wikiServices.wikiService.isInitialized()) {
+          new import_obsidian20.Notice("\u8BF7\u5148\u521D\u59CB\u5316 wiki");
           return;
         }
         new WikiBrowserModal(
           this.app,
-          this.wikiService,
+          wikiServices.wikiService,
           (path) => {
-            this.app.workspace.openLinkText(path, "", false);
+            void this.app.workspace.openLinkText(path, "", false);
           }
         ).open();
       }
     });
     this.addCommand({
       id: "wiki-generate-summary",
-      name: this.commandT("\u751F\u6210 Wiki \u603B\u7ED3", "Generate Wiki Summary"),
+      name: this.commandT("\u751F\u6210 wiki \u603B\u7ED3", "Generate wiki summary"),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 wiki \u529F\u80FD");
+          return;
+        }
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
           return;
         }
         if (!this.settings.apiKey) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API Key");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API key");
           return;
         }
-        if (!this.wikiService.isInitialized()) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u521D\u59CB\u5316 Wiki");
+        if (!wikiServices.wikiService.isInitialized()) {
+          new import_obsidian20.Notice("\u8BF7\u5148\u521D\u59CB\u5316 wiki");
           return;
         }
         const topic = await this.promptForInput("\u8BF7\u8F93\u5165\u4E3B\u9898\u540D\u79F0");
@@ -8204,36 +8228,38 @@ Meta: ${stats.meta}
           return;
         }
         try {
-          new import_obsidian19.Notice("\u6B63\u5728\u751F\u6210\u6458\u8981...");
-          const path = await this.wikiBuilder.generateSummary(topic);
-          new import_obsidian19.Notice(`\u6458\u8981\u5DF2\u751F\u6210: ${path}`, 5e3);
-          this.app.workspace.openLinkText(path, "", false);
+          new import_obsidian20.Notice("\u6B63\u5728\u751F\u6210\u6458\u8981...");
+          const path = await wikiServices.wikiBuilder.generateSummary(topic);
+          new import_obsidian20.Notice(`\u6458\u8981\u5DF2\u751F\u6210: ${path}`, 5e3);
+          await this.app.workspace.openLinkText(path, "", false);
         } catch (error) {
           console.error("\u751F\u6210\u6458\u8981\u5931\u8D25:", error);
-          new import_obsidian19.Notice(`\u751F\u6210\u6458\u8981\u5931\u8D25: ${error instanceof Error ? error.message : String(error)}`);
+          new import_obsidian20.Notice(`\u751F\u6210\u6458\u8981\u5931\u8D25: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
     });
     this.addCommand({
       id: "wiki-audit",
-      name: this.commandT("\u5BA1\u8BA1 Wiki", "Audit Wiki"),
+      name: this.commandT("\u5BA1\u8BA1 wiki", "Audit wiki"),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 wiki \u529F\u80FD");
+          return;
+        }
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
           return;
         }
         if (!this.settings.apiKey) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API Key");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API key");
           return;
         }
-        if (!this.wikiService.isInitialized()) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u521D\u59CB\u5316 Wiki");
+        if (!wikiServices.wikiService.isInitialized()) {
+          new import_obsidian20.Notice("\u8BF7\u5148\u521D\u59CB\u5316 wiki");
           return;
         }
         try {
-          new import_obsidian19.Notice("\u6B63\u5728\u5BA1\u8BA1 Wiki...");
-          const adapter = new ObsidianJsonFileAdapter(this.app);
-          const basePath = `${this.app.vault.configDir}/plugins/${this.manifest.id}/data`;
+          new import_obsidian20.Notice("\u6B63\u5728\u5BA1\u8BA1 wiki...");
           const httpClient = new OpenAiCompatibleHttpClient(
             this.settings.apiBaseUrl,
             this.settings.apiKey
@@ -8243,42 +8269,46 @@ Meta: ${stats.meta}
             this.settings.chatModel
           );
           const { WikiAuditor: WikiAuditor2 } = await Promise.resolve().then(() => (init_WikiAuditor(), WikiAuditor_exports));
-          const auditor = new WikiAuditor2(this.app, this.wikiService, llmClient);
+          const auditor = new WikiAuditor2(this.app, wikiServices.wikiService, llmClient);
           const report = await auditor.auditWiki();
           const markdown = auditor.generateReportMarkdown(report);
           const reportPath = `${this.settings.wikiPath}/audit-report.md`;
           const reportFile = this.app.vault.getAbstractFileByPath(reportPath);
-          if (reportFile && reportFile instanceof import_obsidian19.TFile) {
+          if (reportFile && reportFile instanceof import_obsidian20.TFile) {
             await this.app.vault.modify(reportFile, markdown);
           } else {
             await this.app.vault.create(reportPath, markdown);
           }
-          new import_obsidian19.Notice("\u5BA1\u8BA1\u5B8C\u6210\uFF01\u62A5\u544A\u5DF2\u4FDD\u5B58", 5e3);
-          this.app.workspace.openLinkText(reportPath, "", false);
+          new import_obsidian20.Notice("\u5BA1\u8BA1\u5B8C\u6210\uFF01\u62A5\u544A\u5DF2\u4FDD\u5B58", 5e3);
+          await this.app.workspace.openLinkText(reportPath, "", false);
         } catch (error) {
           console.error("\u5BA1\u8BA1\u5931\u8D25:", error);
-          new import_obsidian19.Notice(`\u5BA1\u8BA1\u5931\u8D25: ${error instanceof Error ? error.message : String(error)}`);
+          new import_obsidian20.Notice(`\u5BA1\u8BA1\u5931\u8D25: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
     });
     this.addCommand({
       id: "wiki-auto-fix-orphans",
-      name: this.commandT("\u81EA\u52A8\u4FEE\u590D\u5B64\u7ACB\u9875\u9762", "Auto-fix Orphan Pages"),
+      name: this.commandT("\u81EA\u52A8\u4FEE\u590D\u5B64\u7ACB\u9875\u9762", "Auto-fix orphan pages"),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 wiki \u529F\u80FD");
+          return;
+        }
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
           return;
         }
         if (!this.settings.apiKey) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API Key");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API key");
           return;
         }
-        if (!this.wikiService.isInitialized()) {
-          new import_obsidian19.Notice("\u8BF7\u5148\u521D\u59CB\u5316 Wiki");
+        if (!wikiServices.wikiService.isInitialized()) {
+          new import_obsidian20.Notice("\u8BF7\u5148\u521D\u59CB\u5316 wiki");
           return;
         }
         try {
-          new import_obsidian19.Notice("\u6B63\u5728\u4FEE\u590D\u5B64\u7ACB\u9875\u9762...");
+          new import_obsidian20.Notice("\u6B63\u5728\u4FEE\u590D\u5B64\u7ACB\u9875\u9762...");
           const httpClient = new OpenAiCompatibleHttpClient(
             this.settings.apiBaseUrl,
             this.settings.apiKey
@@ -8288,15 +8318,15 @@ Meta: ${stats.meta}
             this.settings.chatModel
           );
           const { WikiAuditor: WikiAuditor2 } = await Promise.resolve().then(() => (init_WikiAuditor(), WikiAuditor_exports));
-          const auditor = new WikiAuditor2(this.app, this.wikiService, llmClient);
+          const auditor = new WikiAuditor2(this.app, wikiServices.wikiService, llmClient);
           const report = await auditor.auditWiki();
           const orphanPages = report.orphanPages;
           if (orphanPages.length === 0) {
-            new import_obsidian19.Notice("\u6CA1\u6709\u53D1\u73B0\u5B64\u7ACB\u9875\u9762");
+            new import_obsidian20.Notice("\u6CA1\u6709\u53D1\u73B0\u5B64\u7ACB\u9875\u9762");
             return;
           }
           const result = await auditor.autoFixOrphanPages(orphanPages);
-          new import_obsidian19.Notice(
+          new import_obsidian20.Notice(
             `\u4FEE\u590D\u5B8C\u6210\uFF01
 \u6210\u529F: ${result.fixed.length}
 \u5931\u8D25: ${result.failed.length}`,
@@ -8304,41 +8334,51 @@ Meta: ${stats.meta}
           );
         } catch (error) {
           console.error("\u81EA\u52A8\u4FEE\u590D\u5931\u8D25:", error);
-          new import_obsidian19.Notice(`\u81EA\u52A8\u4FEE\u590D\u5931\u8D25: ${error instanceof Error ? error.message : String(error)}`);
+          new import_obsidian20.Notice(`\u81EA\u52A8\u4FEE\u590D\u5931\u8D25: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
     });
     this.addCommand({
       id: "generate-feedback-tuning-report",
-      name: this.commandT("\u751F\u6210\u53CD\u9988\u8C03\u53C2\u62A5\u544A", "Generate Feedback Tuning Report"),
+      name: this.commandT("\u751F\u6210\u53CD\u9988\u8C03\u53C2\u62A5\u544A", "Generate feedback tuning report"),
       callback: async () => {
         if (!this.feedbackTuningService) {
-          new import_obsidian19.Notice(this.t("\u53CD\u9988\u8C03\u53C2\u670D\u52A1\u5C1A\u672A\u5C31\u7EEA", "Feedback tuning service is not ready"));
+          new import_obsidian20.Notice(this.t("\u53CD\u9988\u8C03\u53C2\u670D\u52A1\u5C1A\u672A\u5C31\u7EEA", "Feedback tuning service is not ready"));
           return;
         }
         const reportPath = await this.feedbackTuningService.generateCurrentReport();
-        new import_obsidian19.Notice(
+        new import_obsidian20.Notice(
           this.t(`\u5DF2\u751F\u6210\u53CD\u9988\u8C03\u53C2\u62A5\u544A\uFF1A${reportPath}`, `Feedback tuning report generated: ${reportPath}`),
           6e3
         );
       }
     });
   }
+  getWikiServices() {
+    if (!this.wikiService || !this.wikiBuilder) {
+      new import_obsidian20.Notice(this.t("wiki \u670D\u52A1\u5C1A\u672A\u5C31\u7EEA\uFF0C\u8BF7\u68C0\u67E5\u8BBE\u7F6E\u3002", "wiki services are not ready. Check settings."));
+      return null;
+    }
+    return {
+      wikiService: this.wikiService,
+      wikiBuilder: this.wikiBuilder
+    };
+  }
   /**
    * 简单的输入提示框
    */
   async promptForInput(prompt) {
     return new Promise((resolve) => {
-      const modal = new class extends import_obsidian19.Modal {
+      const modal = new class extends import_obsidian20.Modal {
         onOpen() {
           const { contentEl } = this;
           contentEl.empty();
           contentEl.createEl("h3", { text: prompt });
           const input = contentEl.createEl("input", {
             type: "text",
-            attr: { style: "width: 100%; padding: 8px; margin: 12px 0;" }
+            cls: "ai-rag-prompt-input"
           });
-          const buttonContainer = contentEl.createDiv({ attr: { style: "display: flex; gap: 8px; justify-content: flex-end;" } });
+          const buttonContainer = contentEl.createDiv({ cls: "ai-rag-prompt-actions" });
           const confirmBtn = buttonContainer.createEl("button", { text: "\u786E\u5B9A", cls: "mod-cta" });
           const cancelBtn = buttonContainer.createEl("button", { text: "\u53D6\u6D88" });
           confirmBtn.addEventListener("click", () => {
@@ -8370,45 +8410,49 @@ Meta: ${stats.meta}
   }
   async ingestNoteWithFeedback(filePath, force) {
     if (!this.settings.enableWiki) {
-      new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+      new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 wiki \u529F\u80FD");
+      return;
+    }
+    const wikiServices = this.getWikiServices();
+    if (!wikiServices) {
       return;
     }
     if (!this.settings.apiKey) {
-      new import_obsidian19.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API Key");
+      new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u9875\u586B\u5199 API key");
       return;
     }
     const file = this.app.vault.getAbstractFileByPath(filePath);
-    if (!(file instanceof import_obsidian19.TFile)) {
-      new import_obsidian19.Notice("\u627E\u4E0D\u5230\u8981\u5BFC\u5165\u7684\u7B14\u8BB0");
+    if (!(file instanceof import_obsidian20.TFile)) {
+      new import_obsidian20.Notice("\u627E\u4E0D\u5230\u8981\u5BFC\u5165\u7684\u7B14\u8BB0");
       return;
     }
     if (!await this.confirmSensitiveProcessing(file.path, force)) {
       return;
     }
-    new import_obsidian19.Notice(force ? "\u6B63\u5728\u5BFC\u5165\u5230 Wiki..." : "\u6B63\u5728\u68C0\u67E5\u5E76\u5BFC\u5165\u5230 Wiki...");
-    const result = await this.wikiBuilder.ingestNote(file.path, { force });
+    new import_obsidian20.Notice(force ? "\u6B63\u5728\u5BFC\u5165\u5230 wiki..." : "\u6B63\u5728\u68C0\u67E5\u5E76\u5BFC\u5165\u5230 wiki...");
+    const result = await wikiServices.wikiBuilder.ingestNote(file.path, { force });
     if (result.skippedFiles.length > 0) {
-      new import_obsidian19.Notice("\u8FD9\u7BC7\u7B14\u8BB0\u5DF2\u7ECF\u5BFC\u5165\u8FC7\uFF0C\u5DF2\u81EA\u52A8\u8DF3\u8FC7\u3002");
+      new import_obsidian20.Notice("\u8FD9\u7BC7\u7B14\u8BB0\u5DF2\u7ECF\u5BFC\u5165\u8FC7\uFF0C\u5DF2\u81EA\u52A8\u8DF3\u8FC7\u3002");
       return;
     }
     const metaNote = await this.enhancementService.updateMetaForFile(file.path);
     await this.syncSourceRelatedNotes(file.path);
     await this.maybeSuggestBidirectionalLinks(file.path, metaNote);
     const summary = `\u5BFC\u5165\u5B8C\u6210\uFF01
-- Source \u9875: ${result.sourcePagePath ? "1" : "0"}
+- source \u9875: ${result.sourcePagePath ? "1" : "0"}
 - \u521B\u5EFA ${result.entitiesCreated.length} \u4E2A\u5B9E\u4F53
 - \u66F4\u65B0 ${result.entitiesUpdated.length} \u4E2A\u5B9E\u4F53
 - \u521B\u5EFA ${result.conceptsCreated.length} \u4E2A\u6982\u5FF5
 - \u66F4\u65B0 ${result.conceptsUpdated.length} \u4E2A\u6982\u5FF5
 - \u521B\u5EFA ${result.summariesCreated.length} \u4E2A\u6458\u8981
 - \u66F4\u65B0 ${result.summariesUpdated.length} \u4E2A\u6458\u8981`;
-    new import_obsidian19.Notice(summary, 6e3);
+    new import_obsidian20.Notice(summary, 6e3);
   }
   scheduleWikiAutoIngest(file) {
     if (!this.settings.enableWiki || !this.settings.apiKey || !this.settings.wikiAutoIngest && !this.settings.autoIndexOnFileChange) {
       return;
     }
-    if (!(file instanceof import_obsidian19.TFile) || file.extension !== "md" || this.isInsideWiki(file.path)) {
+    if (!(file instanceof import_obsidian20.TFile) || file.extension !== "md" || this.isInsideWiki(file.path)) {
       return;
     }
     const existingTimer = this.wikiAutoIngestTimers.get(file.path);
@@ -8430,7 +8474,7 @@ Meta: ${stats.meta}
     this.wikiAutoIngestTimers.set(file.path, timer);
   }
   async runWikiAutoIngest(filePath) {
-    if (!this.settings.enableWiki || !this.settings.wikiAutoIngest || !this.wikiBuilder) {
+    if (!this.settings.enableWiki || !this.settings.wikiAutoIngest || !this.wikiBuilder || !this.wikiService) {
       return;
     }
     if (this.isInsideWiki(filePath)) {
@@ -8450,11 +8494,11 @@ Meta: ${stats.meta}
       const metaNote = await this.enhancementService.updateMetaForFile(filePath);
       await this.syncSourceRelatedNotes(filePath);
       await this.maybeSuggestBidirectionalLinks(filePath, metaNote);
-      console.log(
-        `Wiki \u81EA\u52A8\u5BFC\u5165\u5B8C\u6210: ${filePath}\uFF0C\u521B\u5EFA ${result.createdPages.length} \u9875\uFF0C\u66F4\u65B0 ${result.updatedPages.length} \u9875`
+      console.debug(
+        `wiki \u81EA\u52A8\u5BFC\u5165\u5B8C\u6210: ${filePath}\uFF0C\u521B\u5EFA ${result.createdPages.length} \u9875\uFF0C\u66F4\u65B0 ${result.updatedPages.length} \u9875`
       );
     } catch (error) {
-      console.error(`Wiki \u81EA\u52A8\u5BFC\u5165\u5931\u8D25: ${filePath}`, error);
+      console.error(`wiki \u81EA\u52A8\u5BFC\u5165\u5931\u8D25: ${filePath}`, error);
     }
   }
   async confirmSensitiveProcessing(filePath, force = false) {
@@ -8463,7 +8507,7 @@ Meta: ${stats.meta}
       return true;
     }
     const file = this.app.vault.getAbstractFileByPath(filePath);
-    if (!(file instanceof import_obsidian19.TFile)) {
+    if (!(file instanceof import_obsidian20.TFile)) {
       return false;
     }
     const content = await this.app.vault.read(file);
@@ -8474,13 +8518,13 @@ Meta: ${stats.meta}
     if (decision === "private") {
       await this.sensitivityService.markPrivate(filePath);
       await ((_a = this.wikiIngestStateService) == null ? void 0 : _a.markPrivate(file));
-      new import_obsidian19.Notice("\u5DF2\u6807\u8BB0\u4E3A\u79C1\u5BC6\u7B14\u8BB0\uFF0C\u4E0D\u4F1A\u53D1\u9001\u7ED9 AI \u6216\u505A\u6B63\u6587\u5411\u91CF\u5316\u3002");
+      new import_obsidian20.Notice("\u5DF2\u6807\u8BB0\u4E3A\u79C1\u5BC6\u7B14\u8BB0\uFF0C\u4E0D\u4F1A\u53D1\u9001\u7ED9 AI \u6216\u505A\u6B63\u6587\u5411\u91CF\u5316\u3002");
       return false;
     }
     if (!force) {
       await ((_b = this.wikiIngestStateService) == null ? void 0 : _b.markSkipped(file));
     }
-    new import_obsidian19.Notice("\u5DF2\u8DF3\u8FC7\u8BE5\u654F\u611F\u7B14\u8BB0\u3002");
+    new import_obsidian20.Notice("\u5DF2\u8DF3\u8FC7\u8BE5\u654F\u611F\u7B14\u8BB0\u3002");
     return false;
   }
   async filterProcessableFiles(filePaths, force) {
@@ -8515,8 +8559,9 @@ Meta: ${stats.meta}
     await this.saveData(this.settings);
   }
   refreshLocalizedCommandLabels() {
-    var _a, _b, _c, _d, _e;
-    const commandMap = (_b = (_a = this.app) == null ? void 0 : _a.commands) == null ? void 0 : _b.commands;
+    var _a;
+    const commandRegistry = this.app.commands;
+    const commandMap = commandRegistry == null ? void 0 : commandRegistry.commands;
     if (!commandMap) {
       return;
     }
@@ -8526,32 +8571,32 @@ Meta: ${stats.meta}
         commandMap[fullId].name = name;
       }
     }
-    (_e = (_d = (_c = this.app) == null ? void 0 : _c.commands) == null ? void 0 : _d.updateCommands) == null ? void 0 : _e.call(_d);
+    (_a = commandRegistry == null ? void 0 : commandRegistry.updateCommands) == null ? void 0 : _a.call(commandRegistry);
   }
   getLocalizedCommandNames() {
     return {
-      "open-ai-rag-sidebar": this.commandT("\u6253\u5F00 AI RAG \u4FA7\u8FB9\u680F", "Open AI RAG Sidebar"),
-      "build-ai-index": this.commandT("\u6784\u5EFA AI \u7D22\u5F15", "Build AI Index"),
-      "semantic-search": this.commandT("\u8BED\u4E49\u641C\u7D22", "Semantic Search"),
-      "ask-vault": this.commandT("\u77E5\u8BC6\u5E93\u63D0\u95EE", "Ask Vault"),
-      "build-meta-index": this.commandT("\u6784\u5EFA\u5143\u6570\u636E\u7D22\u5F15", "Build Meta Index (AI Summary)"),
-      "show-index-queue": this.commandT("\u663E\u793A\u7D22\u5F15\u961F\u5217\u72B6\u6001\uFF08\u8C03\u8BD5\uFF09", "Show Index Queue Status (Debug)"),
-      "flush-index-queue": this.commandT("\u7ACB\u5373\u5904\u7406\u7D22\u5F15\u961F\u5217\uFF08\u8C03\u8BD5\uFF09", "Flush Index Queue (Debug)"),
-      "show-user-pattern-stats": this.commandT("\u663E\u793A\u7528\u6237\u63D0\u95EE\u6A21\u5F0F\u7EDF\u8BA1", "Show User Pattern Stats"),
-      "show-eval-metrics": this.commandT("\u663E\u793A\u8BC4\u6D4B\u6307\u6807", "Show Evaluation Metrics"),
-      "show-query-logs": this.commandT("\u663E\u793A\u6700\u8FD1\u67E5\u8BE2\u65E5\u5FD7", "Show Recent Query Logs"),
-      "init-wiki": this.commandT("\u521D\u59CB\u5316 Wiki", "Initialize Wiki"),
-      "wiki-query": this.commandT("\u67E5\u8BE2 Wiki", "Query Wiki"),
-      "wiki-ingest-current": this.commandT("\u5BFC\u5165\u5F53\u524D\u7B14\u8BB0\u5230 Wiki", "Ingest Current Note to Wiki"),
-      "wiki-reingest-current": this.commandT("\u91CD\u65B0\u5BFC\u5165\u5F53\u524D\u7B14\u8BB0\u5230 Wiki", "Re-ingest Current Note to Wiki"),
-      "wiki-batch-ingest": this.commandT("\u4E00\u952E\u5BFC\u5165\u5168\u90E8\u7B14\u8BB0\u5230 Wiki", "Batch Ingest All Notes to Wiki"),
-      "wiki-batch-ingest-interactive": this.commandT("\u4EA4\u4E92\u5F0F\u6279\u91CF\u5BFC\u5165 Wiki", "Batch Ingest (Interactive Mode)"),
-      "wiki-stats": this.commandT("\u663E\u793A Wiki \u7EDF\u8BA1", "Show Wiki Stats"),
-      "wiki-browse": this.commandT("\u6D4F\u89C8 Wiki", "Browse Wiki"),
-      "wiki-generate-summary": this.commandT("\u751F\u6210 Wiki \u603B\u7ED3", "Generate Wiki Summary"),
-      "wiki-audit": this.commandT("\u5BA1\u8BA1 Wiki", "Audit Wiki"),
-      "wiki-auto-fix-orphans": this.commandT("\u81EA\u52A8\u4FEE\u590D\u5B64\u7ACB\u9875\u9762", "Auto-fix Orphan Pages"),
-      "generate-feedback-tuning-report": this.commandT("\u751F\u6210\u53CD\u9988\u8C03\u53C2\u62A5\u544A", "Generate Feedback Tuning Report")
+      "open-ai-rag-sidebar": this.commandT("\u6253\u5F00 AI RAG \u4FA7\u8FB9\u680F", "Open AI RAG sidebar"),
+      "build-ai-index": this.commandT("\u6784\u5EFA AI \u7D22\u5F15", "Build AI index"),
+      "semantic-search": this.commandT("\u8BED\u4E49\u641C\u7D22", "Semantic search"),
+      "ask-vault": this.commandT("\u77E5\u8BC6\u5E93\u63D0\u95EE", "Ask vault"),
+      "build-meta-index": this.commandT("\u6784\u5EFA\u5143\u6570\u636E\u7D22\u5F15", "Build meta index (AI summary)"),
+      "show-index-queue": this.commandT("\u663E\u793A\u7D22\u5F15\u961F\u5217\u72B6\u6001\uFF08\u8C03\u8BD5\uFF09", "Show index queue status (debug)"),
+      "flush-index-queue": this.commandT("\u7ACB\u5373\u5904\u7406\u7D22\u5F15\u961F\u5217\uFF08\u8C03\u8BD5\uFF09", "Flush index queue (debug)"),
+      "show-user-pattern-stats": this.commandT("\u663E\u793A\u7528\u6237\u63D0\u95EE\u6A21\u5F0F\u7EDF\u8BA1", "Show user pattern stats"),
+      "show-eval-metrics": this.commandT("\u663E\u793A\u8BC4\u6D4B\u6307\u6807", "Show evaluation metrics"),
+      "show-query-logs": this.commandT("\u663E\u793A\u6700\u8FD1\u67E5\u8BE2\u65E5\u5FD7", "Show recent query logs"),
+      "init-wiki": this.commandT("\u521D\u59CB\u5316 wiki", "Initialize wiki"),
+      "wiki-query": this.commandT("\u67E5\u8BE2 wiki", "Query wiki"),
+      "wiki-ingest-current": this.commandT("\u5BFC\u5165\u5F53\u524D\u7B14\u8BB0\u5230 wiki", "Ingest current note to wiki"),
+      "wiki-reingest-current": this.commandT("\u91CD\u65B0\u5BFC\u5165\u5F53\u524D\u7B14\u8BB0\u5230 wiki", "Re-ingest current note to wiki"),
+      "wiki-batch-ingest": this.commandT("\u4E00\u952E\u5BFC\u5165\u5168\u90E8\u7B14\u8BB0\u5230 wiki", "Batch ingest all notes to wiki"),
+      "wiki-batch-ingest-interactive": this.commandT("\u4EA4\u4E92\u5F0F\u6279\u91CF\u5BFC\u5165 wiki", "Batch ingest (interactive mode)"),
+      "wiki-stats": this.commandT("\u663E\u793A wiki \u7EDF\u8BA1", "Show wiki stats"),
+      "wiki-browse": this.commandT("\u6D4F\u89C8 wiki", "Browse wiki"),
+      "wiki-generate-summary": this.commandT("\u751F\u6210 wiki \u603B\u7ED3", "Generate wiki summary"),
+      "wiki-audit": this.commandT("\u5BA1\u8BA1 wiki", "Audit wiki"),
+      "wiki-auto-fix-orphans": this.commandT("\u81EA\u52A8\u4FEE\u590D\u5B64\u7ACB\u9875\u9762", "Auto-fix orphan pages"),
+      "generate-feedback-tuning-report": this.commandT("\u751F\u6210\u53CD\u9988\u8C03\u53C2\u62A5\u544A", "Generate feedback tuning report")
     };
   }
   rebuildServices() {
@@ -8656,9 +8701,9 @@ Meta: ${stats.meta}
       );
       this.wikiService.setPageUpdateCallback((filePath) => {
         if (this.settings.autoIndexOnFileChange) {
-          console.log(`Wiki \u9875\u9762\u66F4\u65B0: ${filePath}\uFF0C\u89E6\u53D1 RAG \u7D22\u5F15\u66F4\u65B0`);
+          console.debug(`wiki \u9875\u9762\u66F4\u65B0: ${filePath}\uFF0C\u89E6\u53D1 RAG \u7D22\u5F15\u66F4\u65B0`);
           const file = this.app.vault.getAbstractFileByPath(filePath);
-          if (file instanceof import_obsidian19.TFile) {
+          if (file instanceof import_obsidian20.TFile) {
             this.indexScheduler.enqueueUpdate(file, "modify");
           }
         }
@@ -8696,9 +8741,7 @@ Meta: ${stats.meta}
       sourcePath: filePath,
       suggestions,
       language: this.settings.language,
-      onApply: async (targetPaths) => {
-        await this.applySuggestedLinks(filePath, targetPaths);
-      }
+      onApply: (targetPaths) => this.applySuggestedLinks(filePath, targetPaths)
     }).open();
   }
   async applySuggestedLinks(sourcePath, targetPaths) {
@@ -8714,7 +8757,7 @@ Meta: ${stats.meta}
       await this.syncSourceRelatedNotes(path);
     }
     if (result.updated.length > 0) {
-      new import_obsidian19.Notice(
+      new import_obsidian20.Notice(
         this.t(`\u5DF2\u66F4\u65B0 ${result.updated.length} \u7BC7\u7B14\u8BB0\u7684\u76F8\u5173\u94FE\u63A5`, `Updated related links in ${result.updated.length} notes`),
         5e3
       );
@@ -8738,7 +8781,7 @@ Meta: ${stats.meta}
     const sectionBody = mergedLinks.length > 0 ? mergedLinks.map((path) => `- [[${path}]]`).join("\n") : "- \u6682\u65E0";
     const nextContent = this.upsertMarkdownSection(sourcePage.content, "## \u76F8\u5173\u539F\u59CB\u7B14\u8BB0", sectionBody);
     const file = this.app.vault.getAbstractFileByPath(metaNote.sourceWikiPath);
-    if (file instanceof import_obsidian19.TFile && nextContent !== sourcePage.content) {
+    if (file instanceof import_obsidian20.TFile && nextContent !== sourcePage.content) {
       await this.app.vault.modify(file, nextContent);
     }
   }
@@ -8788,12 +8831,12 @@ ${rendered}`;
       });
       const message = `\u7D22\u5F15\u5B8C\u6210\uFF1A${result.filesIndexed} \u4E2A\u6587\u4EF6\uFF0C${result.chunksIndexed} \u4E2A chunks\u3002`;
       progressModal.markCompleted(true, message);
-      new import_obsidian19.Notice(message, 8e3);
+      new import_obsidian20.Notice(message, 8e3);
     } catch (error) {
       console.error(error);
       const message = `\u6784\u5EFA AI \u7D22\u5F15\u5931\u8D25: ${error}`;
       progressModal.markCompleted(false, message);
-      new import_obsidian19.Notice(message, 8e3);
+      new import_obsidian20.Notice(message, 8e3);
     } finally {
       this.indexBuildInProgress = false;
       this.indexBuildModal = void 0;
@@ -8801,7 +8844,7 @@ ${rendered}`;
   }
   async ensureIndexReady() {
     if (await this.indexBuilder.requiresFullRebuild()) {
-      new import_obsidian19.Notice("\u5F53\u524D\u7D22\u5F15\u4E0D\u5B58\u5728\uFF0C\u6216 embedding/chunk \u914D\u7F6E\u5DF2\u53D8\u5316\u3002\u8BF7\u5148\u6267\u884C Build AI Index\u3002", 8e3);
+      new import_obsidian20.Notice("\u5F53\u524D\u7D22\u5F15\u4E0D\u5B58\u5728\uFF0C\u6216 embedding/chunk \u914D\u7F6E\u5DF2\u53D8\u5316\u3002\u8BF7\u5148\u6267\u884C Build AI index\u3002", 8e3);
       return false;
     }
     return true;
@@ -8817,7 +8860,7 @@ ${rendered}`;
       }
     }
     if (leaf) {
-      workspace.revealLeaf(leaf);
+      await workspace.revealLeaf(leaf);
     }
   }
   async openSearchResult(result) {
@@ -8838,14 +8881,14 @@ ${rendered}`;
   async openFileAtCitation(citation) {
     var _a, _b, _c;
     const file = this.app.vault.getAbstractFileByPath(citation.path);
-    if (!(file instanceof import_obsidian19.TFile)) {
-      new import_obsidian19.Notice(`\u627E\u4E0D\u5230\u6587\u4EF6\uFF1A${citation.path}`);
+    if (!(file instanceof import_obsidian20.TFile)) {
+      new import_obsidian20.Notice(`\u627E\u4E0D\u5230\u6587\u4EF6\uFF1A${citation.path}`);
       return;
     }
     const leaf = this.app.workspace.getLeaf(true);
     await leaf.openFile(file);
     const view = leaf.view;
-    if (!(view instanceof import_obsidian19.MarkdownView)) {
+    if (!(view instanceof import_obsidian20.MarkdownView)) {
       return;
     }
     const editor = view.editor;

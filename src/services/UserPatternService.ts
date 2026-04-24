@@ -1,4 +1,3 @@
-import { App } from 'obsidian';
 import { UserPattern } from '../types/index';
 import { ObsidianJsonFileAdapter } from './Storage';
 
@@ -138,7 +137,7 @@ export class UserPatternService {
 
     return text
       .toLowerCase()
-      .split(/[\s,，。！？、；：""''（）\[\]]+/)
+      .split(/[\s,，。！？、；：""''（）[\]]+/)
       .filter(word => word.length > 1 && !stopWords.has(word))
       .slice(0, 10);
   }

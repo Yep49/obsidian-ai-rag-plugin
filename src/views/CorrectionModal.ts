@@ -28,7 +28,7 @@ export class CorrectionModal extends Modal {
     contentEl.addClass('ai-rag-correction-modal');
     const t = (zh: string, en: string) => this.options.language === 'en' ? en : zh;
 
-    contentEl.createEl('h3', { text: t('纠正答案', 'Correct Answer') });
+    contentEl.createEl('h3', { text: t('纠正答案', 'Correct answer') });
     contentEl.createEl('p', { text: `${t('原问题', 'Question')}: ${this.options.question}`, cls: 'ai-rag-correction-question' });
 
     this.correctionEl = contentEl.createEl('textarea', {
@@ -75,7 +75,7 @@ export class CorrectionModal extends Modal {
     const submitBtn = actions.createEl('button', { text: t('保存到 FAQ', 'Save to FAQ'), cls: 'mod-cta' });
 
     cancelBtn.addEventListener('click', () => this.close());
-    submitBtn.addEventListener('click', async () => {
+    submitBtn.addEventListener('click', () => {
       const correction = this.correctionEl.value.trim();
       if (!correction) {
         new Notice(t('请输入正确答案', 'Please enter the corrected answer'));
@@ -85,16 +85,18 @@ export class CorrectionModal extends Modal {
       submitBtn.disabled = true;
       submitBtn.setText(t('保存中...', 'Saving...'));
 
-      try {
+      void (async () => {
+        try {
         await this.options.onSubmit(correction, Array.from(this.selectedNotes));
         new Notice(t('已加入 FAQ，下次同类问题会优先直答', 'Added to FAQ. Similar questions will prefer direct FAQ answers.'));
         this.close();
-      } catch (error) {
+        } catch (error) {
         console.error('保存 FAQ 失败:', error);
         new Notice(t(`保存 FAQ 失败: ${error instanceof Error ? error.message : String(error)}`, `Saving FAQ failed: ${error instanceof Error ? error.message : String(error)}`));
         submitBtn.disabled = false;
         submitBtn.setText(t('保存到 FAQ', 'Save to FAQ'));
-      }
+        }
+      })();
     });
 
     this.correctionEl.focus();

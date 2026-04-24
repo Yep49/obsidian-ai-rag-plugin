@@ -2,7 +2,8 @@ import { App, TFile, TAbstractFile } from 'obsidian';
 import { IndexBuilder } from './IndexBuilder';
 
 interface QueuedUpdate {
-  file: TFile;
+  file?: TFile;
+  path: string;
   type: 'create' | 'modify' | 'delete';
   timestamp: number;
 }
@@ -46,7 +47,7 @@ export class IndexScheduler {
     // 监听文件重命名
     this.app.vault.on('rename', this.handleRename);
 
-    console.log('IndexScheduler: File watching started');
+    console.debug('IndexScheduler: File watching started');
   }
 
   private onFileCreate(file: TAbstractFile) {
@@ -90,6 +91,7 @@ export class IndexScheduler {
     // 添加到队列（覆盖旧的更新）
     this.updateQueue.set(file.path, {
       file,
+      path: file.path,
       type,
       timestamp: Date.now()
     });
@@ -108,7 +110,7 @@ export class IndexScheduler {
   private queueDeleteByPath(path: string) {
     // 对于删除操作，我们需要记录路径
     this.updateQueue.set(path, {
-      file: { path } as TFile,
+      path,
       type: 'delete',
       timestamp: Date.now()
     });
@@ -138,7 +140,7 @@ export class IndexScheduler {
       const updates = Array.from(this.updateQueue.values());
       this.updateQueue.clear();
 
-      console.log(`IndexScheduler: Processing ${updates.length} updates`);
+      console.debug(`IndexScheduler: Processing ${updates.length} updates`);
 
       // 分批处理
       for (let i = 0; i < updates.length; i += this.BATCH_SIZE) {
@@ -149,7 +151,7 @@ export class IndexScheduler {
         );
       }
 
-      console.log('IndexScheduler: Queue processed');
+      console.debug('IndexScheduler: Queue processed');
     } catch (error) {
       console.error('IndexScheduler: Error processing queue:', error);
     } finally {
@@ -162,14 +164,16 @@ export class IndexScheduler {
       switch (update.type) {
         case 'create':
         case 'modify':
-          await this.indexBuilder.updateFile(update.file);
+          if (update.file) {
+            await this.indexBuilder.updateFile(update.file);
+          }
           break;
         case 'delete':
-          await this.indexBuilder.deleteFile(update.file.path);
+          await this.indexBuilder.deleteFile(update.path);
           break;
       }
     } catch (error) {
-      console.error(`IndexScheduler: Error processing ${update.type} for ${update.file.path}:`, error);
+      console.error(`IndexScheduler: Error processing ${update.type} for ${update.path}:`, error);
     }
   }
 
@@ -198,7 +202,7 @@ export class IndexScheduler {
 
     this.updateQueue.clear();
 
-    console.log('IndexScheduler: Disposed');
+    console.debug('IndexScheduler: Disposed');
   }
 
   isDisposed(): boolean {

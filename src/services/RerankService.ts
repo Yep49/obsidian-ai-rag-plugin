@@ -4,7 +4,7 @@ import { PluginSettings } from '../types/index';
 export interface RerankCandidate {
   id: string;
   content: string;
-  metadata?: any;
+  metadata?: unknown;
 }
 
 export interface RerankResult {
@@ -107,11 +107,11 @@ Ranking (indices only, comma-separated):`;
 
 // Cross-Encoder Rerank (占位符，未来可接入专门的 rerank 模型)
 export class CrossEncoderRerankService {
-  async rerank(
+  rerank(
     query: string,
     candidates: RerankCandidate[],
     topK: number
-  ): Promise<RerankResult[]> {
+  ): RerankResult[] {
     // TODO: 接入 cross-encoder 模型
     // 例如：BAAI/bge-reranker-large
 

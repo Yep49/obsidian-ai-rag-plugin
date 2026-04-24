@@ -1,4 +1,23 @@
-﻿// HTTP client for OpenAI-compatible APIs
+﻿import { requestUrl } from 'obsidian';
+
+interface ApiErrorResponse {
+  error?: { message?: string };
+  message?: string;
+}
+
+interface EmbeddingResponse {
+  data: Array<{ embedding: number[] }>;
+}
+
+interface ChatResponse {
+  choices: Array<{ message: { content: string } }>;
+}
+
+type ApiRequestBody = Record<string, unknown>;
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
 
 export class OpenAiCompatibleHttpClient {
   private baseUrl: string;
@@ -12,50 +31,51 @@ export class OpenAiCompatibleHttpClient {
     this.apiKey = apiKey;
   }
 
-  async post(endpoint: string, body: any, retryCount = 0): Promise<any> {
+  async post<TResponse>(endpoint: string, body: ApiRequestBody, retryCount = 0): Promise<TResponse> {
     const url = `${this.baseUrl}${endpoint}`;
+    let timeoutId: number | undefined;
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT);
-
-      console.log(`[API] Request: ${url}`);
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`
-        },
-        body: JSON.stringify(body),
-        signal: controller.signal
+      console.debug(`[API] Request: ${url}`);
+      const timeout = new Promise<never>((_, reject) => {
+        timeoutId = window.setTimeout(() => {
+          reject(new Error(`API request timed out after ${this.TIMEOUT / 1000}s.`));
+        }, this.TIMEOUT);
       });
 
-      clearTimeout(timeoutId);
+      const response = await Promise.race([
+        requestUrl({
+          url,
+          method: 'POST',
+          contentType: 'application/json',
+          headers: {
+            'Authorization': `Bearer ${this.apiKey}`
+          },
+          body: JSON.stringify(body),
+          throw: false
+        }),
+        timeout
+      ]);
 
-      if (!response.ok) {
-        let errorDetail = response.statusText;
-        let errorText = '';
+      if (timeoutId !== undefined) {
+        window.clearTimeout(timeoutId);
+      }
 
-        try {
-          errorText = await response.text();
-          const errorJson = JSON.parse(errorText);
-          errorDetail = errorJson?.error?.message || errorJson?.message || errorText || response.statusText;
-        } catch {
-          if (errorText) {
-            errorDetail = errorText;
-          }
-        }
+      if (response.status >= 400) {
+        const errorJson = response.json as unknown as ApiErrorResponse;
+        const errorText = response.text;
+        const errorDetail = errorJson?.error?.message || errorJson?.message || errorText || 'Unknown API error';
 
         console.error(`[API] Error ${response.status}: ${errorDetail}`);
 
         if (response.status === 429 && retryCount < this.MAX_RETRIES) {
           await this.sleep(this.RETRY_DELAY * (retryCount + 1));
-          return this.post(endpoint, body, retryCount + 1);
+          return this.post<TResponse>(endpoint, body, retryCount + 1);
         }
 
         if (response.status >= 500 && retryCount < this.MAX_RETRIES) {
           await this.sleep(this.RETRY_DELAY);
-          return this.post(endpoint, body, retryCount + 1);
+          return this.post<TResponse>(endpoint, body, retryCount + 1);
         }
 
         if (response.status === 401) {
@@ -73,21 +93,24 @@ export class OpenAiCompatibleHttpClient {
         throw new Error(`API request failed (${response.status}): ${errorDetail}`);
       }
 
-      return await response.json();
-    } catch (error: any) {
-      if (error?.name === 'AbortError') {
-        if (retryCount < this.MAX_RETRIES) {
-          await this.sleep(this.RETRY_DELAY);
-          return this.post(endpoint, body, retryCount + 1);
-        }
-        throw new Error(`API request timed out after ${this.TIMEOUT / 1000}s.`);
+      return response.json as unknown as TResponse;
+    } catch (error) {
+      if (timeoutId !== undefined) {
+        window.clearTimeout(timeoutId);
       }
 
-      const message = String(error?.message || error);
-      if (message.includes('fetch') || message.includes('Failed to fetch')) {
+      const message = getErrorMessage(error);
+      if (message.includes('timed out')) {
         if (retryCount < this.MAX_RETRIES) {
           await this.sleep(this.RETRY_DELAY);
-          return this.post(endpoint, body, retryCount + 1);
+          return this.post<TResponse>(endpoint, body, retryCount + 1);
+        }
+      }
+
+      if (message.includes('requestUrl') || message.includes('Network') || message.includes('Failed')) {
+        if (retryCount < this.MAX_RETRIES) {
+          await this.sleep(this.RETRY_DELAY);
+          return this.post<TResponse>(endpoint, body, retryCount + 1);
         }
         throw new Error(`Network error while connecting to ${this.baseUrl}.`);
       }
@@ -107,7 +130,6 @@ export class OpenAiCompatibleEmbeddingClient {
   private model: string;
   private readonly MAX_TOKENS = 512;
   private readonly CHARS_PER_TOKEN = 2;
-  private static readonly INVALID_CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 
   constructor(httpClient: OpenAiCompatibleHttpClient, model: string) {
     this.httpClient = httpClient;
@@ -117,8 +139,15 @@ export class OpenAiCompatibleEmbeddingClient {
   private normalizeText(text: string): string {
     return (text ?? '')
       .replace(/\r\n?/g, '\n')
-      .replace(OpenAiCompatibleEmbeddingClient.INVALID_CONTROL_CHARS, ' ')
+      .split('')
+      .map(char => this.isInvalidControlChar(char) ? ' ' : char)
+      .join('')
       .trim();
+  }
+
+  private isInvalidControlChar(char: string): boolean {
+    const code = char.charCodeAt(0);
+    return code <= 8 || code === 11 || code === 12 || (code >= 14 && code <= 31) || code === 127;
   }
 
   private truncateText(text: string): string {
@@ -139,7 +168,7 @@ export class OpenAiCompatibleEmbeddingClient {
       throw new Error('Embedding input is empty after normalization.');
     }
 
-    const response = await this.httpClient.post('/embeddings', {
+    const response = await this.httpClient.post<EmbeddingResponse>('/embeddings', {
       model: this.model,
       input: preparedText
     });
@@ -163,7 +192,7 @@ export class OpenAiCompatibleEmbeddingClient {
     }
 
     try {
-      const response = await this.httpClient.post('/embeddings', {
+      const response = await this.httpClient.post<EmbeddingResponse>('/embeddings', {
         model: this.model,
         input: preparedTexts
       });
@@ -174,14 +203,14 @@ export class OpenAiCompatibleEmbeddingClient {
         );
       }
 
-      return response.data.map((item: any) => item.embedding);
+      return response.data.map(item => item.embedding);
     } catch (error) {
       console.warn('[Embedding] Batch request failed, fallback to per-item mode.', error);
 
       const results: number[][] = [];
       for (let i = 0; i < preparedTexts.length; i++) {
         try {
-          const response = await this.httpClient.post('/embeddings', {
+          const response = await this.httpClient.post<EmbeddingResponse>('/embeddings', {
             model: this.model,
             input: preparedTexts[i]
           });
@@ -191,9 +220,8 @@ export class OpenAiCompatibleEmbeddingClient {
           }
 
           results.push(response.data[0].embedding);
-        } catch (itemError: any) {
-          const msg = itemError?.message || String(itemError);
-          throw new Error(`Embedding fallback failed at item ${i + 1}/${preparedTexts.length}: ${msg}`);
+        } catch (itemError) {
+          throw new Error(`Embedding fallback failed at item ${i + 1}/${preparedTexts.length}: ${getErrorMessage(itemError)}`);
         }
       }
 
@@ -213,7 +241,7 @@ export class OpenAiCompatibleLlmClient {
   }
 
   async chat(messages: Array<{ role: string; content: string }>, temperature = 0.7): Promise<string> {
-    const response = await this.httpClient.post('/chat/completions', {
+    const response = await this.httpClient.post<ChatResponse>('/chat/completions', {
       model: this.model,
       messages,
       temperature

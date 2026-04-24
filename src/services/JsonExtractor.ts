@@ -7,7 +7,7 @@ export class JsonExtractor {
    * 从文本中提取 JSON
    * 支持多种格式：纯 JSON、代码块、混合文本等
    */
-  static extract(text: string): any {
+  static extract<T = unknown>(text: string): T {
     if (!text || text.trim().length === 0) {
       throw new Error('Empty response from LLM');
     }
@@ -15,7 +15,7 @@ export class JsonExtractor {
     // 尝试1: 直接解析（最快）
     try {
       return JSON.parse(text.trim());
-    } catch (e) {
+    } catch {
       // 继续尝试其他方法
     }
 
@@ -24,7 +24,7 @@ export class JsonExtractor {
     if (codeBlockMatch) {
       try {
         return JSON.parse(codeBlockMatch[1].trim());
-      } catch (e) {
+      } catch {
         // 继续尝试
       }
     }
@@ -37,7 +37,7 @@ export class JsonExtractor {
       const jsonCandidate = text.substring(firstBrace, lastBrace + 1);
       try {
         return JSON.parse(jsonCandidate);
-      } catch (e) {
+      } catch {
         // 继续尝试
       }
     }
@@ -50,7 +50,7 @@ export class JsonExtractor {
       const jsonCandidate = text.substring(firstBracket, lastBracket + 1);
       try {
         return JSON.parse(jsonCandidate);
-      } catch (e) {
+      } catch {
         // 继续尝试
       }
     }
@@ -59,7 +59,7 @@ export class JsonExtractor {
     const cleanedText = this.removeCommonPrefixes(text);
     try {
       return JSON.parse(cleanedText);
-    } catch (e) {
+    } catch {
       // 继续尝试
     }
 
@@ -67,7 +67,7 @@ export class JsonExtractor {
     const fixedText = this.fixCommonJsonErrors(text);
     try {
       return JSON.parse(fixedText);
-    } catch (e) {
+    } catch {
       // 所有尝试都失败
     }
 
@@ -145,7 +145,7 @@ export class JsonExtractor {
   /**
    * 验证提取的 JSON 是否符合预期结构
    */
-  static validate(json: any, expectedKeys: string[]): boolean {
+  static validate(json: unknown, expectedKeys: string[]): json is Record<string, unknown> {
     if (!json || typeof json !== 'object') {
       return false;
     }
@@ -162,14 +162,17 @@ export class JsonExtractor {
   /**
    * 提取并验证
    */
-  static extractAndValidate(text: string, expectedKeys: string[]): any {
+  static extractAndValidate(text: string, expectedKeys: string[]): Record<string, unknown> {
     const json = this.extract(text);
 
     if (!this.validate(json, expectedKeys)) {
+      const gotKeys = json && typeof json === 'object'
+        ? Object.keys(json as Record<string, unknown>).join(', ')
+        : typeof json;
       throw new Error(
         `Extracted JSON is missing required keys. ` +
         `Expected: ${expectedKeys.join(', ')}. ` +
-        `Got: ${Object.keys(json).join(', ')}`
+        `Got: ${gotKeys}`
       );
     }
 
@@ -179,9 +182,9 @@ export class JsonExtractor {
   /**
    * 安全提取（返回默认值而不是抛出错误）
    */
-  static extractSafe(text: string, defaultValue: any = null): any {
+  static extractSafe<T = unknown>(text: string, defaultValue: T): T {
     try {
-      return this.extract(text);
+      return this.extract<T>(text);
     } catch (error) {
       console.error('JSON extraction failed:', error);
       return defaultValue;

@@ -27,20 +27,20 @@ export class AiRagSidebarView extends ItemView {
   }
 
   getDisplayText(): string {
-    return this.plugin.t('AI RAG 助手', 'AI RAG Assistant');
+    return this.plugin.t('AI RAG 助手', 'AI RAG assistant');
   }
 
   getIcon(): string {
     return 'message-circle';
   }
 
-  async onOpen() {
+  onOpen(): Promise<void> {
     const container = this.containerEl.children[1] as HTMLElement;
     container.empty();
     container.addClass('ai-rag-sidebar');
 
     const header = container.createDiv({ cls: 'ai-rag-sidebar-header' });
-    header.createEl('h4', { text: this.plugin.t('AI RAG 助手', 'AI RAG Assistant') });
+    header.createEl('h4', { text: this.plugin.t('AI RAG 助手', 'AI RAG assistant') });
 
     this.chatEl = container.createDiv({ cls: 'ai-rag-sidebar-chat' });
     this.renderWelcome();
@@ -67,6 +67,8 @@ export class AiRagSidebarView extends ItemView {
         void this.sendMessage();
       }
     });
+
+    return Promise.resolve();
   }
 
   private renderWelcome() {
@@ -140,7 +142,7 @@ export class AiRagSidebarView extends ItemView {
 
     const content = bubble.createDiv({ cls: 'ai-rag-bubble-content markdown-rendered' });
     if (message.role === 'ai') {
-      await MarkdownRenderer.renderMarkdown(message.content, content, '', this);
+      await MarkdownRenderer.render(this.app, message.content, content, '', this);
     } else {
       content.setText(message.content);
     }
@@ -169,7 +171,7 @@ export class AiRagSidebarView extends ItemView {
           cls: 'ai-rag-sidebar-citation-link'
         });
         link.addEventListener('click', () => {
-          this.plugin.openCitation(citation);
+          void this.plugin.openCitation(citation);
         });
         if (index < message.citations!.length - 1) {
           citationsDiv.appendText(' ');
@@ -185,7 +187,8 @@ export class AiRagSidebarView extends ItemView {
     this.renderWelcome();
   }
 
-  async onClose() {
+  onClose(): Promise<void> {
     // no-op
+    return Promise.resolve();
   }
 }

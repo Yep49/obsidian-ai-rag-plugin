@@ -33,7 +33,7 @@ export class IndexBuildProgressModal extends Modal {
     // 进度条
     this.progressEl = contentEl.createDiv({ cls: 'ai-rag-progress-track' });
     this.progressBar = this.progressEl.createDiv({ cls: 'ai-rag-progress-bar' });
-    this.progressBar.style.width = '0%';
+    this.progressBar.setCssProps({ '--ai-rag-progress-width': '0%' });
 
     // 当前文件
     this.fileEl = contentEl.createDiv({ cls: 'ai-rag-build-file ai-rag-muted' });
@@ -50,7 +50,7 @@ export class IndexBuildProgressModal extends Modal {
     const percent = Math.round((progress.current / progress.total) * 100);
 
     this.percentEl.setText(`${percent}%`);
-    this.progressBar.style.width = `${percent}%`;
+    this.progressBar.setCssProps({ '--ai-rag-progress-width': `${percent}%` });
     this.fileEl.setText(`${progress.phase}: ${progress.currentFile}`);
 
     this.metaEl.empty();
@@ -65,7 +65,7 @@ export class IndexBuildProgressModal extends Modal {
       this.statusEl.addClass('is-success');
       this.statusEl.setText('✓ 完成');
       this.percentEl.setText('100%');
-      this.progressBar.style.width = '100%';
+      this.progressBar.setCssProps({ '--ai-rag-progress-width': '100%' });
     } else {
       this.statusEl.addClass('is-error');
       this.statusEl.setText('✗ 失败');

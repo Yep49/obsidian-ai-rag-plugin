@@ -40,7 +40,7 @@ export class WikiAuditor {
     report.orphanPages = this.findOrphanPages(pages);
 
     // 2. 检查缺失的交叉引用
-    report.missingLinks = await this.findMissingLinks(pages);
+    report.missingLinks = this.findMissingLinks(pages);
 
     // 3. 使用 LLM 检查矛盾和过时信息
     const llmChecks = await this.llmAuditPages(pages);
@@ -93,11 +93,8 @@ export class WikiAuditor {
    * 查找缺失的交叉引用
    * 例如：页面 A 提到概念 B，但没有链接到 B 的页面
    */
-  private async findMissingLinks(pages: WikiPage[]): Promise<Array<{page: string; missingConcept: string}>> {
+  private findMissingLinks(pages: WikiPage[]): Array<{page: string; missingConcept: string}> {
     const missingLinks: Array<{page: string; missingConcept: string}> = [];
-
-    // 构建所有页面标题的索引
-    const pageTitles = new Set(pages.map(p => p.title.toLowerCase()));
 
     for (const page of pages) {
       // 提取页面内容中的关键词（简化版）

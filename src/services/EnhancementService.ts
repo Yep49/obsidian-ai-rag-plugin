@@ -15,6 +15,7 @@ import { FAQService } from './FAQService';
 import { SensitivityService } from './SensitivityService';
 import { CorrectionModal } from '../views/CorrectionModal';
 import { TuningProposalModal } from '../views/TuningProposalModal';
+import { OpenAiCompatibleEmbeddingClient, OpenAiCompatibleHttpClient, OpenAiCompatibleLlmClient } from './ApiClients';
 
 interface UpdateMetaOptions {
   promptSensitive?: boolean;
@@ -55,11 +56,14 @@ export class EnhancementService {
       cls: 'ai-rag-copy-button'
     });
 
-    copyBtn.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(text);
-      new Notice(this.t('已复制到剪贴板', 'Copied to clipboard'));
-      copyBtn.textContent = this.t('已复制', 'Copied');
-      window.setTimeout(() => copyBtn.textContent = this.t('复制', 'Copy'), 1600);
+    copyBtn.addEventListener('click', () => {
+      void navigator.clipboard.writeText(text).then(() => {
+        new Notice(this.t('已复制到剪贴板', 'Copied to clipboard'));
+        copyBtn.textContent = this.t('已复制', 'Copied');
+        window.setTimeout(() => copyBtn.textContent = this.t('复制', 'Copy'), 1600);
+      }, error => {
+        console.error('Copy failed:', error);
+      });
     });
 
     return copyBtn;
@@ -115,17 +119,23 @@ export class EnhancementService {
       cls: 'ai-rag-feedback-button ai-rag-feedback-button-negative'
     });
 
-    positiveBtn.addEventListener('click', async () => {
-      await this.recordFeedbackEvent(context, 1);
-      new Notice(this.t('已记录满意反馈', 'Positive feedback saved'));
+    positiveBtn.addEventListener('click', () => {
+      void this.recordFeedbackEvent(context, 1).then(() => {
+        new Notice(this.t('已记录满意反馈', 'Positive feedback saved'));
+      }, error => {
+        console.error('Saving positive feedback failed:', error);
+      });
     });
 
-    negativeBtn.addEventListener('click', async () => {
-      const proposal = await this.recordFeedbackEvent(context, -1);
-      new Notice(this.t('已记录不满意反馈', 'Negative feedback saved'));
-      if (proposal) {
-        this.openTuningProposalModal(proposal);
-      }
+    negativeBtn.addEventListener('click', () => {
+      void this.recordFeedbackEvent(context, -1).then((proposal) => {
+        new Notice(this.t('已记录不满意反馈', 'Negative feedback saved'));
+        if (proposal) {
+          this.openTuningProposalModal(proposal);
+        }
+      }, error => {
+        console.error('Saving negative feedback failed:', error);
+      });
     });
 
     return { positive: positiveBtn, negative: negativeBtn };
@@ -487,15 +497,20 @@ ${relatedWikiPages}
   }
 
   private openTuningProposalModal(proposal: TuningProposal): void {
+    const feedbackTuningService = this.plugin.feedbackTuningService;
+    if (!feedbackTuningService) {
+      return;
+    }
+
     const modal = new TuningProposalModal(this.app, {
       proposal,
       language: this.plugin.settings.language,
       onApply: async () => {
-        const result = await this.plugin.feedbackTuningService!.applyProposal(proposal.id);
+        const result = await feedbackTuningService.applyProposal(proposal.id);
         return { reportPath: result.reportPath };
       },
       onDismiss: async () => {
-        await this.plugin.feedbackTuningService!.dismissProposal(proposal.id);
+        await feedbackTuningService.dismissProposal(proposal.id);
       }
     });
     modal.open();
@@ -588,39 +603,16 @@ ${relatedWikiPages}
     const settings = this.plugin.settings;
     const baseUrl = (settings.embeddingApiBaseUrl || settings.apiBaseUrl).replace(/\/$/, '');
     const apiKey = settings.embeddingApiKey || settings.apiKey;
-    const response = await fetch(baseUrl + '/embeddings', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: settings.embeddingModel,
-        input: text
-      })
-    });
-
-    const data = await response.json();
-    return data.data[0].embedding;
+    const httpClient = new OpenAiCompatibleHttpClient(baseUrl, apiKey);
+    const embeddingClient = new OpenAiCompatibleEmbeddingClient(httpClient, settings.embeddingModel);
+    return embeddingClient.embed(text);
   }
 
   private async callLLM(prompt: string): Promise<string> {
     const settings = this.plugin.settings;
-    const response = await fetch(settings.apiBaseUrl + '/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${settings.apiKey}`
-      },
-      body: JSON.stringify({
-        model: settings.chatModel,
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.3
-      })
-    });
-
-    const data = await response.json();
-    return data.choices[0].message.content;
+    const httpClient = new OpenAiCompatibleHttpClient(settings.apiBaseUrl, settings.apiKey);
+    const llmClient = new OpenAiCompatibleLlmClient(httpClient, settings.chatModel);
+    return llmClient.chat([{ role: 'user', content: prompt }], 0.3);
   }
 
   private async readJSON<T>(path: string): Promise<T | null> {
@@ -632,7 +624,7 @@ ${relatedWikiPages}
     }
   }
 
-  private async writeJSON(path: string, data: any) {
+  private async writeJSON(path: string, data: unknown): Promise<void> {
     const parent = path.substring(0, path.lastIndexOf('/'));
     if (parent) {
       try {

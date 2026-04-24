@@ -11,7 +11,9 @@
   background: var(--background-secondary);
 }
 
-.ai-rag-input {
+.ai-rag-input,
+.ai-rag-search-input,
+.ai-rag-prompt-input {
   width: 100%;
   min-height: 96px;
   margin-bottom: 10px;
@@ -21,6 +23,21 @@
   padding: 10px;
   background: var(--background-primary);
   color: var(--text-normal);
+}
+
+.ai-rag-search-input {
+  min-height: 80px;
+}
+
+.ai-rag-prompt-input {
+  min-height: 0;
+  margin: 12px 0;
+}
+
+.ai-rag-prompt-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .ai-rag-result-list,
@@ -36,6 +53,10 @@
   border-radius: 8px;
   padding: 12px;
   background: var(--background-primary);
+}
+
+.ai-rag-clickable {
+  cursor: pointer;
 }
 
 .ai-rag-snippet,
@@ -155,10 +176,20 @@
 
 .ai-rag-progress-bar {
   height: 100%;
-  width: 0;
+  width: var(--ai-rag-progress-width, 0);
   border-radius: inherit;
   background: linear-gradient(90deg, color-mix(in srgb, var(--interactive-accent) 80%, white), var(--interactive-accent));
   transition: width 180ms ease;
+}
+
+.wiki-progress-bar {
+  width: var(--wiki-progress-width, 0);
+}
+
+.wiki-browser-search-input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
 }
 
 .ai-rag-build-percent {

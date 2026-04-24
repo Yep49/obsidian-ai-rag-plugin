@@ -22,7 +22,7 @@ export class TuningProposalModal extends Modal {
     contentEl.addClass('ai-rag-tuning-modal');
     const t = (zh: string, en: string) => this.options.language === 'en' ? en : zh;
 
-    contentEl.createEl('h3', { text: t('建议调整参数', 'Suggested Parameter Tuning') });
+    contentEl.createEl('h3', { text: t('建议调整参数', 'Suggested parameter tuning') });
     contentEl.createEl('p', { text: this.options.proposal.summary });
 
     const metrics = contentEl.createDiv({ cls: 'ai-rag-muted' });
@@ -51,24 +51,30 @@ export class TuningProposalModal extends Modal {
     const laterBtn = actions.createEl('button', { text: t('稍后处理', 'Later') });
     const applyBtn = actions.createEl('button', { text: t('应用建议', 'Apply suggestion'), cls: 'mod-cta' });
 
-    laterBtn.addEventListener('click', async () => {
-      await this.options.onDismiss();
-      this.close();
+    laterBtn.addEventListener('click', () => {
+      void this.options.onDismiss().then(() => {
+        this.close();
+      }, error => {
+        console.error('Dismiss tuning proposal failed:', error);
+      });
     });
 
-    applyBtn.addEventListener('click', async () => {
+    applyBtn.addEventListener('click', () => {
       applyBtn.disabled = true;
       applyBtn.setText(t('应用中...', 'Applying...'));
-      try {
+
+      void (async () => {
+        try {
         const { reportPath } = await this.options.onApply();
         new Notice(t(`已应用建议，报告已生成: ${reportPath}`, `Applied suggestion. Report generated: ${reportPath}`));
         this.close();
-      } catch (error) {
+        } catch (error) {
         console.error('应用调参建议失败:', error);
         new Notice(t(`应用失败: ${error instanceof Error ? error.message : String(error)}`, `Apply failed: ${error instanceof Error ? error.message : String(error)}`));
         applyBtn.disabled = false;
         applyBtn.setText(t('应用建议', 'Apply suggestion'));
-      }
+        }
+      })();
     });
   }
 

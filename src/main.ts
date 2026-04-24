@@ -67,12 +67,12 @@ export default class AiRagPlugin extends Plugin {
   ragChat!: RagChatService;
   indexScheduler!: IndexScheduler;
   enhancementService!: EnhancementService;
-  wikiService!: WikiService;
-  wikiBuilder!: WikiBuilder;
-  faqService!: FAQService;
-  wikiGraphSearch!: WikiGraphSearchService;
-  sensitivityService!: SensitivityService;
-  wikiIngestStateService!: WikiIngestStateService;
+  wikiService?: WikiService;
+  wikiBuilder?: WikiBuilder;
+  faqService?: FAQService;
+  wikiGraphSearch?: WikiGraphSearchService;
+  sensitivityService?: SensitivityService;
+  wikiIngestStateService?: WikiIngestStateService;
   feedbackTuningService!: FeedbackTuningService;
   noteLinkService!: NoteLinkService;
 
@@ -102,7 +102,7 @@ export default class AiRagPlugin extends Plugin {
     this.registerView(AI_RAG_SIDEBAR_VIEW, (leaf) => new AiRagSidebarView(leaf, this));
 
     // 添加 Ribbon 图标
-    this.addRibbonIcon('message-circle', this.t('AI RAG 助手', 'AI RAG Assistant'), () => {
+    this.addRibbonIcon('message-circle', this.t('AI RAG 助手', 'AI RAG assistant'), () => {
       void this.activateSidebarView();
     });
 
@@ -114,10 +114,10 @@ export default class AiRagPlugin extends Plugin {
           if (this.settings.enableWiki && !this.isInsideWiki(file.path)) {
             menu.addItem((item) => {
               item
-                .setTitle(this.t('导入到 Wiki', 'Ingest to Wiki'))
+                .setTitle(this.t('导入到 wiki', 'Ingest to wiki'))
                 .setIcon('book-plus')
-                .onClick(async () => {
-                  await this.ingestNoteWithFeedback(file.path, true);
+                .onClick(() => {
+                  void this.ingestNoteWithFeedback(file.path, true);
                 });
             });
           }
@@ -127,15 +127,19 @@ export default class AiRagPlugin extends Plugin {
             item
               .setTitle('在此文件中语义搜索')
               .setIcon('search')
-              .onClick(async () => {
-                if (!this.settings.apiKey) {
-                  new Notice('请先在设置页填写 API Key');
-                  return;
-                }
-                if (!await this.ensureIndexReady()) {
-                  return;
-                }
-                new SearchModal(this.app, this.retriever, (result) => this.openSearchResult(result)).open();
+              .onClick(() => {
+                void (async () => {
+                  if (!this.settings.apiKey) {
+                    new Notice('请先在设置页填写 API key');
+                    return;
+                  }
+                  if (!await this.ensureIndexReady()) {
+                    return;
+                  }
+                  new SearchModal(this.app, this.retriever, (result) => {
+                    void this.openSearchResult(result);
+                  }).open();
+                })();
               });
           });
         }
@@ -149,7 +153,7 @@ export default class AiRagPlugin extends Plugin {
     // 命令：打开侧边栏
     this.addCommand({
       id: 'open-ai-rag-sidebar',
-      name: this.commandT('打开 AI RAG 侧边栏', 'Open AI RAG Sidebar'),
+      name: this.commandT('打开 AI RAG 侧边栏', 'Open AI RAG sidebar'),
       callback: () => {
         void this.activateSidebarView();
       }
@@ -158,10 +162,10 @@ export default class AiRagPlugin extends Plugin {
     // 命令：构建索引
     this.addCommand({
       id: 'build-ai-index',
-      name: this.commandT('构建 AI 索引', 'Build AI Index'),
+      name: this.commandT('构建 AI 索引', 'Build AI index'),
       callback: async () => {
         if (!this.settings.apiKey) {
-          new Notice('请先在设置页填写 API Key。');
+          new Notice('请先在设置页填写 API key。');
           return;
         }
         if (this.indexBuildInProgress) {
@@ -178,41 +182,43 @@ export default class AiRagPlugin extends Plugin {
     // 命令：语义搜索
     this.addCommand({
       id: 'semantic-search',
-      name: this.commandT('语义搜索', 'Semantic Search'),
-      hotkeys: [{ modifiers: ['Mod', 'Shift'], key: 's' }],
+      name: this.commandT('语义搜索', 'Semantic search'),
       callback: async () => {
         if (!this.settings.apiKey) {
-          new Notice('请先在设置页填写 API Key。');
+          new Notice('请先在设置页填写 API key。');
           return;
         }
         if (!await this.ensureIndexReady()) {
           return;
         }
-        new SearchModal(this.app, this.retriever, (result) => this.openSearchResult(result)).open();
+        new SearchModal(this.app, this.retriever, (result) => {
+          void this.openSearchResult(result);
+        }).open();
       }
     });
 
     // 命令：Ask Vault
     this.addCommand({
       id: 'ask-vault',
-      name: this.commandT('知识库提问', 'Ask Vault'),
-      hotkeys: [{ modifiers: ['Mod', 'Shift'], key: 'a' }],
-      callback: async () => {
+      name: this.commandT('知识库提问', 'Ask vault'),
+      callback: () => {
         if (!this.settings.apiKey) {
-          new Notice('请先在设置页填写 API Key。');
+          new Notice('请先在设置页填写 API key。');
           return;
         }
-        new AskVaultModal(this.app, this, this.ragChat, this.enhancementService, (citation) => this.openCitation(citation)).open();
+        new AskVaultModal(this.app, this, this.ragChat, this.enhancementService, (citation) => {
+          void this.openCitation(citation);
+        }).open();
       }
     });
 
     // 命令：构建元数据索引
     this.addCommand({
       id: 'build-meta-index',
-      name: this.commandT('构建元数据索引', 'Build Meta Index (AI Summary)'),
+      name: this.commandT('构建元数据索引', 'Build meta index (AI summary)'),
       callback: async () => {
         if (!this.settings.apiKey) {
-          new Notice('请先在设置页填写 API Key。');
+          new Notice('请先在设置页填写 API key。');
           return;
         }
         await this.enhancementService.buildMetaIndex((current, total, file) => {
@@ -225,12 +231,12 @@ export default class AiRagPlugin extends Plugin {
     // 命令：查看索引队列状态（调试用）
     this.addCommand({
       id: 'show-index-queue',
-      name: this.commandT('显示索引队列状态（调试）', 'Show Index Queue Status (Debug)'),
+      name: this.commandT('显示索引队列状态（调试）', 'Show index queue status (debug)'),
       callback: () => {
         const queueSize = this.indexScheduler.getQueueSize();
         const isEnabled = this.settings.autoIndexOnFileChange;
         new Notice(
-          `Auto Index: ${isEnabled ? 'Enabled' : 'Disabled'}\nQueue Size: ${queueSize}`,
+          `Auto index: ${isEnabled ? 'enabled' : 'disabled'}\nQueue size: ${queueSize}`,
           5000
         );
       }
@@ -239,7 +245,7 @@ export default class AiRagPlugin extends Plugin {
     // 命令：手动刷新队列（调试用）
     this.addCommand({
       id: 'flush-index-queue',
-      name: this.commandT('立即处理索引队列（调试）', 'Flush Index Queue (Debug)'),
+      name: this.commandT('立即处理索引队列（调试）', 'Flush index queue (debug)'),
       callback: async () => {
         new Notice('Flushing index queue...');
         await this.indexScheduler.flush();
@@ -250,18 +256,18 @@ export default class AiRagPlugin extends Plugin {
     // 命令：查看用户模式统计
     this.addCommand({
       id: 'show-user-pattern-stats',
-      name: this.commandT('显示用户提问模式统计', 'Show User Pattern Stats'),
+      name: this.commandT('显示用户提问模式统计', 'Show user pattern stats'),
       callback: async () => {
         const stats = await this.enhancementService.getUserPatternStats();
         const frequentTerms = await this.enhancementService.getFrequentTerms(5);
 
         new Notice(
-          `User Pattern Stats:\n` +
-          `Total Questions: ${stats.totalQuestions}\n` +
-          `Unique Terms: ${stats.uniqueTerms}\n` +
-          `Trigger Words: ${stats.triggerWords}\n` +
+          `User pattern stats:\n` +
+          `Total questions: ${stats.totalQuestions}\n` +
+          `Unique terms: ${stats.uniqueTerms}\n` +
+          `Trigger words: ${stats.triggerWords}\n` +
           `Templates: ${stats.templates}\n` +
-          `Top Terms: ${frequentTerms.join(', ')}`,
+          `Top terms: ${frequentTerms.join(', ')}`,
           10000
         );
       }
@@ -270,7 +276,7 @@ export default class AiRagPlugin extends Plugin {
     // 命令：查看评测指标
     this.addCommand({
       id: 'show-eval-metrics',
-      name: this.commandT('显示评测指标', 'Show Evaluation Metrics'),
+      name: this.commandT('显示评测指标', 'Show evaluation metrics'),
       callback: async () => {
         // 需要从 retriever 或 ragChat 获取 loggingService
         // 这里简化处理，直接创建一个新实例
@@ -282,13 +288,13 @@ export default class AiRagPlugin extends Plugin {
         const stats = await loggingService.getStats();
 
         new Notice(
-          `Evaluation Metrics:\n` +
-          `Retrieval Relevance: ${(metrics.retrievalRelevance * 100).toFixed(1)}%\n` +
+          `Evaluation metrics:\n` +
+          `Retrieval relevance: ${(metrics.retrievalRelevance * 100).toFixed(1)}%\n` +
           `Groundedness: ${(metrics.groundedness * 100).toFixed(1)}%\n` +
-          `Citation Accuracy: ${(metrics.citationAccuracy * 100).toFixed(1)}%\n` +
-          `Avg Response Time: ${metrics.responseTime.toFixed(0)}ms\n\n` +
-          `Total Queries: ${stats.totalQueries}\n` +
-          `Correction Rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
+          `Citation accuracy: ${(metrics.citationAccuracy * 100).toFixed(1)}%\n` +
+          `Avg response time: ${metrics.responseTime.toFixed(0)}ms\n\n` +
+          `Total queries: ${stats.totalQueries}\n` +
+          `Correction rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
           15000
         );
       }
@@ -297,7 +303,7 @@ export default class AiRagPlugin extends Plugin {
     // 命令：查看查询日志
     this.addCommand({
       id: 'show-query-logs',
-      name: this.commandT('显示最近查询日志', 'Show Recent Query Logs'),
+      name: this.commandT('显示最近查询日志', 'Show recent query logs'),
       callback: async () => {
         const adapter = new ObsidianJsonFileAdapter(this.app);
         const basePath = `${this.app.vault.configDir}/plugins/${this.manifest.id}/data`;
@@ -306,7 +312,7 @@ export default class AiRagPlugin extends Plugin {
         const stats = await loggingService.getStats();
 
         new Notice(
-          `Recent Queries:\n` +
+          `Recent queries:\n` +
           stats.recentQueries.slice(0, 5).map((q, i) => `${i + 1}. ${q}`).join('\n'),
           10000
         );
@@ -316,44 +322,51 @@ export default class AiRagPlugin extends Plugin {
     // Wiki 命令
     this.addCommand({
       id: 'init-wiki',
-      name: this.commandT('初始化 Wiki', 'Initialize Wiki'),
+      name: this.commandT('初始化 wiki', 'Initialize wiki'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用 wiki 功能');
+          return;
+        }
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
           return;
         }
 
         try {
-          await this.wikiService.initializeWikiStructure();
-          new Notice('Wiki 初始化完成！');
+          await wikiServices.wikiService.initializeWikiStructure();
+          new Notice('wiki 初始化完成！');
         } catch (error) {
-          console.error('Wiki 初始化失败:', error);
-          new Notice('Wiki 初始化失败');
+          console.error('wiki 初始化失败:', error);
+          new Notice('wiki 初始化失败');
         }
       }
     });
 
     this.addCommand({
       id: 'wiki-query',
-      name: this.commandT('查询 Wiki', 'Query Wiki'),
-      hotkeys: [{ modifiers: ['Mod', 'Shift'], key: 'w' }],
-      callback: async () => {
+      name: this.commandT('查询 wiki', 'Query wiki'),
+      callback: () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用 wiki 功能');
+          return;
+        }
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
           return;
         }
 
-        if (!this.wikiService.isInitialized()) {
-          new Notice('请先初始化 Wiki（运行 Initialize Wiki 命令）');
+        if (!wikiServices.wikiService.isInitialized()) {
+          new Notice('请先初始化 wiki（运行 Initialize wiki 命令）');
           return;
         }
 
         new WikiQueryModal(
           this.app,
-          this.wikiBuilder,
-          this.wikiService,
+          wikiServices.wikiBuilder,
+          wikiServices.wikiService,
           (path) => {
-            this.app.workspace.openLinkText(path, '', false);
+            void this.app.workspace.openLinkText(path, '', false);
           }
         ).open();
       }
@@ -361,8 +374,7 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'wiki-ingest-current',
-      name: this.commandT('导入当前笔记到 Wiki', 'Ingest Current Note to Wiki'),
-      hotkeys: [{ modifiers: ['Mod', 'Shift'], key: 'i' }],
+      name: this.commandT('导入当前笔记到 wiki', 'Ingest current note to wiki'),
       callback: async () => {
         const activeFile = this.app.workspace.getActiveFile();
         if (!activeFile) {
@@ -371,7 +383,7 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (this.isInsideWiki(activeFile.path)) {
-          new Notice('不能导入 Wiki 页面');
+          new Notice('不能导入 wiki 页面');
           return;
         }
 
@@ -381,7 +393,7 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'wiki-reingest-current',
-      name: this.commandT('重新导入当前笔记到 Wiki', 'Re-ingest Current Note to Wiki'),
+      name: this.commandT('重新导入当前笔记到 wiki', 'Re-ingest current note to wiki'),
       callback: async () => {
         const activeFile = this.app.workspace.getActiveFile();
         if (!activeFile) {
@@ -390,7 +402,7 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (this.isInsideWiki(activeFile.path)) {
-          new Notice('不能导入 Wiki 页面');
+          new Notice('不能导入 wiki 页面');
           return;
         }
 
@@ -400,15 +412,19 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'wiki-batch-ingest',
-      name: this.commandT('一键导入全部笔记到 Wiki', 'Batch Ingest All Notes to Wiki'),
+      name: this.commandT('一键导入全部笔记到 wiki', 'Batch ingest all notes to wiki'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用 wiki 功能');
+          return;
+        }
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
           return;
         }
 
         if (!this.settings.apiKey) {
-          new Notice('请先在设置页填写 API Key');
+          new Notice('请先在设置页填写 API key');
           return;
         }
 
@@ -428,7 +444,7 @@ export default class AiRagPlugin extends Plugin {
         progressModal.open();
 
         try {
-          const result = await this.wikiBuilder.batchIngest(
+          const result = await wikiServices.wikiBuilder.batchIngest(
             filePaths,
             (current, total, file) => {
               progressModal.updateProgress(current, total, file);
@@ -458,15 +474,19 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'wiki-batch-ingest-interactive',
-      name: this.commandT('交互式批量导入 Wiki', 'Batch Ingest (Interactive Mode)'),
+      name: this.commandT('交互式批量导入 wiki', 'Batch ingest (interactive mode)'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用 wiki 功能');
+          return;
+        }
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
           return;
         }
 
         if (!this.settings.apiKey) {
-          new Notice('请先在设置页填写 API Key');
+          new Notice('请先在设置页填写 API key');
           return;
         }
 
@@ -486,15 +506,15 @@ export default class AiRagPlugin extends Plugin {
         progressModal.open();
 
         try {
-          const result = await this.wikiBuilder.batchIngest(
+          const result = await wikiServices.wikiBuilder.batchIngest(
             filePaths,
             (current, total, file) => {
               progressModal.updateProgress(current, total, file);
             },
             true,
-            async (fileResult) => {
+            (fileResult) => {
               // 显示当前文件结果，等待用户确认
-              return await progressModal.showFileResult(fileResult);
+              return progressModal.showFileResult(fileResult);
             },
             { force: false }
           );
@@ -519,22 +539,26 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'wiki-stats',
-      name: this.commandT('显示 Wiki 统计', 'Show Wiki Stats'),
+      name: this.commandT('显示 wiki 统计', 'Show wiki stats'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用 wiki 功能');
+          return;
+        }
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
           return;
         }
 
-        if (!this.wikiService.isInitialized()) {
-          new Notice('Wiki 尚未初始化');
+        if (!wikiServices.wikiService.isInitialized()) {
+          new Notice('wiki 尚未初始化');
           return;
         }
 
-        const stats = await this.wikiService.getStats();
+        const stats = await wikiServices.wikiService.getStats();
 
         new Notice(
-          `Wiki 统计:\n` +
+          `wiki 统计:\n` +
           `FAQ: ${stats.faq}\n` +
           `Meta: ${stats.meta}\n` +
           `关系: ${stats.relations}\n` +
@@ -551,24 +575,27 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'wiki-browse',
-      name: this.commandT('浏览 Wiki', 'Browse Wiki'),
-      hotkeys: [{ modifiers: ['Mod', 'Shift'], key: 'b' }],
-      callback: async () => {
+      name: this.commandT('浏览 wiki', 'Browse wiki'),
+      callback: () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用 wiki 功能');
+          return;
+        }
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
           return;
         }
 
-        if (!this.wikiService.isInitialized()) {
-          new Notice('请先初始化 Wiki');
+        if (!wikiServices.wikiService.isInitialized()) {
+          new Notice('请先初始化 wiki');
           return;
         }
 
         new WikiBrowserModal(
           this.app,
-          this.wikiService,
+          wikiServices.wikiService,
           (path) => {
-            this.app.workspace.openLinkText(path, '', false);
+            void this.app.workspace.openLinkText(path, '', false);
           }
         ).open();
       }
@@ -576,20 +603,24 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'wiki-generate-summary',
-      name: this.commandT('生成 Wiki 总结', 'Generate Wiki Summary'),
+      name: this.commandT('生成 wiki 总结', 'Generate wiki summary'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用 wiki 功能');
+          return;
+        }
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
           return;
         }
 
         if (!this.settings.apiKey) {
-          new Notice('请先在设置页填写 API Key');
+          new Notice('请先在设置页填写 API key');
           return;
         }
 
-        if (!this.wikiService.isInitialized()) {
-          new Notice('请先初始化 Wiki');
+        if (!wikiServices.wikiService.isInitialized()) {
+          new Notice('请先初始化 wiki');
           return;
         }
 
@@ -601,11 +632,11 @@ export default class AiRagPlugin extends Plugin {
 
         try {
           new Notice('正在生成摘要...');
-          const path = await this.wikiBuilder.generateSummary(topic);
+          const path = await wikiServices.wikiBuilder.generateSummary(topic);
           new Notice(`摘要已生成: ${path}`, 5000);
 
           // 打开生成的摘要
-          this.app.workspace.openLinkText(path, '', false);
+          await this.app.workspace.openLinkText(path, '', false);
         } catch (error) {
           console.error('生成摘要失败:', error);
           new Notice(`生成摘要失败: ${error instanceof Error ? error.message : String(error)}`);
@@ -615,29 +646,31 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'wiki-audit',
-      name: this.commandT('审计 Wiki', 'Audit Wiki'),
+      name: this.commandT('审计 wiki', 'Audit wiki'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用 wiki 功能');
+          return;
+        }
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
           return;
         }
 
         if (!this.settings.apiKey) {
-          new Notice('请先在设置页填写 API Key');
+          new Notice('请先在设置页填写 API key');
           return;
         }
 
-        if (!this.wikiService.isInitialized()) {
-          new Notice('请先初始化 Wiki');
+        if (!wikiServices.wikiService.isInitialized()) {
+          new Notice('请先初始化 wiki');
           return;
         }
 
         try {
-          new Notice('正在审计 Wiki...');
+          new Notice('正在审计 wiki...');
 
           // 创建审计器
-          const adapter = new ObsidianJsonFileAdapter(this.app);
-          const basePath = `${this.app.vault.configDir}/plugins/${this.manifest.id}/data`;
           const httpClient = new OpenAiCompatibleHttpClient(
             this.settings.apiBaseUrl,
             this.settings.apiKey
@@ -648,7 +681,7 @@ export default class AiRagPlugin extends Plugin {
           );
 
           const { WikiAuditor } = await import('./services/WikiAuditor');
-          const auditor = new WikiAuditor(this.app, this.wikiService, llmClient);
+          const auditor = new WikiAuditor(this.app, wikiServices.wikiService, llmClient);
 
           const report = await auditor.auditWiki();
           const markdown = auditor.generateReportMarkdown(report);
@@ -664,7 +697,7 @@ export default class AiRagPlugin extends Plugin {
           }
 
           new Notice('审计完成！报告已保存', 5000);
-          this.app.workspace.openLinkText(reportPath, '', false);
+          await this.app.workspace.openLinkText(reportPath, '', false);
         } catch (error) {
           console.error('审计失败:', error);
           new Notice(`审计失败: ${error instanceof Error ? error.message : String(error)}`);
@@ -674,20 +707,24 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'wiki-auto-fix-orphans',
-      name: this.commandT('自动修复孤立页面', 'Auto-fix Orphan Pages'),
+      name: this.commandT('自动修复孤立页面', 'Auto-fix orphan pages'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用 wiki 功能');
+          return;
+        }
+        const wikiServices = this.getWikiServices();
+        if (!wikiServices) {
           return;
         }
 
         if (!this.settings.apiKey) {
-          new Notice('请先在设置页填写 API Key');
+          new Notice('请先在设置页填写 API key');
           return;
         }
 
-        if (!this.wikiService.isInitialized()) {
-          new Notice('请先初始化 Wiki');
+        if (!wikiServices.wikiService.isInitialized()) {
+          new Notice('请先初始化 wiki');
           return;
         }
 
@@ -705,7 +742,7 @@ export default class AiRagPlugin extends Plugin {
           );
 
           const { WikiAuditor } = await import('./services/WikiAuditor');
-          const auditor = new WikiAuditor(this.app, this.wikiService, llmClient);
+          const auditor = new WikiAuditor(this.app, wikiServices.wikiService, llmClient);
 
           // 先找出孤立页面
           const report = await auditor.auditWiki();
@@ -732,7 +769,7 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'generate-feedback-tuning-report',
-      name: this.commandT('生成反馈调参报告', 'Generate Feedback Tuning Report'),
+      name: this.commandT('生成反馈调参报告', 'Generate feedback tuning report'),
       callback: async () => {
         if (!this.feedbackTuningService) {
           new Notice(this.t('反馈调参服务尚未就绪', 'Feedback tuning service is not ready'));
@@ -748,6 +785,18 @@ export default class AiRagPlugin extends Plugin {
     });
   }
 
+  private getWikiServices(): { wikiService: WikiService; wikiBuilder: WikiBuilder } | null {
+    if (!this.wikiService || !this.wikiBuilder) {
+      new Notice(this.t('wiki 服务尚未就绪，请检查设置。', 'wiki services are not ready. Check settings.'));
+      return null;
+    }
+
+    return {
+      wikiService: this.wikiService,
+      wikiBuilder: this.wikiBuilder
+    };
+  }
+
   /**
    * 简单的输入提示框
    */
@@ -761,10 +810,10 @@ export default class AiRagPlugin extends Plugin {
 
           const input = contentEl.createEl('input', {
             type: 'text',
-            attr: { style: 'width: 100%; padding: 8px; margin: 12px 0;' }
+            cls: 'ai-rag-prompt-input'
           });
 
-          const buttonContainer = contentEl.createDiv({ attr: { style: 'display: flex; gap: 8px; justify-content: flex-end;' } });
+          const buttonContainer = contentEl.createDiv({ cls: 'ai-rag-prompt-actions' });
 
           const confirmBtn = buttonContainer.createEl('button', { text: '确定', cls: 'mod-cta' });
           const cancelBtn = buttonContainer.createEl('button', { text: '取消' });
@@ -804,12 +853,16 @@ export default class AiRagPlugin extends Plugin {
 
   private async ingestNoteWithFeedback(filePath: string, force: boolean): Promise<void> {
     if (!this.settings.enableWiki) {
-      new Notice('请先在设置中启用 Wiki 功能');
+      new Notice('请先在设置中启用 wiki 功能');
+      return;
+    }
+    const wikiServices = this.getWikiServices();
+    if (!wikiServices) {
       return;
     }
 
     if (!this.settings.apiKey) {
-      new Notice('请先在设置页填写 API Key');
+      new Notice('请先在设置页填写 API key');
       return;
     }
 
@@ -823,8 +876,8 @@ export default class AiRagPlugin extends Plugin {
       return;
     }
 
-    new Notice(force ? '正在导入到 Wiki...' : '正在检查并导入到 Wiki...');
-    const result = await this.wikiBuilder.ingestNote(file.path, { force });
+    new Notice(force ? '正在导入到 wiki...' : '正在检查并导入到 wiki...');
+    const result = await wikiServices.wikiBuilder.ingestNote(file.path, { force });
     if (result.skippedFiles.length > 0) {
       new Notice('这篇笔记已经导入过，已自动跳过。');
       return;
@@ -834,7 +887,7 @@ export default class AiRagPlugin extends Plugin {
     await this.syncSourceRelatedNotes(file.path);
     await this.maybeSuggestBidirectionalLinks(file.path, metaNote);
     const summary = `导入完成！
-- Source 页: ${result.sourcePagePath ? '1' : '0'}
+- source 页: ${result.sourcePagePath ? '1' : '0'}
 - 创建 ${result.entitiesCreated.length} 个实体
 - 更新 ${result.entitiesUpdated.length} 个实体
 - 创建 ${result.conceptsCreated.length} 个概念
@@ -880,7 +933,7 @@ export default class AiRagPlugin extends Plugin {
   }
 
   private async runWikiAutoIngest(filePath: string): Promise<void> {
-    if (!this.settings.enableWiki || !this.settings.wikiAutoIngest || !this.wikiBuilder) {
+    if (!this.settings.enableWiki || !this.settings.wikiAutoIngest || !this.wikiBuilder || !this.wikiService) {
       return;
     }
 
@@ -904,11 +957,11 @@ export default class AiRagPlugin extends Plugin {
       const metaNote = await this.enhancementService.updateMetaForFile(filePath);
       await this.syncSourceRelatedNotes(filePath);
       await this.maybeSuggestBidirectionalLinks(filePath, metaNote);
-      console.log(
-        `Wiki 自动导入完成: ${filePath}，创建 ${result.createdPages.length} 页，更新 ${result.updatedPages.length} 页`
+      console.debug(
+        `wiki 自动导入完成: ${filePath}，创建 ${result.createdPages.length} 页，更新 ${result.updatedPages.length} 页`
       );
     } catch (error) {
-      console.error(`Wiki 自动导入失败: ${filePath}`, error);
+      console.error(`wiki 自动导入失败: ${filePath}`, error);
     }
   }
 
@@ -979,7 +1032,13 @@ export default class AiRagPlugin extends Plugin {
   }
 
   refreshLocalizedCommandLabels() {
-    const commandMap = (this.app as any)?.commands?.commands;
+    const commandRegistry = (this.app as typeof this.app & {
+      commands?: {
+        commands?: Record<string, { name: string }>;
+        updateCommands?: () => void;
+      };
+    }).commands;
+    const commandMap = commandRegistry?.commands;
     if (!commandMap) {
       return;
     }
@@ -991,33 +1050,33 @@ export default class AiRagPlugin extends Plugin {
       }
     }
 
-    (this.app as any)?.commands?.updateCommands?.();
+    commandRegistry?.updateCommands?.();
   }
 
   private getLocalizedCommandNames(): Record<string, string> {
     return {
-      'open-ai-rag-sidebar': this.commandT('打开 AI RAG 侧边栏', 'Open AI RAG Sidebar'),
-      'build-ai-index': this.commandT('构建 AI 索引', 'Build AI Index'),
-      'semantic-search': this.commandT('语义搜索', 'Semantic Search'),
-      'ask-vault': this.commandT('知识库提问', 'Ask Vault'),
-      'build-meta-index': this.commandT('构建元数据索引', 'Build Meta Index (AI Summary)'),
-      'show-index-queue': this.commandT('显示索引队列状态（调试）', 'Show Index Queue Status (Debug)'),
-      'flush-index-queue': this.commandT('立即处理索引队列（调试）', 'Flush Index Queue (Debug)'),
-      'show-user-pattern-stats': this.commandT('显示用户提问模式统计', 'Show User Pattern Stats'),
-      'show-eval-metrics': this.commandT('显示评测指标', 'Show Evaluation Metrics'),
-      'show-query-logs': this.commandT('显示最近查询日志', 'Show Recent Query Logs'),
-      'init-wiki': this.commandT('初始化 Wiki', 'Initialize Wiki'),
-      'wiki-query': this.commandT('查询 Wiki', 'Query Wiki'),
-      'wiki-ingest-current': this.commandT('导入当前笔记到 Wiki', 'Ingest Current Note to Wiki'),
-      'wiki-reingest-current': this.commandT('重新导入当前笔记到 Wiki', 'Re-ingest Current Note to Wiki'),
-      'wiki-batch-ingest': this.commandT('一键导入全部笔记到 Wiki', 'Batch Ingest All Notes to Wiki'),
-      'wiki-batch-ingest-interactive': this.commandT('交互式批量导入 Wiki', 'Batch Ingest (Interactive Mode)'),
-      'wiki-stats': this.commandT('显示 Wiki 统计', 'Show Wiki Stats'),
-      'wiki-browse': this.commandT('浏览 Wiki', 'Browse Wiki'),
-      'wiki-generate-summary': this.commandT('生成 Wiki 总结', 'Generate Wiki Summary'),
-      'wiki-audit': this.commandT('审计 Wiki', 'Audit Wiki'),
-      'wiki-auto-fix-orphans': this.commandT('自动修复孤立页面', 'Auto-fix Orphan Pages'),
-      'generate-feedback-tuning-report': this.commandT('生成反馈调参报告', 'Generate Feedback Tuning Report')
+      'open-ai-rag-sidebar': this.commandT('打开 AI RAG 侧边栏', 'Open AI RAG sidebar'),
+      'build-ai-index': this.commandT('构建 AI 索引', 'Build AI index'),
+      'semantic-search': this.commandT('语义搜索', 'Semantic search'),
+      'ask-vault': this.commandT('知识库提问', 'Ask vault'),
+      'build-meta-index': this.commandT('构建元数据索引', 'Build meta index (AI summary)'),
+      'show-index-queue': this.commandT('显示索引队列状态（调试）', 'Show index queue status (debug)'),
+      'flush-index-queue': this.commandT('立即处理索引队列（调试）', 'Flush index queue (debug)'),
+      'show-user-pattern-stats': this.commandT('显示用户提问模式统计', 'Show user pattern stats'),
+      'show-eval-metrics': this.commandT('显示评测指标', 'Show evaluation metrics'),
+      'show-query-logs': this.commandT('显示最近查询日志', 'Show recent query logs'),
+      'init-wiki': this.commandT('初始化 wiki', 'Initialize wiki'),
+      'wiki-query': this.commandT('查询 wiki', 'Query wiki'),
+      'wiki-ingest-current': this.commandT('导入当前笔记到 wiki', 'Ingest current note to wiki'),
+      'wiki-reingest-current': this.commandT('重新导入当前笔记到 wiki', 'Re-ingest current note to wiki'),
+      'wiki-batch-ingest': this.commandT('一键导入全部笔记到 wiki', 'Batch ingest all notes to wiki'),
+      'wiki-batch-ingest-interactive': this.commandT('交互式批量导入 wiki', 'Batch ingest (interactive mode)'),
+      'wiki-stats': this.commandT('显示 wiki 统计', 'Show wiki stats'),
+      'wiki-browse': this.commandT('浏览 wiki', 'Browse wiki'),
+      'wiki-generate-summary': this.commandT('生成 wiki 总结', 'Generate wiki summary'),
+      'wiki-audit': this.commandT('审计 wiki', 'Audit wiki'),
+      'wiki-auto-fix-orphans': this.commandT('自动修复孤立页面', 'Auto-fix orphan pages'),
+      'generate-feedback-tuning-report': this.commandT('生成反馈调参报告', 'Generate feedback tuning report')
     };
   }
 
@@ -1118,12 +1177,12 @@ export default class AiRagPlugin extends Plugin {
     );
 
     // 初始化 Wiki 服务
-    this.wikiService = undefined as any;
-    this.wikiBuilder = undefined as any;
-    this.sensitivityService = undefined as any;
-    this.faqService = undefined as any;
-    this.wikiGraphSearch = undefined as any;
-    this.wikiIngestStateService = undefined as any;
+    this.wikiService = undefined;
+    this.wikiBuilder = undefined;
+    this.sensitivityService = undefined;
+    this.faqService = undefined;
+    this.wikiGraphSearch = undefined;
+    this.wikiIngestStateService = undefined;
 
     if (this.settings.enableWiki) {
       this.wikiService = new WikiService(this.app, this.settings.wikiPath);
@@ -1146,10 +1205,10 @@ export default class AiRagPlugin extends Plugin {
         this.wikiIngestStateService
       );
 
-      // 设置 Wiki 页面更新回调，触发 RAG 索引更新
+      // 设置 wiki 页面更新回调，触发 RAG 索引更新
       this.wikiService.setPageUpdateCallback((filePath: string) => {
         if (this.settings.autoIndexOnFileChange) {
-          console.log(`Wiki 页面更新: ${filePath}，触发 RAG 索引更新`);
+          console.debug(`wiki 页面更新: ${filePath}，触发 RAG 索引更新`);
           // 手动触发索引更新
           const file = this.app.vault.getAbstractFileByPath(filePath);
           if (file instanceof TFile) {
@@ -1199,9 +1258,7 @@ export default class AiRagPlugin extends Plugin {
       sourcePath: filePath,
       suggestions,
       language: this.settings.language,
-      onApply: async (targetPaths) => {
-        await this.applySuggestedLinks(filePath, targetPaths);
-      }
+      onApply: (targetPaths) => this.applySuggestedLinks(filePath, targetPaths)
     }).open();
   }
 
@@ -1320,7 +1377,7 @@ export default class AiRagPlugin extends Plugin {
 
   async ensureIndexReady(): Promise<boolean> {
     if (await this.indexBuilder.requiresFullRebuild()) {
-      new Notice('当前索引不存在，或 embedding/chunk 配置已变化。请先执行 Build AI Index。', 8000);
+      new Notice('当前索引不存在，或 embedding/chunk 配置已变化。请先执行 Build AI index。', 8000);
       return false;
     }
     return true;
@@ -1339,7 +1396,7 @@ export default class AiRagPlugin extends Plugin {
     }
 
     if (leaf) {
-      workspace.revealLeaf(leaf);
+      await workspace.revealLeaf(leaf);
     }
   }
 

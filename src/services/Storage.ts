@@ -1,5 +1,5 @@
 import { App } from 'obsidian';
-import { Chunk, IndexManifest } from '../types/index';
+import { Chunk, IndexedFileMetadata, IndexManifest, StoredEmbedding } from '../types/index';
 
 // JSON 文件适配器
 export class ObsidianJsonFileAdapter {
@@ -41,7 +41,7 @@ export class ObsidianJsonFileAdapter {
   async mkdir(path: string): Promise<void> {
     try {
       await this.app.vault.adapter.mkdir(path);
-    } catch (error) {
+    } catch {
       // 目录可能已存在，忽略错误
     }
   }
@@ -64,7 +64,7 @@ export class JsonIndexManifestStore {
     }
 
     const content = await this.adapter.read(path);
-    return JSON.parse(content);
+    return JSON.parse(content) as IndexManifest;
   }
 
   async save(manifest: IndexManifest): Promise<void> {
@@ -91,7 +91,7 @@ export class JsonMetadataStore {
     }
 
     const content = await this.adapter.read(path);
-    return JSON.parse(content);
+    return JSON.parse(content) as Chunk[];
   }
 
   async saveChunks(chunks: Chunk[]): Promise<void> {
@@ -100,17 +100,17 @@ export class JsonMetadataStore {
     await this.adapter.write(path, JSON.stringify(chunks, null, 2));
   }
 
-  async loadFiles(): Promise<any[]> {
+  async loadFiles(): Promise<IndexedFileMetadata[]> {
     const path = `${this.basePath}/files.json`;
     if (!await this.adapter.exists(path)) {
       return [];
     }
 
     const content = await this.adapter.read(path);
-    return JSON.parse(content);
+    return JSON.parse(content) as IndexedFileMetadata[];
   }
 
-  async saveFiles(files: any[]): Promise<void> {
+  async saveFiles(files: IndexedFileMetadata[]): Promise<void> {
     await this.adapter.mkdir(this.basePath);
     const path = `${this.basePath}/files.json`;
     await this.adapter.write(path, JSON.stringify(files, null, 2));
@@ -139,17 +139,17 @@ export class JsonVectorStore {
     this.basePath = basePath;
   }
 
-  async loadEmbeddings(): Promise<Array<{ chunk: { id: string }; embedding: number[] }>> {
+  async loadEmbeddings(): Promise<StoredEmbedding[]> {
     const path = `${this.basePath}/embeddings.json`;
     if (!await this.adapter.exists(path)) {
       return [];
     }
 
     const content = await this.adapter.read(path);
-    return JSON.parse(content);
+    return JSON.parse(content) as StoredEmbedding[];
   }
 
-  async saveEmbeddings(embeddings: Array<{ chunk: { id: string }; embedding: number[] }>): Promise<void> {
+  async saveEmbeddings(embeddings: StoredEmbedding[]): Promise<void> {
     await this.adapter.mkdir(this.basePath);
     const path = `${this.basePath}/embeddings.json`;
     await this.adapter.write(path, JSON.stringify(embeddings, null, 2));

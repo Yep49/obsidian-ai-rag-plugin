@@ -347,11 +347,13 @@ ${incomingContent.substring(0, 4000)}
         'mergeWikiPage'
       );
 
-      const merged = JsonExtractor.extractSafe(response, null);
+      const merged = JsonExtractor.extractSafe<{ content?: string; conflicts?: unknown } | null>(response, null);
       if (merged && typeof merged.content === 'string') {
         return {
           content: merged.content,
-          conflicts: Array.isArray(merged.conflicts) ? merged.conflicts : []
+          conflicts: Array.isArray(merged.conflicts)
+            ? merged.conflicts.filter((item): item is string => typeof item === 'string')
+            : []
         };
       }
     } catch (error) {
@@ -497,7 +499,7 @@ ${claudeRules ? '6. 严格遵守上述 Wiki 维护规则\n' : ''}
       );
 
       // 使用 JsonExtractor 提取和验证 JSON
-      const analysis = JsonExtractor.extractAndValidate(response, ['sourceSummary', 'entities', 'concepts']);
+      const analysis = JsonExtractor.extractAndValidate(response, ['sourceSummary', 'entities', 'concepts']) as unknown as Partial<WikiAnalysis>;
       return {
         sourceSummary: analysis.sourceSummary || null,
         entities: Array.isArray(analysis.entities) ? analysis.entities : [],
@@ -529,7 +531,7 @@ ${claudeRules ? '6. 严格遵守上述 Wiki 维护规则\n' : ''}
     return pages.filter(page => page.path !== filePath).slice(0, 6);
   }
 
-  private async findCandidateRawNotes(filePath: string, content: string): Promise<string[]> {
+  private findCandidateRawNotes(filePath: string, content: string): string[] {
     const files = this.app.vault.getMarkdownFiles()
       .filter(file => file.path !== filePath && !this.wikiService.isWikiFile(file.path));
     const tokens = this.extractSearchTerms(`${filePath}\n${content}`);
@@ -592,7 +594,7 @@ ${claudeRules ? '6. 严格遵守上述 Wiki 维护规则\n' : ''}
           const shouldContinue = await interactiveCallback(result);
           if (!shouldContinue) {
             // 用户选择停止
-            console.log('用户停止了批量导入');
+            console.debug('用户停止了批量导入');
             break;
           }
         }
@@ -739,10 +741,14 @@ ${context}
       // 使用 JsonExtractor 提取 JSON，带降级处理
       try {
         const result = JsonExtractor.extractAndValidate(response, ['answer', 'shouldArchive']);
+        const answer = typeof result.answer === 'string' ? result.answer : response;
+        const shouldArchive = typeof result.shouldArchive === 'boolean'
+          ? result.shouldArchive
+          : this.shouldArchiveQuestion(question, answer);
         return {
-          answer: result.answer,
+          answer,
           sources,
-          shouldArchive: result.shouldArchive || false
+          shouldArchive
         };
       } catch (extractError) {
         // 降级处理：直接使用响应作为答案
@@ -893,12 +899,14 @@ ${claudeRules ? '5. 严格遵守上述 Wiki 维护规则\n' : ''}
         'keyPoints',
         'content'
       ]);
+      const title = typeof result.title === 'string' ? result.title : topic;
+      const content = typeof result.content === 'string' ? result.content : response;
 
       // 创建摘要页面
       const path = await this.wikiService.createOrUpdatePage(
         'summary',
-        result.title,
-        result.content,
+        title,
+        content,
         category,
         sources.length
       );
@@ -909,7 +917,7 @@ ${claudeRules ? '5. 严格遵守上述 Wiki 维护规则\n' : ''}
         timestamp: Date.now(),
         date: today,
         action: 'summary',
-        title: result.title,
+        title,
         details: `- 生成主题摘要\n- 综合 ${sources.length} 个来源\n- 主题: ${topic}`
       });
 

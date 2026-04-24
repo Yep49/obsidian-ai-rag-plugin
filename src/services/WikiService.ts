@@ -4,7 +4,8 @@ import {
   WikiPageType,
   WikiPageFrontmatter,
   WikiIndexEntry,
-  WikiLogEntry
+  WikiLogEntry,
+  SearchResult
 } from '../types/index';
 
 const WIKI_PAGE_FOLDERS: Record<WikiPageType, string> = {
@@ -129,38 +130,6 @@ export class WikiService {
     await this.ensureLogFile();
     await this.ensureSchemaFile();
 
-    // 检查 Git 仓库
-    await this.checkGitRepository();
-  }
-
-  /**
-   * 检查是否是 Git 仓库，并提示用户
-   */
-  private async checkGitRepository(): Promise<void> {
-    try {
-      const vaultPath = (this.app.vault.adapter as any).basePath;
-      if (!vaultPath || typeof require === 'undefined') {
-        return;
-      }
-
-      const { exec } = require('child_process');
-      const { promisify } = require('util');
-      const execAsync = promisify(exec);
-
-      // 检查是否是 Git 仓库
-      await execAsync('git rev-parse --git-dir', { cwd: vaultPath });
-
-      console.log('✓ 检测到 Git 仓库');
-    } catch (error) {
-      // 不是 Git 仓库，提示用户
-      console.warn('⚠️ 未检测到 Git 仓库');
-      console.warn('建议: Wiki 系统建议使用 Git 进行版本控制');
-      console.warn('你可以运行以下命令初始化 Git:');
-      console.warn('  git init');
-      console.warn('  git add .');
-      console.warn('  git commit -m "Initial Wiki setup"');
-      console.warn('或者安装 Obsidian Git 插件以获得更好的集成体验');
-    }
   }
 
   /**
@@ -390,7 +359,7 @@ ${content}`;
 
     const fmText = fmMatch[1];
     const lines = fmText.split('\n');
-    const fm: any = {};
+    const fm: Record<string, string> = {};
 
     for (const line of lines) {
       const [key, ...valueParts] = line.split(':');
@@ -598,7 +567,7 @@ ${content}`;
   /**
    * 搜索 Wiki 页面（增强版，集成 Retriever）
    */
-  async searchWiki(query: string, retriever?: any): Promise<WikiPage[]> {
+  async searchWiki(query: string, retriever?: { search(query: string): Promise<SearchResult[]> }): Promise<WikiPage[]> {
     // 如果提供了 Retriever，使用混合搜索
     if (retriever) {
       try {

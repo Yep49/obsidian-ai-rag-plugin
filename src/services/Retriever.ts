@@ -58,7 +58,7 @@ export class LexicalSearchService {
 
   private tokenize(text: string): string[] {
     return text
-      .split(/[\s,，。！？、；：""''（）\[\]]+/)
+      .split(/[\s,，。！？、；：""''（）[\]]+/)
       .filter(word => word.length > 0);
   }
 

@@ -1,4 +1,4 @@
-import { App, Modal, Notice, MarkdownRenderer } from 'obsidian';
+import { App, Modal, Notice, MarkdownRenderer, TFile, Component } from 'obsidian';
 import { WikiBuilder } from '../services/WikiBuilder';
 import { WikiService } from '../services/WikiService';
 
@@ -18,6 +18,7 @@ export class WikiQueryModal extends Modal {
   private onArchive?: (path: string) => void;
   private abortController?: AbortController;
   private queryHistory: QueryHistory[] = [];
+  private readonly markdownRendererComponent = new Component();
 
   constructor(
     app: App,
@@ -36,9 +37,10 @@ export class WikiQueryModal extends Modal {
     const { contentEl } = this;
     contentEl.empty();
     contentEl.addClass('wiki-query-modal');
+    this.markdownRendererComponent.load();
 
     // 标题
-    contentEl.createEl('h2', { text: 'Wiki 查询' });
+    contentEl.createEl('h2', { text: 'wiki 查询' });
 
     // 检查 Wiki 是否初始化
     if (!this.wikiService.isInitialized()) {
@@ -68,7 +70,7 @@ export class WikiQueryModal extends Modal {
     const buttonContainer = contentEl.createDiv({ cls: 'wiki-query-buttons' });
 
     const searchButton = buttonContainer.createEl('button', {
-      text: '🔍 搜索 Wiki',
+      text: '🔍 搜索 wiki',
       cls: 'mod-cta'
     });
 
@@ -80,8 +82,8 @@ export class WikiQueryModal extends Modal {
     const resultContainer = contentEl.createDiv({ cls: 'wiki-query-result' });
 
     // 搜索按钮点击
-    searchButton.addEventListener('click', async () => {
-      await this.performSearch(input, searchButton, buttonContainer, resultContainer);
+    searchButton.addEventListener('click', () => {
+      void this.performSearch(input, searchButton, buttonContainer, resultContainer);
     });
 
     // 取消按钮
@@ -109,6 +111,7 @@ export class WikiQueryModal extends Modal {
     if (this.abortController) {
       this.abortController.abort();
     }
+    this.markdownRendererComponent.unload();
   }
 
   /**
@@ -116,30 +119,32 @@ export class WikiQueryModal extends Modal {
    */
   private showEmptyState(contentEl: HTMLElement): void {
     const emptyState = contentEl.createDiv({ cls: 'wiki-empty-state' });
-    emptyState.createEl('h3', { text: '📚 Wiki 还未初始化' });
+    emptyState.createEl('h3', { text: '📚 wiki 还未初始化' });
     emptyState.createEl('p', { text: '点击下方按钮开始创建你的知识库' });
 
     const initButton = emptyState.createEl('button', {
-      text: '🚀 初始化 Wiki',
+      text: '🚀 初始化 wiki',
       cls: 'mod-cta'
     });
 
-    initButton.addEventListener('click', async () => {
+    initButton.addEventListener('click', () => {
       initButton.disabled = true;
       initButton.textContent = '⏳ 初始化中...';
 
-      try {
+      void (async () => {
+        try {
         await this.wikiService.initializeWikiStructure();
-        new Notice('Wiki 初始化完成！');
+        new Notice('wiki 初始化完成！');
         this.close();
         // 重新打开以显示正常界面
         new WikiQueryModal(this.app, this.wikiBuilder, this.wikiService, this.onArchive).open();
-      } catch (error) {
+        } catch (error) {
         console.error('初始化失败:', error);
         new Notice('初始化失败');
         initButton.disabled = false;
-        initButton.textContent = '🚀 初始化 Wiki';
-      }
+        initButton.textContent = '🚀 初始化 wiki';
+        }
+      })();
     });
   }
 
@@ -267,7 +272,7 @@ export class WikiQueryModal extends Modal {
       let errorMsg = '查询失败，请重试';
       if (error instanceof Error) {
         if (error.message.includes('API key') || error.message.includes('401')) {
-          errorMsg = '❌ API Key 无效，请检查设置';
+          errorMsg = '❌ API key 无效，请检查设置';
         } else if (error.message.includes('timeout') || error.message.includes('ETIMEDOUT')) {
           errorMsg = '⏱️ 请求超时，请检查网络连接';
         } else if (error.message.includes('quota') || error.message.includes('429')) {
@@ -291,12 +296,12 @@ export class WikiQueryModal extends Modal {
       });
 
       retryButton.addEventListener('click', () => {
-        this.performSearch(input, searchButton, buttonContainer, resultContainer);
+        void this.performSearch(input, searchButton, buttonContainer, resultContainer);
       });
 
     } finally {
       searchButton.disabled = false;
-      searchButton.textContent = '🔍 搜索 Wiki';
+      searchButton.textContent = '🔍 搜索 wiki';
       cancelSearchButton.remove();
       this.abortController = undefined;
     }
@@ -323,22 +328,26 @@ export class WikiQueryModal extends Modal {
     });
 
     copyButton.addEventListener('click', () => {
-      navigator.clipboard.writeText(result.answer);
-      new Notice('已复制到剪贴板');
-      copyButton.textContent = '✅ 已复制';
-      setTimeout(() => {
-        copyButton.textContent = '📋 复制';
-      }, 2000);
+      void navigator.clipboard.writeText(result.answer).then(() => {
+        new Notice('已复制到剪贴板');
+        copyButton.textContent = '✅ 已复制';
+        setTimeout(() => {
+          copyButton.textContent = '📋 复制';
+        }, 2000);
+      }, error => {
+        console.error('复制失败:', error);
+      });
     });
 
     const answerContent = answerSection.createDiv({ cls: 'wiki-answer-content' });
 
     // 使用 Obsidian 的 MarkdownRenderer
-    await MarkdownRenderer.renderMarkdown(
+    await MarkdownRenderer.render(
+      this.app,
       result.answer,
       answerContent,
       '',
-      this as any
+      this.markdownRendererComponent
     );
 
     // 显示来源
@@ -359,7 +368,7 @@ export class WikiQueryModal extends Modal {
         });
         link.title = source; // 完整路径作为 tooltip
         link.addEventListener('click', () => {
-          this.app.workspace.openLinkText(source, '', false);
+          void this.app.workspace.openLinkText(source, '', false);
         });
       }
     }
@@ -373,13 +382,13 @@ export class WikiQueryModal extends Modal {
       cls: 'wiki-action-button'
     });
 
-    regenerateButton.addEventListener('click', async () => {
+    regenerateButton.addEventListener('click', () => {
       const input = this.contentEl.querySelector('.wiki-query-input') as HTMLTextAreaElement;
       const searchButton = this.contentEl.querySelector('.wiki-query-buttons button') as HTMLButtonElement;
       const buttonContainer = this.contentEl.querySelector('.wiki-query-buttons') as HTMLElement;
 
       if (input && searchButton && buttonContainer) {
-        await this.performSearch(input, searchButton, buttonContainer, resultContainer);
+        void this.performSearch(input, searchButton, buttonContainer, resultContainer);
       }
     });
 
@@ -390,11 +399,12 @@ export class WikiQueryModal extends Modal {
         cls: 'mod-cta'
       });
 
-      archiveButton.addEventListener('click', async () => {
+      archiveButton.addEventListener('click', () => {
         archiveButton.disabled = true;
         archiveButton.textContent = '⏳ 归档中...';
 
-        try {
+        void (async () => {
+          try {
           const path = await this.wikiBuilder.archiveQuery(
             question,
             result.answer,
@@ -408,12 +418,13 @@ export class WikiQueryModal extends Modal {
           }
 
           this.close();
-        } catch (error) {
+          } catch (error) {
           console.error('归档失败:', error);
           new Notice('归档失败');
           archiveButton.disabled = false;
           archiveButton.textContent = '📝 归档';
-        }
+          }
+        })();
       });
     }
 
@@ -428,9 +439,14 @@ export class WikiQueryModal extends Modal {
         const firstSource = result.sources[0];
         const file = this.app.vault.getAbstractFileByPath(firstSource);
 
-        if (file) {
-          this.app.workspace.getLeaf(false).openFile(file as any).then(() => {
-            (this.app as any).commands.executeCommandById('graph:open-local');
+        if (file instanceof TFile) {
+          const appWithCommands = this.app as App & {
+            commands?: { executeCommandById: (id: string) => unknown };
+          };
+          void this.app.workspace.getLeaf(false).openFile(file).then(() => {
+            appWithCommands.commands?.executeCommandById('graph:open-local');
+          }, error => {
+            console.error('打开图谱失败:', error);
           });
         } else {
           new Notice('无法打开文件');
@@ -446,9 +462,9 @@ export class WikiQueryModal extends Modal {
    */
   private loadQueryHistory(): void {
     try {
-      const stored = localStorage.getItem('wiki-query-history');
-      if (stored) {
-        this.queryHistory = JSON.parse(stored);
+      const stored = this.app.loadLocalStorage('wiki-query-history') as QueryHistory[] | null;
+      if (Array.isArray(stored)) {
+        this.queryHistory = stored;
       }
     } catch (error) {
       console.error('加载查询历史失败:', error);
@@ -461,7 +477,7 @@ export class WikiQueryModal extends Modal {
    */
   private saveQueryHistory(): void {
     try {
-      localStorage.setItem('wiki-query-history', JSON.stringify(this.queryHistory));
+      this.app.saveLocalStorage('wiki-query-history', this.queryHistory);
     } catch (error) {
       console.error('保存查询历史失败:', error);
     }
