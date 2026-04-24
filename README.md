@@ -2,6 +2,13 @@
 
 一个面向 Obsidian 的 AI 知识库插件：既保留高级 RAG 检索问答，也新增持久 LLM Wiki 层，让 AI 把原始资料持续整理成可积累、可审计、可互链的 Markdown Wiki。
 
+## 面向新手的中文教程
+
+- [小白使用教程](docs/USER_GUIDE_ZH.md)：从安装、配置 API、构建索引到日常提问、导入 Wiki、保存 FAQ。
+- [底层原理图解](docs/ARCHITECTURE_ZH.md)：用流程图解释 RAG、Embedding、Wiki、FAQ、日志和隐私边界。
+
+> 隐私提醒：本插件不会内置 API Key。构建索引、提问、导入 Wiki 时，会把必要文本发送到你自己配置的 AI API 服务。自动索引和自动导入默认关闭，建议确认笔记隐私范围后再开启。
+
 ## ✨ 核心特性
 
 ### 🔍 主流最佳实践检索链路
