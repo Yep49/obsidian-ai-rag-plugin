@@ -1,7 +1,25 @@
-import { App, TFile } from 'obsidian';
+import {App, TFile } from 'obsidian';
 import { WikiService } from './WikiService';
 import { WikiPage, WikiAuditReport } from '../types/index';
 import { OpenAiCompatibleLlmClient } from './ApiClients';
+
+interface PageAuditResponse {
+  contradictions?: WikiAuditReport['contradictions'];
+  outdatedInfo?: WikiAuditReport['outdatedInfo'];
+}
+
+function isContradiction(value: unknown): value is WikiAuditReport['contradictions'][number] {
+  return typeof value === 'object' && value !== null &&
+    typeof (value as { page1?: unknown }).page1 === 'string' &&
+    typeof (value as { page2?: unknown }).page2 === 'string' &&
+    typeof (value as { issue?: unknown }).issue === 'string';
+}
+
+function isOutdatedInfo(value: unknown): value is WikiAuditReport['outdatedInfo'][number] {
+  return typeof value === 'object' && value !== null &&
+    typeof (value as { page?: unknown }).page === 'string' &&
+    typeof (value as { reason?: unknown }).reason === 'string';
+}
 
 /**
  * WikiAuditor - Wiki 审计服务
@@ -164,16 +182,16 @@ ${pagesContext}
 
         const jsonMatch = response.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-          const result = JSON.parse(jsonMatch[0]);
-          contradictions.push(...(result.contradictions || []));
-          outdatedInfo.push(...(result.outdatedInfo || []));
+          const result = JSON.parse(jsonMatch[0]) as unknown as PageAuditResponse;
+          contradictions.push(...(Array.isArray(result.contradictions) ? result.contradictions.filter(isContradiction) : []));
+          outdatedInfo.push(...(Array.isArray(result.outdatedInfo) ? result.outdatedInfo.filter(isOutdatedInfo) : []));
         }
       } catch (error) {
         console.error('LLM 审计失败:', error);
       }
 
       // 避免 API 限流
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => activeWindow.setTimeout(resolve, 1000));
     }
 
     return { contradictions, outdatedInfo };
@@ -213,8 +231,10 @@ ${pagesContext}
 
       const jsonMatch = response.match(/\[[\s\S]*?\]/);
       if (jsonMatch) {
-        const gaps = JSON.parse(jsonMatch[0]);
-        dataGaps.push(...gaps);
+        const gaps = JSON.parse(jsonMatch[0]) as unknown;
+        if (Array.isArray(gaps)) {
+          dataGaps.push(...gaps.filter((gap): gap is string => typeof gap === 'string'));
+        }
       }
     } catch (error) {
       console.error('识别知识空白失败:', error);
@@ -426,7 +446,7 @@ ${pagesContext}
       }
 
       // 避免 API 限流
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => activeWindow.setTimeout(resolve, 1000));
     }
 
     return { fixed, failed };
@@ -462,14 +482,14 @@ ${otherPages.slice(0, 20).map(p => `- ${p.title} (${p.type})`).join('\n')}
 
       const jsonMatch = response.match(/\[[\s\S]*?\]/);
       if (jsonMatch) {
-        const titles = JSON.parse(jsonMatch[0]);
+        const titles = JSON.parse(jsonMatch[0]) as unknown;
         // 转换标题为路径
-        return titles
+        return (Array.isArray(titles) ? titles.filter((title): title is string => typeof title === 'string') : [])
           .map((title: string) => {
             const matchedPage = otherPages.find(p => p.title === title);
             return matchedPage ? matchedPage.path : null;
           })
-          .filter((path: string | null) => path !== null);
+          .filter((path): path is string => path !== null);
       }
     } catch (error) {
       console.error('建议链接失败:', error);

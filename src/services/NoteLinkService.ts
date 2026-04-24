@@ -50,8 +50,7 @@ export class NoteLinkService {
       }
 
       const wikiContent = await this.app.vault.read(wikiFile);
-      const linkedRawNotes = (wikiContent.match(/\[\[([^\]]+)\]\]/g) || [])
-        .map(link => link.replace(/^\[\[/, '').replace(/\]\]$/, '').split('|')[0].trim())
+      const linkedRawNotes = this.extractWikiLinks(wikiContent)
         .filter(path => path && !this.isWikiPath(path) && path !== filePath && /\.md$/i.test(path));
 
       for (const rawPath of linkedRawNotes) {
@@ -128,10 +127,14 @@ export class NoteLinkService {
       return [];
     }
 
-    return Array.from(new Set(
-      (section.body.match(/\[\[([^\]]+)\]\]/g) || [])
-        .map(link => link.replace(/^\[\[/, '').replace(/\]\]$/, '').split('|')[0].trim())
-    ));
+    return Array.from(new Set(this.extractWikiLinks(section.body)));
+  }
+
+  private extractWikiLinks(content: string): string[] {
+    const matches = content.match(/\[\[([^\]]+)\]\]/g) ?? [];
+    return matches.map((link: string) =>
+      link.replace(/^\[\[/, '').replace(/\]\]$/, '').split('|')[0].trim()
+    );
   }
 
   private async upsertRelatedLink(file: TFile, targetPath: string): Promise<void> {

@@ -7,10 +7,12 @@ import { UserPatternService } from './UserPatternService';
 export interface QueryAnalysis {
   standaloneQuestion: string;
   queryVariants: string[];
-  inferredFilters?: {
-    tags?: string[];
-    paths?: string[];
-  };
+  inferredFilters?: QueryFilters;
+}
+
+export interface QueryFilters {
+  tags?: string[];
+  paths?: string[];
 }
 
 // 查询分析服务
@@ -140,9 +142,9 @@ Alternative Questions:`;
     return variants;
   }
 
-  private inferFilters(query: string): { tags?: string[]; paths?: string[] } | undefined {
+  private inferFilters(query: string): QueryFilters | undefined {
     // 简单的关键词匹配推断
-    const filters: { tags?: string[]; paths?: string[] } = {};
+    const filters: QueryFilters = {};
 
     // 提取可能的标签
     const tagMatches = query.match(/#([a-zA-Z0-9_\u4e00-\u9fa5]+)/g);
@@ -162,7 +164,7 @@ Alternative Questions:`;
   // 应用过滤器到检索结果
   applyFilters(
     results: Array<{ id: string; score: number; chunk?: Chunk }>,
-    filters?: { tags?: string[]; paths?: string[] }
+    filters?: QueryFilters
   ): Array<{ id: string; score: number; chunk?: Chunk }> {
     if (!filters) {
       return results;

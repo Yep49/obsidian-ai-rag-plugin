@@ -42,8 +42,8 @@ export class RagChatService {
     if (this.faqService?.isStrongMatch(bestFAQ)) {
       await this.loggingService?.endQuery();
       return {
-        answer: bestFAQ!.entry.correction,
-        citations: this.buildFAQCitations(bestFAQ!),
+        answer: bestFAQ.entry.correction,
+        citations: this.buildFAQCitations(bestFAQ),
         sourceLayer: 'faq',
         faqMatches,
         wikiPages: [],

@@ -1,4 +1,4 @@
-﻿import { requestUrl } from 'obsidian';
+﻿import {requestUrl } from 'obsidian';
 
 interface ApiErrorResponse {
   error?: { message?: string };
@@ -38,7 +38,7 @@ export class OpenAiCompatibleHttpClient {
     try {
       console.debug(`[API] Request: ${url}`);
       const timeout = new Promise<never>((_, reject) => {
-        timeoutId = window.setTimeout(() => {
+        timeoutId = activeWindow.setTimeout(() => {
           reject(new Error(`API request timed out after ${this.TIMEOUT / 1000}s.`));
         }, this.TIMEOUT);
       });
@@ -58,7 +58,7 @@ export class OpenAiCompatibleHttpClient {
       ]);
 
       if (timeoutId !== undefined) {
-        window.clearTimeout(timeoutId);
+        activeWindow.clearTimeout(timeoutId);
       }
 
       if (response.status >= 400) {
@@ -93,10 +93,11 @@ export class OpenAiCompatibleHttpClient {
         throw new Error(`API request failed (${response.status}): ${errorDetail}`);
       }
 
-      return response.json as unknown as TResponse;
+      const responseJson: unknown = response.json;
+      return responseJson as TResponse;
     } catch (error) {
       if (timeoutId !== undefined) {
-        window.clearTimeout(timeoutId);
+        activeWindow.clearTimeout(timeoutId);
       }
 
       const message = getErrorMessage(error);
@@ -120,7 +121,7 @@ export class OpenAiCompatibleHttpClient {
   }
 
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => activeWindow.setTimeout(resolve, ms));
   }
 }
 

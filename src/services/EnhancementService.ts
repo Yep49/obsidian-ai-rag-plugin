@@ -1,4 +1,4 @@
-import { App, Notice, TFile } from 'obsidian';
+import {App, Notice, TFile } from 'obsidian';
 import {
   CorrectionContext,
   FeedbackEvent,
@@ -60,7 +60,7 @@ export class EnhancementService {
       void navigator.clipboard.writeText(text).then(() => {
         new Notice(this.t('已复制到剪贴板', 'Copied to clipboard'));
         copyBtn.textContent = this.t('已复制', 'Copied');
-        window.setTimeout(() => copyBtn.textContent = this.t('复制', 'Copy'), 1600);
+        activeWindow.setTimeout(() => copyBtn.textContent = this.t('复制', 'Copy'), 1600);
       }, error => {
         console.error('Copy failed:', error);
       });
@@ -352,7 +352,8 @@ ${candidateWikiPages.length > 0 ? candidateWikiPages.join('\n') : '- 暂无'}
 
     const response = await this.callLLM(prompt);
     try {
-      const parsed = JSON.parse(response);
+      const parsedJson: unknown = JSON.parse(response);
+      const parsed = parsedJson as Partial<Omit<MetaNote, 'path' | 'mtime'>>;
       return {
         summary: parsed.summary || '无法生成摘要',
         userRelation: parsed.userRelation || '未知',
@@ -618,7 +619,8 @@ ${relatedWikiPages}
   private async readJSON<T>(path: string): Promise<T | null> {
     try {
       const content = await this.app.vault.adapter.read(path);
-      return JSON.parse(content);
+      const parsed: unknown = JSON.parse(content);
+      return parsed as T;
     } catch {
       return null;
     }

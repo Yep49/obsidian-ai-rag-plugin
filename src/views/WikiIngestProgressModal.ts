@@ -1,4 +1,4 @@
-import { App, Modal } from 'obsidian';
+import {App, Modal } from 'obsidian';
 import { WikiIngestResult } from '../types/index';
 
 /**
@@ -27,7 +27,7 @@ export class WikiIngestProgressModal extends Modal {
     contentEl.empty();
     contentEl.addClass('wiki-ingest-progress-modal');
 
-    contentEl.createEl('h2', { text: 'wiki 导入进度' });
+    contentEl.createEl('h2', { text: 'Wiki 导入进度' });
 
     // 进度条容器
     const progressContainer = contentEl.createDiv({ cls: 'wiki-progress-container' });
@@ -195,7 +195,7 @@ ${result.conflicts.length > 0 ? `冲突: ${result.conflicts.length}\n${result.co
     }
 
     // 3 秒后自动关闭
-    setTimeout(() => {
+    activeWindow.setTimeout(() => {
       this.close();
     }, 3000);
   }

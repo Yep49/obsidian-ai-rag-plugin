@@ -32,7 +32,7 @@ export class IndexBuilder {
   }
 
   async buildFullIndex(progressCallback?: (progress: BuildProgress) => void): Promise<BuildResult> {
-    const files = (await this.scanner.scanMarkdownFiles())
+    const files = this.scanner.scanMarkdownFiles()
       .filter(file => !this.isIgnoredPath(file.path));
     const allChunks: Chunk[] = [];
     const allEmbeddings: StoredEmbedding[] = [];

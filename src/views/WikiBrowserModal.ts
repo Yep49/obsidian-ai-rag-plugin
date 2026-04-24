@@ -1,4 +1,4 @@
-import { App, Modal, Setting } from 'obsidian';
+import {App, Modal, Setting } from 'obsidian';
 import { WikiService } from '../services/WikiService';
 import { WikiPage, WikiPageType } from '../types/index';
 
@@ -30,7 +30,7 @@ export class WikiBrowserModal extends Modal {
     contentEl.empty();
     contentEl.addClass('wiki-browser-modal');
 
-    contentEl.createEl('h2', { text: 'wiki 浏览器' });
+    contentEl.createEl('h2', { text: 'Wiki 浏览器' });
 
     // 加载页面
     await this.loadPages();
@@ -87,7 +87,7 @@ export class WikiBrowserModal extends Modal {
         dropdown
           .addOption('all', '全部')
           .addOption('faq', 'FAQ')
-          .addOption('meta', 'meta')
+          .addOption('meta', 'Meta')
           .addOption('relation', '关系')
           .addOption('source', '来源')
           .addOption('entity', '实体')
@@ -140,7 +140,7 @@ export class WikiBrowserModal extends Modal {
     const statItems = [
       ['总计', stats.total],
       ['FAQ', stats.faq],
-      ['meta', stats.meta],
+      ['Meta', stats.meta],
       ['关系', stats.relations],
       ['来源', stats.sources],
       ['实体', stats.entities],
@@ -243,7 +243,7 @@ export class WikiBrowserModal extends Modal {
       copyPathBtn.addEventListener('click', () => {
         void navigator.clipboard.writeText(page.path).then(() => {
           copyPathBtn.textContent = '已复制！';
-          setTimeout(() => {
+          activeWindow.setTimeout(() => {
             copyPathBtn.textContent = '复制路径';
           }, 2000);
         }, error => {
@@ -305,7 +305,7 @@ export class WikiBrowserModal extends Modal {
   private getTypeLabel(type: WikiPageType): string {
     const labels: Record<WikiPageType, string> = {
       faq: 'FAQ',
-      meta: 'meta',
+      meta: 'Meta',
       relation: '关系',
       source: '来源',
       entity: '实体',

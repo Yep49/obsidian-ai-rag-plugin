@@ -1,3 +1,4 @@
+import type {} from 'obsidian';
 import { OpenAiCompatibleLlmClient } from './ApiClients';
 
 /**
@@ -106,7 +107,7 @@ export class LlmRetryService {
       throw new Error(`未找到失败记录: ${id}`);
     }
 
-    const messages = JSON.parse(record.prompt);
+    const messages = JSON.parse(record.prompt) as unknown as Array<{ role: string; content: string }>;
     const response = await this.chatWithRetry(messages, 0.3, record.operation);
 
     // 成功后移除记录
@@ -154,7 +155,7 @@ export class LlmRetryService {
    * 延迟函数
    */
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => activeWindow.setTimeout(resolve, ms));
   }
 
   /**

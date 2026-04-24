@@ -127,7 +127,8 @@ export class LoggingService {
     const path = `${this.basePath}/query-logs.json`;
     try {
       const content = await this.adapter.read(path);
-      return JSON.parse(content);
+      const parsed: unknown = JSON.parse(content);
+      return parsed as QueryLogEntry[];
     } catch {
       return [];
     }

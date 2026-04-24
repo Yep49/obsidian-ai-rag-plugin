@@ -21,12 +21,13 @@ export class UserPatternService {
     const path = `${this.basePath}/user-patterns.json`;
     try {
       const content = await this.adapter.read(path);
-      this.pattern = JSON.parse(content);
+      const parsed: unknown = JSON.parse(content);
+      this.pattern = parsed as UserPattern;
     } catch {
       this.pattern = this.getDefaultPattern();
     }
 
-    return this.pattern!;
+    return this.pattern;
   }
 
   // 保存用户模式

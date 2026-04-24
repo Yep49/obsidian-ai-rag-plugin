@@ -1,4 +1,4 @@
-import { App, TFile, TAbstractFile } from 'obsidian';
+import {App, TFile, TAbstractFile } from 'obsidian';
 import { IndexBuilder } from './IndexBuilder';
 
 interface QueuedUpdate {
@@ -18,10 +18,10 @@ export class IndexScheduler {
   private isProcessing = false;
   private readonly DEBOUNCE_DELAY = 2000; // 2秒防抖
   private readonly BATCH_SIZE = 5; // 每批处理5个文件
-  private readonly handleCreate = this.onFileCreate.bind(this);
-  private readonly handleModify = this.onFileModify.bind(this);
-  private readonly handleDelete = this.onFileDelete.bind(this);
-  private readonly handleRename = this.onFileRename.bind(this);
+  private readonly handleCreate = (file: TAbstractFile): void => this.onFileCreate(file);
+  private readonly handleModify = (file: TAbstractFile): void => this.onFileModify(file);
+  private readonly handleDelete = (file: TAbstractFile): void => this.onFileDelete(file);
+  private readonly handleRename = (file: TAbstractFile, oldPath: string): void => this.onFileRename(file, oldPath);
 
   constructor(app: App, indexBuilder: IndexBuilder, shouldIgnore?: (path: string) => boolean) {
     this.app = app;
@@ -120,10 +120,10 @@ export class IndexScheduler {
 
   private scheduleProcess() {
     if (this.debounceTimer) {
-      window.clearTimeout(this.debounceTimer);
+      activeWindow.clearTimeout(this.debounceTimer);
     }
 
-    this.debounceTimer = window.setTimeout(() => {
+    this.debounceTimer = activeWindow.setTimeout(() => {
       void this.processQueue();
     }, this.DEBOUNCE_DELAY);
   }
@@ -180,7 +180,7 @@ export class IndexScheduler {
   // 手动触发处理（用于测试）
   async flush() {
     if (this.debounceTimer) {
-      window.clearTimeout(this.debounceTimer);
+      activeWindow.clearTimeout(this.debounceTimer);
       this.debounceTimer = undefined;
     }
 
@@ -191,7 +191,7 @@ export class IndexScheduler {
     this.disposed = true;
 
     if (this.debounceTimer) {
-      window.clearTimeout(this.debounceTimer);
+      activeWindow.clearTimeout(this.debounceTimer);
     }
 
     // 移除事件监听

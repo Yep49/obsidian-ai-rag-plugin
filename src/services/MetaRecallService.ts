@@ -66,7 +66,8 @@ export class MetaRecallService {
     const path = `${this.basePath}/meta-notes.json`;
     try {
       const content = await this.adapter.read(path);
-      return JSON.parse(content);
+      const parsed: unknown = JSON.parse(content);
+      return parsed as MetaNote[];
     } catch {
       return [];
     }
@@ -76,7 +77,8 @@ export class MetaRecallService {
     const path = `${this.basePath}/meta-embeddings.json`;
     try {
       const content = await this.adapter.read(path);
-      return JSON.parse(content);
+      const parsed: unknown = JSON.parse(content);
+      return parsed as MetaEmbedding[];
     } catch {
       return [];
     }

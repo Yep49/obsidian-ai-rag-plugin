@@ -1,4 +1,4 @@
-import { App, Modal, Notice, MarkdownRenderer, TFile, Component } from 'obsidian';
+import {App, Modal, Notice, MarkdownRenderer, TFile, Component } from 'obsidian';
 import { WikiBuilder } from '../services/WikiBuilder';
 import { WikiService } from '../services/WikiService';
 
@@ -40,7 +40,7 @@ export class WikiQueryModal extends Modal {
     this.markdownRendererComponent.load();
 
     // 标题
-    contentEl.createEl('h2', { text: 'wiki 查询' });
+    contentEl.createEl('h2', { text: 'Wiki 查询' });
 
     // 检查 Wiki 是否初始化
     if (!this.wikiService.isInitialized()) {
@@ -70,7 +70,7 @@ export class WikiQueryModal extends Modal {
     const buttonContainer = contentEl.createDiv({ cls: 'wiki-query-buttons' });
 
     const searchButton = buttonContainer.createEl('button', {
-      text: '🔍 搜索 wiki',
+      text: '🔍 搜索 Wiki',
       cls: 'mod-cta'
     });
 
@@ -119,11 +119,11 @@ export class WikiQueryModal extends Modal {
    */
   private showEmptyState(contentEl: HTMLElement): void {
     const emptyState = contentEl.createDiv({ cls: 'wiki-empty-state' });
-    emptyState.createEl('h3', { text: '📚 wiki 还未初始化' });
+    emptyState.createEl('h3', { text: '📚 Wiki 还未初始化' });
     emptyState.createEl('p', { text: '点击下方按钮开始创建你的知识库' });
 
     const initButton = emptyState.createEl('button', {
-      text: '🚀 初始化 wiki',
+      text: '🚀 初始化 Wiki',
       cls: 'mod-cta'
     });
 
@@ -134,7 +134,7 @@ export class WikiQueryModal extends Modal {
       void (async () => {
         try {
         await this.wikiService.initializeWikiStructure();
-        new Notice('wiki 初始化完成！');
+        new Notice('Wiki 初始化完成！');
         this.close();
         // 重新打开以显示正常界面
         new WikiQueryModal(this.app, this.wikiBuilder, this.wikiService, this.onArchive).open();
@@ -142,7 +142,7 @@ export class WikiQueryModal extends Modal {
         console.error('初始化失败:', error);
         new Notice('初始化失败');
         initButton.disabled = false;
-        initButton.textContent = '🚀 初始化 wiki';
+        initButton.textContent = '🚀 初始化 Wiki';
         }
       })();
     });
@@ -301,7 +301,7 @@ export class WikiQueryModal extends Modal {
 
     } finally {
       searchButton.disabled = false;
-      searchButton.textContent = '🔍 搜索 wiki';
+      searchButton.textContent = '🔍 搜索 Wiki';
       cancelSearchButton.remove();
       this.abortController = undefined;
     }
@@ -331,7 +331,7 @@ export class WikiQueryModal extends Modal {
       void navigator.clipboard.writeText(result.answer).then(() => {
         new Notice('已复制到剪贴板');
         copyButton.textContent = '✅ 已复制';
-        setTimeout(() => {
+        activeWindow.setTimeout(() => {
           copyButton.textContent = '📋 复制';
         }, 2000);
       }, error => {

@@ -307,7 +307,8 @@ ${recentEvents.map(event => `- ${new Date(event.createdAt).toLocaleString()} | $
   private async readJson<T>(path: string): Promise<T | null> {
     try {
       const content = await this.adapter.read(path);
-      return JSON.parse(content);
+      const parsed: unknown = JSON.parse(content);
+      return parsed as T;
     } catch {
       return null;
     }

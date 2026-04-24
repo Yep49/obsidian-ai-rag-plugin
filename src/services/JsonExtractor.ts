@@ -3,6 +3,11 @@
  * 处理 LLM 返回的各种格式，提取有效的 JSON
  */
 export class JsonExtractor {
+  private static parseJson<T>(text: string): T {
+    const parsed: unknown = JSON.parse(text);
+    return parsed as T;
+  }
+
   /**
    * 从文本中提取 JSON
    * 支持多种格式：纯 JSON、代码块、混合文本等
@@ -14,7 +19,7 @@ export class JsonExtractor {
 
     // 尝试1: 直接解析（最快）
     try {
-      return JSON.parse(text.trim());
+      return this.parseJson<T>(text.trim());
     } catch {
       // 继续尝试其他方法
     }
@@ -23,7 +28,7 @@ export class JsonExtractor {
     const codeBlockMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
     if (codeBlockMatch) {
       try {
-        return JSON.parse(codeBlockMatch[1].trim());
+        return this.parseJson<T>(codeBlockMatch[1].trim());
       } catch {
         // 继续尝试
       }
@@ -36,7 +41,7 @@ export class JsonExtractor {
     if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
       const jsonCandidate = text.substring(firstBrace, lastBrace + 1);
       try {
-        return JSON.parse(jsonCandidate);
+        return this.parseJson<T>(jsonCandidate);
       } catch {
         // 继续尝试
       }
@@ -49,7 +54,7 @@ export class JsonExtractor {
     if (firstBracket !== -1 && lastBracket !== -1 && lastBracket > firstBracket) {
       const jsonCandidate = text.substring(firstBracket, lastBracket + 1);
       try {
-        return JSON.parse(jsonCandidate);
+        return this.parseJson<T>(jsonCandidate);
       } catch {
         // 继续尝试
       }
@@ -58,7 +63,7 @@ export class JsonExtractor {
     // 尝试5: 移除常见的前缀/后缀文本
     const cleanedText = this.removeCommonPrefixes(text);
     try {
-      return JSON.parse(cleanedText);
+      return this.parseJson<T>(cleanedText);
     } catch {
       // 继续尝试
     }
@@ -66,7 +71,7 @@ export class JsonExtractor {
     // 尝试6: 修复常见的 JSON 错误
     const fixedText = this.fixCommonJsonErrors(text);
     try {
-      return JSON.parse(fixedText);
+      return this.parseJson<T>(fixedText);
     } catch {
       // 所有尝试都失败
     }
@@ -167,7 +172,7 @@ export class JsonExtractor {
 
     if (!this.validate(json, expectedKeys)) {
       const gotKeys = json && typeof json === 'object'
-        ? Object.keys(json as Record<string, unknown>).join(', ')
+        ? Object.keys(json).join(', ')
         : typeof json;
       throw new Error(
         `Extracted JSON is missing required keys. ` +

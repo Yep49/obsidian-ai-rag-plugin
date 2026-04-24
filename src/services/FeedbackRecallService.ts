@@ -61,7 +61,8 @@ export class FeedbackRecallService {
     const path = `${this.basePath}/feedbacks.json`;
     try {
       const content = await this.adapter.read(path);
-      return JSON.parse(content);
+      const parsed: unknown = JSON.parse(content);
+      return parsed as FeedbackEntry[];
     } catch {
       return [];
     }
@@ -71,7 +72,8 @@ export class FeedbackRecallService {
     const path = `${this.basePath}/feedback-embeddings.json`;
     try {
       const content = await this.adapter.read(path);
-      return JSON.parse(content);
+      const parsed: unknown = JSON.parse(content);
+      return parsed as FeedbackEmbedding[];
     } catch {
       return [];
     }

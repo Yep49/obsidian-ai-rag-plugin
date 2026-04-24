@@ -242,8 +242,8 @@ ${linkedNotesText}
     const path = `${this.basePath}/${this.faqPath}/faq.json`;
     try {
       const content = await this.adapter.read(path);
-      const parsed = JSON.parse(content);
-      return Array.isArray(parsed) ? parsed : [];
+      const parsed = JSON.parse(content) as unknown;
+      return Array.isArray(parsed) ? parsed as FAQEntry[] : [];
     } catch {
       return [];
     }
@@ -253,7 +253,7 @@ ${linkedNotesText}
     const path = `${this.basePath}/${this.legacyFeedbackPath}`;
     try {
       const content = await this.adapter.read(path);
-      const parsed = JSON.parse(content) as FeedbackEntry[];
+      const parsed = JSON.parse(content) as unknown as FeedbackEntry[];
       if (!Array.isArray(parsed)) {
         return [];
       }
@@ -272,7 +272,7 @@ ${linkedNotesText}
           created,
           updated: created,
           content: entry.content || this.buildEmbeddingText(entry.question, entry.correction, entry.linkedNotes || [])
-        } as FAQEntry;
+        };
       });
     } catch {
       return [];
@@ -293,8 +293,8 @@ ${linkedNotesText}
     const path = `${this.basePath}/${this.faqPath}/faq-embeddings.json`;
     try {
       const content = await this.adapter.read(path);
-      const parsed = JSON.parse(content);
-      return Array.isArray(parsed) ? parsed : [];
+      const parsed = JSON.parse(content) as unknown;
+      return Array.isArray(parsed) ? parsed as FAQEmbedding[] : [];
     } catch {
       return [];
     }

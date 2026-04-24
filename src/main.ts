@@ -1,4 +1,4 @@
-import { Plugin, Notice, TFile, TAbstractFile, MarkdownView, Modal } from 'obsidian';
+import {Plugin, Notice, TFile, TAbstractFile, MarkdownView, Modal } from 'obsidian';
 import { PluginSettings, Citation, MetaNote, SearchResult } from './types/index';
 import { AiRagSettingTab } from './views/SettingTab';
 import { AiRagSidebarView, AI_RAG_SIDEBAR_VIEW } from './views/SidebarView';
@@ -322,10 +322,10 @@ export default class AiRagPlugin extends Plugin {
     // Wiki 命令
     this.addCommand({
       id: 'init-wiki',
-      name: this.commandT('初始化 wiki', 'Initialize wiki'),
+      name: this.commandT('初始化 Wiki', 'Initialize wiki'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 wiki 功能');
+          new Notice('请先在设置中启用 Wiki 功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -335,10 +335,10 @@ export default class AiRagPlugin extends Plugin {
 
         try {
           await wikiServices.wikiService.initializeWikiStructure();
-          new Notice('wiki 初始化完成！');
+          new Notice('Wiki 初始化完成！');
         } catch (error) {
-          console.error('wiki 初始化失败:', error);
-          new Notice('wiki 初始化失败');
+          console.error('Wiki 初始化失败:', error);
+          new Notice('Wiki 初始化失败');
         }
       }
     });
@@ -348,7 +348,7 @@ export default class AiRagPlugin extends Plugin {
       name: this.commandT('查询 wiki', 'Query wiki'),
       callback: () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 wiki 功能');
+          new Notice('请先在设置中启用 Wiki 功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -357,7 +357,7 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (!wikiServices.wikiService.isInitialized()) {
-          new Notice('请先初始化 wiki（运行 Initialize wiki 命令）');
+          new Notice('请先初始化 Wiki（运行 initialize Wiki 命令）');
           return;
         }
 
@@ -383,7 +383,7 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (this.isInsideWiki(activeFile.path)) {
-          new Notice('不能导入 wiki 页面');
+          new Notice('不能导入 Wiki 页面');
           return;
         }
 
@@ -402,7 +402,7 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (this.isInsideWiki(activeFile.path)) {
-          new Notice('不能导入 wiki 页面');
+          new Notice('不能导入 Wiki 页面');
           return;
         }
 
@@ -415,7 +415,7 @@ export default class AiRagPlugin extends Plugin {
       name: this.commandT('一键导入全部笔记到 wiki', 'Batch ingest all notes to wiki'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 wiki 功能');
+          new Notice('请先在设置中启用 Wiki 功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -477,7 +477,7 @@ export default class AiRagPlugin extends Plugin {
       name: this.commandT('交互式批量导入 wiki', 'Batch ingest (interactive mode)'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 wiki 功能');
+          new Notice('请先在设置中启用 Wiki 功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -542,7 +542,7 @@ export default class AiRagPlugin extends Plugin {
       name: this.commandT('显示 wiki 统计', 'Show wiki stats'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 wiki 功能');
+          new Notice('请先在设置中启用 Wiki 功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -551,7 +551,7 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (!wikiServices.wikiService.isInitialized()) {
-          new Notice('wiki 尚未初始化');
+          new Notice('Wiki 尚未初始化');
           return;
         }
 
@@ -578,7 +578,7 @@ export default class AiRagPlugin extends Plugin {
       name: this.commandT('浏览 wiki', 'Browse wiki'),
       callback: () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 wiki 功能');
+          new Notice('请先在设置中启用 Wiki 功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -587,7 +587,7 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (!wikiServices.wikiService.isInitialized()) {
-          new Notice('请先初始化 wiki');
+          new Notice('请先初始化 Wiki');
           return;
         }
 
@@ -606,7 +606,7 @@ export default class AiRagPlugin extends Plugin {
       name: this.commandT('生成 wiki 总结', 'Generate wiki summary'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 wiki 功能');
+          new Notice('请先在设置中启用 Wiki 功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -620,7 +620,7 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (!wikiServices.wikiService.isInitialized()) {
-          new Notice('请先初始化 wiki');
+          new Notice('请先初始化 Wiki');
           return;
         }
 
@@ -649,7 +649,7 @@ export default class AiRagPlugin extends Plugin {
       name: this.commandT('审计 wiki', 'Audit wiki'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 wiki 功能');
+          new Notice('请先在设置中启用 Wiki 功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -663,12 +663,12 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (!wikiServices.wikiService.isInitialized()) {
-          new Notice('请先初始化 wiki');
+          new Notice('请先初始化 Wiki');
           return;
         }
 
         try {
-          new Notice('正在审计 wiki...');
+          new Notice('正在审计 Wiki...');
 
           // 创建审计器
           const httpClient = new OpenAiCompatibleHttpClient(
@@ -710,7 +710,7 @@ export default class AiRagPlugin extends Plugin {
       name: this.commandT('自动修复孤立页面', 'Auto-fix orphan pages'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 wiki 功能');
+          new Notice('请先在设置中启用 Wiki 功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -724,7 +724,7 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (!wikiServices.wikiService.isInitialized()) {
-          new Notice('请先初始化 wiki');
+          new Notice('请先初始化 Wiki');
           return;
         }
 
@@ -853,7 +853,7 @@ export default class AiRagPlugin extends Plugin {
 
   private async ingestNoteWithFeedback(filePath: string, force: boolean): Promise<void> {
     if (!this.settings.enableWiki) {
-      new Notice('请先在设置中启用 wiki 功能');
+      new Notice('请先在设置中启用 Wiki 功能');
       return;
     }
     const wikiServices = this.getWikiServices();
@@ -913,10 +913,10 @@ export default class AiRagPlugin extends Plugin {
 
     const existingTimer = this.wikiAutoIngestTimers.get(file.path);
     if (existingTimer) {
-      window.clearTimeout(existingTimer);
+      activeWindow.clearTimeout(existingTimer);
     }
 
-    const timer = window.setTimeout(() => {
+    const timer = activeWindow.setTimeout(() => {
       this.wikiAutoIngestTimers.delete(file.path);
       if (this.settings.wikiAutoIngest) {
         void this.runWikiAutoIngest(file.path);
@@ -1016,7 +1016,7 @@ export default class AiRagPlugin extends Plugin {
 
   onunload() {
     for (const timer of this.wikiAutoIngestTimers.values()) {
-      window.clearTimeout(timer);
+      activeWindow.clearTimeout(timer);
     }
     this.wikiAutoIngestTimers.clear();
     this.indexScheduler?.dispose();
@@ -1024,7 +1024,8 @@ export default class AiRagPlugin extends Plugin {
   }
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const loadedSettings = await this.loadData() as Partial<PluginSettings> | null;
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedSettings ?? {});
   }
 
   async saveSettings() {
@@ -1065,7 +1066,7 @@ export default class AiRagPlugin extends Plugin {
       'show-user-pattern-stats': this.commandT('显示用户提问模式统计', 'Show user pattern stats'),
       'show-eval-metrics': this.commandT('显示评测指标', 'Show evaluation metrics'),
       'show-query-logs': this.commandT('显示最近查询日志', 'Show recent query logs'),
-      'init-wiki': this.commandT('初始化 wiki', 'Initialize wiki'),
+      'init-wiki': this.commandT('初始化 Wiki', 'Initialize wiki'),
       'wiki-query': this.commandT('查询 wiki', 'Query wiki'),
       'wiki-ingest-current': this.commandT('导入当前笔记到 wiki', 'Ingest current note to wiki'),
       'wiki-reingest-current': this.commandT('重新导入当前笔记到 wiki', 'Re-ingest current note to wiki'),
@@ -1377,7 +1378,7 @@ export default class AiRagPlugin extends Plugin {
 
   async ensureIndexReady(): Promise<boolean> {
     if (await this.indexBuilder.requiresFullRebuild()) {
-      new Notice('当前索引不存在，或 embedding/chunk 配置已变化。请先执行 Build AI index。', 8000);
+      new Notice('当前索引不存在，或 embedding/chunk 配置已变化。请先执行 build AI index。', 8000);
       return false;
     }
     return true;

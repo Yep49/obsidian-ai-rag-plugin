@@ -1,4 +1,4 @@
-import { App, Modal, TFile } from 'obsidian';
+import { App, Modal } from 'obsidian';
 import { WikiService } from './WikiService';
 
 export type SensitiveDecision = 'process' | 'private' | 'skip';

@@ -71,7 +71,7 @@ export class WikiIngestStateService {
     const path = `${this.basePath}/${this.fileName}`;
     try {
       const content = await this.adapter.read(path);
-      const parsed = JSON.parse(content);
+      const parsed = JSON.parse(content) as unknown;
       this.cache = Array.isArray(parsed) ? parsed : [];
       return this.cache;
     } catch {

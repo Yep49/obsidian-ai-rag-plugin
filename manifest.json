@@ -2,7 +2,7 @@
   "id": "ai-rag-llm-wiki",
   "name": "AI RAG + LLM Wiki",
   "version": "1.0.0",
-  "minAppVersion": "0.15.0",
+  "minAppVersion": "1.8.7",
   "description": "AI assistant with advanced RAG and a persistent LLM-maintained Wiki for source ingestion, entity/concept pages, synthesis, indexing, logging, and auditing.",
   "author": "Yep",
   "isDesktopOnly": false

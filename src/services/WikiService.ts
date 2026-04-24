@@ -432,7 +432,7 @@ ${content}`;
   private extractLinks(content: string): string[] {
     const linkRegex = /\[\[([^\]]+)\]\]/g;
     const links: string[] = [];
-    let match;
+    let match: RegExpExecArray | null;
 
     while ((match = linkRegex.exec(content)) !== null) {
       links.push(match[1]);

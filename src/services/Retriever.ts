@@ -1,7 +1,7 @@
 import { SearchResult, Chunk, PluginSettings } from '../types/index';
 import { OpenAiCompatibleEmbeddingClient } from './ApiClients';
 import { JsonMetadataStore, JsonVectorStore } from './Storage';
-import { QueryAnalysisService } from './QueryAnalysisService';
+import { QueryAnalysisService, QueryFilters } from './QueryAnalysisService';
 import { FusionService, RecallResult } from './FusionService';
 import { LlmRerankService, RerankCandidate } from './RerankService';
 import { ContextCompressionService } from './ContextCompressionService';
@@ -131,7 +131,7 @@ export class Retriever {
     // 1. Query Analysis（查询理解）
     let effectiveQuery = query;
     let queryVariants = [query];
-    let filters;
+    let filters: QueryFilters | undefined;
 
     if (this.queryAnalysis) {
       const analysis = await this.queryAnalysis.analyzeQuery(query, conversationHistory);

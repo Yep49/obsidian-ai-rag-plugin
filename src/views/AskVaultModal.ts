@@ -1,4 +1,4 @@
-import { App, Modal, Notice, MarkdownRenderer } from 'obsidian';
+import { App, Component, Modal, Notice, MarkdownRenderer } from 'obsidian';
 import { Citation, CorrectionContext } from '../types/index';
 import { RagChatService } from '../services/RagChatService';
 import { EnhancementService } from '../services/EnhancementService';
@@ -11,6 +11,7 @@ export class AskVaultModal extends Modal {
   onCitationClick: (citation: Citation) => void;
   private inputEl!: HTMLTextAreaElement;
   private answerContainerEl!: HTMLElement;
+  private readonly markdownRendererComponent = new Component();
 
   constructor(
     app: App,
@@ -30,6 +31,7 @@ export class AskVaultModal extends Modal {
     const { contentEl } = this;
     contentEl.empty();
     contentEl.addClass('ai-rag-modal');
+    this.markdownRendererComponent.load();
 
     contentEl.createEl('h2', { text: this.plugin.t('知识库提问', 'Ask vault') });
 
@@ -114,7 +116,7 @@ export class AskVaultModal extends Modal {
       }
 
       const answerText = answerDiv.createDiv({ cls: 'ai-rag-answer-text markdown-rendered' });
-      await MarkdownRenderer.render(this.app, result.answer, answerText, '', this.plugin);
+      await MarkdownRenderer.render(this.app, result.answer, answerText, '', this.markdownRendererComponent);
 
       if (result.citations.length > 0) {
         this.renderCitations(answerDiv, result.citations);
@@ -170,5 +172,6 @@ export class AskVaultModal extends Modal {
 
   onClose() {
     this.contentEl.empty();
+    this.markdownRendererComponent.unload();
   }
 }

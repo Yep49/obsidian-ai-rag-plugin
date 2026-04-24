@@ -1,4 +1,4 @@
-import { App, TFile } from 'obsidian';
+import {App, TFile } from 'obsidian';
 import { WikiService } from './WikiService';
 import { OpenAiCompatibleLlmClient } from './ApiClients';
 import { WikiIngestResult, WikiIndexEntry, WikiPage, WikiPageType } from '../types/index';
@@ -415,7 +415,7 @@ ${incomingContent.substring(0, 4000)}
     }
 
     const candidateWikiPages = await this.findCandidateWikiPages(filePath, content);
-    const candidateRawNotes = await this.findCandidateRawNotes(filePath, content);
+    const candidateRawNotes = this.findCandidateRawNotes(filePath, content);
     const candidateWikiText = candidateWikiPages.length > 0
       ? candidateWikiPages.map(page => `- ${page.title} | ${page.path} | ${page.frontmatter.category}`).join('\n')
       : '- 暂无';
@@ -607,7 +607,7 @@ ${claudeRules ? '6. 严格遵守上述 Wiki 维护规则\n' : ''}
       }
 
       // 避免 API 限流，每个文件之间延迟 1 秒
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => activeWindow.setTimeout(resolve, 1000));
     }
 
     return totalResult;
@@ -957,7 +957,7 @@ ${claudeRules ? '5. 严格遵守上述 Wiki 维护规则\n' : ''}
       }
 
       // 避免 API 限流
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => activeWindow.setTimeout(resolve, 1000));
     }
 
     return { success, failed };
