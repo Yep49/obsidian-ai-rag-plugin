@@ -322,10 +322,10 @@ export default class AiRagPlugin extends Plugin {
     // Wiki 命令
     this.addCommand({
       id: 'init-wiki',
-      name: this.commandT('初始化 Wiki', 'Initialize wiki'),
+      name: this.commandT('初始化知识库', 'Initialize wiki'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用知识库功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -335,10 +335,10 @@ export default class AiRagPlugin extends Plugin {
 
         try {
           await wikiServices.wikiService.initializeWikiStructure();
-          new Notice('Wiki 初始化完成！');
+          new Notice('知识库初始化完成！');
         } catch (error) {
-          console.error('Wiki 初始化失败:', error);
-          new Notice('Wiki 初始化失败');
+          console.error('知识库初始化失败:', error);
+          new Notice('知识库初始化失败');
         }
       }
     });
@@ -348,7 +348,7 @@ export default class AiRagPlugin extends Plugin {
       name: this.commandT('查询 wiki', 'Query wiki'),
       callback: () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用知识库功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -357,7 +357,7 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (!wikiServices.wikiService.isInitialized()) {
-          new Notice('请先初始化 Wiki（运行 initialize Wiki 命令）');
+          new Notice('请先初始化知识库（运行 initialize wiki 命令）');
           return;
         }
 
@@ -374,7 +374,7 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'wiki-ingest-current',
-      name: this.commandT('导入当前笔记到 wiki', 'Ingest current note to wiki'),
+      name: this.commandT('导入当前笔记到知识库', 'Ingest current note to wiki'),
       callback: async () => {
         const activeFile = this.app.workspace.getActiveFile();
         if (!activeFile) {
@@ -383,7 +383,7 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (this.isInsideWiki(activeFile.path)) {
-          new Notice('不能导入 Wiki 页面');
+          new Notice('不能导入知识库页面');
           return;
         }
 
@@ -393,7 +393,7 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'wiki-reingest-current',
-      name: this.commandT('重新导入当前笔记到 wiki', 'Re-ingest current note to wiki'),
+      name: this.commandT('重新导入当前笔记到知识库', 'Re-ingest current note to wiki'),
       callback: async () => {
         const activeFile = this.app.workspace.getActiveFile();
         if (!activeFile) {
@@ -402,7 +402,7 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (this.isInsideWiki(activeFile.path)) {
-          new Notice('不能导入 Wiki 页面');
+          new Notice('不能导入知识库页面');
           return;
         }
 
@@ -412,10 +412,10 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'wiki-batch-ingest',
-      name: this.commandT('一键导入全部笔记到 wiki', 'Batch ingest all notes to wiki'),
+      name: this.commandT('一键导入全部笔记到知识库', 'Batch ingest all notes to wiki'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用知识库功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -474,10 +474,10 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'wiki-batch-ingest-interactive',
-      name: this.commandT('交互式批量导入 wiki', 'Batch ingest (interactive mode)'),
+      name: this.commandT('交互式批量导入知识库', 'Batch ingest (interactive mode)'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用知识库功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -539,10 +539,10 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'wiki-stats',
-      name: this.commandT('显示 wiki 统计', 'Show wiki stats'),
+      name: this.commandT('显示知识库统计', 'Show wiki stats'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用知识库功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -551,14 +551,14 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (!wikiServices.wikiService.isInitialized()) {
-          new Notice('Wiki 尚未初始化');
+          new Notice('知识库尚未初始化');
           return;
         }
 
         const stats = await wikiServices.wikiService.getStats();
 
         new Notice(
-          `wiki 统计:\n` +
+          `知识库统计:\n` +
           `FAQ: ${stats.faq}\n` +
           `Meta: ${stats.meta}\n` +
           `关系: ${stats.relations}\n` +
@@ -575,10 +575,10 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'wiki-browse',
-      name: this.commandT('浏览 wiki', 'Browse wiki'),
+      name: this.commandT('浏览知识库', 'Browse wiki'),
       callback: () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用知识库功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -587,7 +587,7 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (!wikiServices.wikiService.isInitialized()) {
-          new Notice('请先初始化 Wiki');
+          new Notice('请先初始化知识库');
           return;
         }
 
@@ -603,10 +603,10 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'wiki-generate-summary',
-      name: this.commandT('生成 wiki 总结', 'Generate wiki summary'),
+      name: this.commandT('生成知识库总结', 'Generate wiki summary'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用知识库功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -620,7 +620,7 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (!wikiServices.wikiService.isInitialized()) {
-          new Notice('请先初始化 Wiki');
+          new Notice('请先初始化知识库');
           return;
         }
 
@@ -646,10 +646,10 @@ export default class AiRagPlugin extends Plugin {
 
     this.addCommand({
       id: 'wiki-audit',
-      name: this.commandT('审计 wiki', 'Audit wiki'),
+      name: this.commandT('审计知识库', 'Audit wiki'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用知识库功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -663,12 +663,12 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (!wikiServices.wikiService.isInitialized()) {
-          new Notice('请先初始化 Wiki');
+          new Notice('请先初始化知识库');
           return;
         }
 
         try {
-          new Notice('正在审计 Wiki...');
+          new Notice('正在审计知识库...');
 
           // 创建审计器
           const httpClient = new OpenAiCompatibleHttpClient(
@@ -710,7 +710,7 @@ export default class AiRagPlugin extends Plugin {
       name: this.commandT('自动修复孤立页面', 'Auto-fix orphan pages'),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new Notice('请先在设置中启用 Wiki 功能');
+          new Notice('请先在设置中启用知识库功能');
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -724,7 +724,7 @@ export default class AiRagPlugin extends Plugin {
         }
 
         if (!wikiServices.wikiService.isInitialized()) {
-          new Notice('请先初始化 Wiki');
+          new Notice('请先初始化知识库');
           return;
         }
 
@@ -853,7 +853,7 @@ export default class AiRagPlugin extends Plugin {
 
   private async ingestNoteWithFeedback(filePath: string, force: boolean): Promise<void> {
     if (!this.settings.enableWiki) {
-      new Notice('请先在设置中启用 Wiki 功能');
+      new Notice('请先在设置中启用知识库功能');
       return;
     }
     const wikiServices = this.getWikiServices();
@@ -1066,16 +1066,16 @@ export default class AiRagPlugin extends Plugin {
       'show-user-pattern-stats': this.commandT('显示用户提问模式统计', 'Show user pattern stats'),
       'show-eval-metrics': this.commandT('显示评测指标', 'Show evaluation metrics'),
       'show-query-logs': this.commandT('显示最近查询日志', 'Show recent query logs'),
-      'init-wiki': this.commandT('初始化 Wiki', 'Initialize wiki'),
-      'wiki-query': this.commandT('查询 wiki', 'Query wiki'),
-      'wiki-ingest-current': this.commandT('导入当前笔记到 wiki', 'Ingest current note to wiki'),
-      'wiki-reingest-current': this.commandT('重新导入当前笔记到 wiki', 'Re-ingest current note to wiki'),
-      'wiki-batch-ingest': this.commandT('一键导入全部笔记到 wiki', 'Batch ingest all notes to wiki'),
-      'wiki-batch-ingest-interactive': this.commandT('交互式批量导入 wiki', 'Batch ingest (interactive mode)'),
-      'wiki-stats': this.commandT('显示 wiki 统计', 'Show wiki stats'),
-      'wiki-browse': this.commandT('浏览 wiki', 'Browse wiki'),
-      'wiki-generate-summary': this.commandT('生成 wiki 总结', 'Generate wiki summary'),
-      'wiki-audit': this.commandT('审计 wiki', 'Audit wiki'),
+      'init-wiki': this.commandT('初始化知识库', 'Initialize wiki'),
+      'wiki-query': this.commandT('查询知识库', 'Query wiki'),
+      'wiki-ingest-current': this.commandT('导入当前笔记到知识库', 'Ingest current note to wiki'),
+      'wiki-reingest-current': this.commandT('重新导入当前笔记到知识库', 'Re-ingest current note to wiki'),
+      'wiki-batch-ingest': this.commandT('一键导入全部笔记到知识库', 'Batch ingest all notes to wiki'),
+      'wiki-batch-ingest-interactive': this.commandT('交互式批量导入知识库', 'Batch ingest (interactive mode)'),
+      'wiki-stats': this.commandT('显示知识库统计', 'Show wiki stats'),
+      'wiki-browse': this.commandT('浏览知识库', 'Browse wiki'),
+      'wiki-generate-summary': this.commandT('生成知识库总结', 'Generate wiki summary'),
+      'wiki-audit': this.commandT('审计知识库', 'Audit wiki'),
       'wiki-auto-fix-orphans': this.commandT('自动修复孤立页面', 'Auto-fix orphan pages'),
       'generate-feedback-tuning-report': this.commandT('生成反馈调参报告', 'Generate feedback tuning report')
     };

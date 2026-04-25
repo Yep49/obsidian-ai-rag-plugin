@@ -40,7 +40,7 @@ export class WikiQueryModal extends Modal {
     this.markdownRendererComponent.load();
 
     // 标题
-    contentEl.createEl('h2', { text: 'Wiki 查询' });
+    contentEl.createEl('h2', { text: '知识库查询' });
 
     // 检查 Wiki 是否初始化
     if (!this.wikiService.isInitialized()) {
@@ -70,7 +70,7 @@ export class WikiQueryModal extends Modal {
     const buttonContainer = contentEl.createDiv({ cls: 'wiki-query-buttons' });
 
     const searchButton = buttonContainer.createEl('button', {
-      text: '🔍 搜索 Wiki',
+      text: '🔍 搜索知识库',
       cls: 'mod-cta'
     });
 
@@ -119,11 +119,11 @@ export class WikiQueryModal extends Modal {
    */
   private showEmptyState(contentEl: HTMLElement): void {
     const emptyState = contentEl.createDiv({ cls: 'wiki-empty-state' });
-    emptyState.createEl('h3', { text: '📚 Wiki 还未初始化' });
+    emptyState.createEl('h3', { text: '📚 知识库还未初始化' });
     emptyState.createEl('p', { text: '点击下方按钮开始创建你的知识库' });
 
     const initButton = emptyState.createEl('button', {
-      text: '🚀 初始化 Wiki',
+      text: '🚀 初始化知识库',
       cls: 'mod-cta'
     });
 
@@ -134,7 +134,7 @@ export class WikiQueryModal extends Modal {
       void (async () => {
         try {
         await this.wikiService.initializeWikiStructure();
-        new Notice('Wiki 初始化完成！');
+        new Notice('知识库初始化完成！');
         this.close();
         // 重新打开以显示正常界面
         new WikiQueryModal(this.app, this.wikiBuilder, this.wikiService, this.onArchive).open();
@@ -142,7 +142,7 @@ export class WikiQueryModal extends Modal {
         console.error('初始化失败:', error);
         new Notice('初始化失败');
         initButton.disabled = false;
-        initButton.textContent = '🚀 初始化 Wiki';
+        initButton.textContent = '🚀 初始化知识库';
         }
       })();
     });
@@ -301,7 +301,7 @@ export class WikiQueryModal extends Modal {
 
     } finally {
       searchButton.disabled = false;
-      searchButton.textContent = '🔍 搜索 Wiki';
+      searchButton.textContent = '🔍 搜索知识库';
       cancelSearchButton.remove();
       this.abortController = undefined;
     }

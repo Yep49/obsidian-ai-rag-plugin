@@ -616,7 +616,7 @@ var AiRagSettingTab = class extends import_obsidian.PluginSettingTab {
       this.plugin.rebuildServices();
       this.display();
     }));
-    new import_obsidian.Setting(containerEl).setName(t.apiKey).setDesc(t.apiKeyDesc).addText((text) => text.setPlaceholder("sk-...").setValue(this.plugin.settings.apiKey).onChange((value) => {
+    new import_obsidian.Setting(containerEl).setName(t.apiKey).setDesc(t.apiKeyDesc).addText((text) => text.setPlaceholder("API key").setValue(this.plugin.settings.apiKey).onChange((value) => {
       this.plugin.settings.apiKey = value.trim();
       void this.plugin.saveSettings();
       this.plugin.rebuildServices();
@@ -647,7 +647,7 @@ var AiRagSettingTab = class extends import_obsidian.PluginSettingTab {
       }
     });
     if (!currentProvider || currentProvider.models.length === 0 || !currentProvider.models.includes(this.plugin.settings.chatModel)) {
-      new import_obsidian.Setting(containerEl).setName(t.customChatModel).setDesc(t.chatModelDesc).addText((text) => text.setPlaceholder("gpt-3.5-turbo").setValue(this.plugin.settings.chatModel).onChange((value) => {
+      new import_obsidian.Setting(containerEl).setName(t.customChatModel).setDesc(t.chatModelDesc).addText((text) => text.setPlaceholder("Model ID").setValue(this.plugin.settings.chatModel).onChange((value) => {
         this.plugin.settings.chatModel = value.trim();
         void this.plugin.saveSettings();
         this.plugin.rebuildServices();
@@ -697,7 +697,7 @@ var AiRagSettingTab = class extends import_obsidian.PluginSettingTab {
       this.plugin.rebuildServices();
       this.display();
     }));
-    new import_obsidian.Setting(containerEl).setName(t.embeddingApiKey).setDesc(t.embeddingApiKeyDesc).addText((text) => text.setPlaceholder("sk-...").setValue(this.plugin.settings.embeddingApiKey || "").onChange((value) => {
+    new import_obsidian.Setting(containerEl).setName(t.embeddingApiKey).setDesc(t.embeddingApiKeyDesc).addText((text) => text.setPlaceholder("Embedding API key").setValue(this.plugin.settings.embeddingApiKey || "").onChange((value) => {
       this.plugin.settings.embeddingApiKey = value.trim();
       void this.plugin.saveSettings();
       this.plugin.rebuildServices();
@@ -728,7 +728,7 @@ var AiRagSettingTab = class extends import_obsidian.PluginSettingTab {
       }
     });
     if (!currentEmbeddingProvider || currentEmbeddingProvider.embeddingModels.length === 0 || !currentEmbeddingProvider.embeddingModels.includes(this.plugin.settings.embeddingModel)) {
-      new import_obsidian.Setting(containerEl).setName(t.customEmbeddingModel).setDesc(t.embeddingModelDesc).addText((text) => text.setPlaceholder("BAAI/bge-m3").setValue(this.plugin.settings.embeddingModel).onChange((value) => {
+      new import_obsidian.Setting(containerEl).setName(t.customEmbeddingModel).setDesc(t.embeddingModelDesc).addText((text) => text.setPlaceholder("Embedding model ID").setValue(this.plugin.settings.embeddingModel).onChange((value) => {
         this.plugin.settings.embeddingModel = value.trim();
         void this.plugin.saveSettings();
         this.showRebuildWarning(isZh ? "\u5D4C\u5165\u6A21\u578B\u5DF2\u66F4\u6539" : "Embedding model changed");
@@ -1268,7 +1268,7 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
     contentEl.empty();
     contentEl.addClass("wiki-query-modal");
     this.markdownRendererComponent.load();
-    contentEl.createEl("h2", { text: "Wiki \u67E5\u8BE2" });
+    contentEl.createEl("h2", { text: "\u77E5\u8BC6\u5E93\u67E5\u8BE2" });
     if (!this.wikiService.isInitialized()) {
       this.showEmptyState(contentEl);
       return;
@@ -1287,7 +1287,7 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
     });
     const buttonContainer = contentEl.createDiv({ cls: "wiki-query-buttons" });
     const searchButton = buttonContainer.createEl("button", {
-      text: "\u{1F50D} \u641C\u7D22 Wiki",
+      text: "\u{1F50D} \u641C\u7D22\u77E5\u8BC6\u5E93",
       cls: "mod-cta"
     });
     const cancelButton = buttonContainer.createEl("button", {
@@ -1322,10 +1322,10 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
    */
   showEmptyState(contentEl) {
     const emptyState = contentEl.createDiv({ cls: "wiki-empty-state" });
-    emptyState.createEl("h3", { text: "\u{1F4DA} Wiki \u8FD8\u672A\u521D\u59CB\u5316" });
+    emptyState.createEl("h3", { text: "\u{1F4DA} \u77E5\u8BC6\u5E93\u8FD8\u672A\u521D\u59CB\u5316" });
     emptyState.createEl("p", { text: "\u70B9\u51FB\u4E0B\u65B9\u6309\u94AE\u5F00\u59CB\u521B\u5EFA\u4F60\u7684\u77E5\u8BC6\u5E93" });
     const initButton = emptyState.createEl("button", {
-      text: "\u{1F680} \u521D\u59CB\u5316 Wiki",
+      text: "\u{1F680} \u521D\u59CB\u5316\u77E5\u8BC6\u5E93",
       cls: "mod-cta"
     });
     initButton.addEventListener("click", () => {
@@ -1334,14 +1334,14 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
       void (async () => {
         try {
           await this.wikiService.initializeWikiStructure();
-          new import_obsidian6.Notice("Wiki \u521D\u59CB\u5316\u5B8C\u6210\uFF01");
+          new import_obsidian6.Notice("\u77E5\u8BC6\u5E93\u521D\u59CB\u5316\u5B8C\u6210\uFF01");
           this.close();
           new WikiQueryModal(this.app, this.wikiBuilder, this.wikiService, this.onArchive).open();
         } catch (error) {
           console.error("\u521D\u59CB\u5316\u5931\u8D25:", error);
           new import_obsidian6.Notice("\u521D\u59CB\u5316\u5931\u8D25");
           initButton.disabled = false;
-          initButton.textContent = "\u{1F680} \u521D\u59CB\u5316 Wiki";
+          initButton.textContent = "\u{1F680} \u521D\u59CB\u5316\u77E5\u8BC6\u5E93";
         }
       })();
     });
@@ -1462,7 +1462,7 @@ var WikiQueryModal = class extends import_obsidian6.Modal {
       });
     } finally {
       searchButton.disabled = false;
-      searchButton.textContent = "\u{1F50D} \u641C\u7D22 Wiki";
+      searchButton.textContent = "\u{1F50D} \u641C\u7D22\u77E5\u8BC6\u5E93";
       cancelSearchButton.remove();
       this.abortController = void 0;
     }
@@ -7995,10 +7995,10 @@ Correction rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
     });
     this.addCommand({
       id: "init-wiki",
-      name: this.commandT("\u521D\u59CB\u5316 Wiki", "Initialize wiki"),
+      name: this.commandT("\u521D\u59CB\u5316\u77E5\u8BC6\u5E93", "Initialize wiki"),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528\u77E5\u8BC6\u5E93\u529F\u80FD");
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -8007,10 +8007,10 @@ Correction rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
         }
         try {
           await wikiServices.wikiService.initializeWikiStructure();
-          new import_obsidian20.Notice("Wiki \u521D\u59CB\u5316\u5B8C\u6210\uFF01");
+          new import_obsidian20.Notice("\u77E5\u8BC6\u5E93\u521D\u59CB\u5316\u5B8C\u6210\uFF01");
         } catch (error) {
-          console.error("Wiki \u521D\u59CB\u5316\u5931\u8D25:", error);
-          new import_obsidian20.Notice("Wiki \u521D\u59CB\u5316\u5931\u8D25");
+          console.error("\u77E5\u8BC6\u5E93\u521D\u59CB\u5316\u5931\u8D25:", error);
+          new import_obsidian20.Notice("\u77E5\u8BC6\u5E93\u521D\u59CB\u5316\u5931\u8D25");
         }
       }
     });
@@ -8019,7 +8019,7 @@ Correction rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
       name: this.commandT("\u67E5\u8BE2 wiki", "Query wiki"),
       callback: () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528\u77E5\u8BC6\u5E93\u529F\u80FD");
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -8027,7 +8027,7 @@ Correction rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
           return;
         }
         if (!wikiServices.wikiService.isInitialized()) {
-          new import_obsidian20.Notice("\u8BF7\u5148\u521D\u59CB\u5316 Wiki\uFF08\u8FD0\u884C initialize Wiki \u547D\u4EE4\uFF09");
+          new import_obsidian20.Notice("\u8BF7\u5148\u521D\u59CB\u5316\u77E5\u8BC6\u5E93\uFF08\u8FD0\u884C initialize wiki \u547D\u4EE4\uFF09");
           return;
         }
         new WikiQueryModal(
@@ -8042,7 +8042,7 @@ Correction rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
     });
     this.addCommand({
       id: "wiki-ingest-current",
-      name: this.commandT("\u5BFC\u5165\u5F53\u524D\u7B14\u8BB0\u5230 wiki", "Ingest current note to wiki"),
+      name: this.commandT("\u5BFC\u5165\u5F53\u524D\u7B14\u8BB0\u5230\u77E5\u8BC6\u5E93", "Ingest current note to wiki"),
       callback: async () => {
         const activeFile = this.app.workspace.getActiveFile();
         if (!activeFile) {
@@ -8050,7 +8050,7 @@ Correction rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
           return;
         }
         if (this.isInsideWiki(activeFile.path)) {
-          new import_obsidian20.Notice("\u4E0D\u80FD\u5BFC\u5165 Wiki \u9875\u9762");
+          new import_obsidian20.Notice("\u4E0D\u80FD\u5BFC\u5165\u77E5\u8BC6\u5E93\u9875\u9762");
           return;
         }
         await this.ingestNoteWithFeedback(activeFile.path, true);
@@ -8058,7 +8058,7 @@ Correction rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
     });
     this.addCommand({
       id: "wiki-reingest-current",
-      name: this.commandT("\u91CD\u65B0\u5BFC\u5165\u5F53\u524D\u7B14\u8BB0\u5230 wiki", "Re-ingest current note to wiki"),
+      name: this.commandT("\u91CD\u65B0\u5BFC\u5165\u5F53\u524D\u7B14\u8BB0\u5230\u77E5\u8BC6\u5E93", "Re-ingest current note to wiki"),
       callback: async () => {
         const activeFile = this.app.workspace.getActiveFile();
         if (!activeFile) {
@@ -8066,7 +8066,7 @@ Correction rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
           return;
         }
         if (this.isInsideWiki(activeFile.path)) {
-          new import_obsidian20.Notice("\u4E0D\u80FD\u5BFC\u5165 Wiki \u9875\u9762");
+          new import_obsidian20.Notice("\u4E0D\u80FD\u5BFC\u5165\u77E5\u8BC6\u5E93\u9875\u9762");
           return;
         }
         await this.ingestNoteWithFeedback(activeFile.path, true);
@@ -8074,10 +8074,10 @@ Correction rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
     });
     this.addCommand({
       id: "wiki-batch-ingest",
-      name: this.commandT("\u4E00\u952E\u5BFC\u5165\u5168\u90E8\u7B14\u8BB0\u5230 wiki", "Batch ingest all notes to wiki"),
+      name: this.commandT("\u4E00\u952E\u5BFC\u5165\u5168\u90E8\u7B14\u8BB0\u5230\u77E5\u8BC6\u5E93", "Batch ingest all notes to wiki"),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528\u77E5\u8BC6\u5E93\u529F\u80FD");
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -8125,10 +8125,10 @@ Correction rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
     });
     this.addCommand({
       id: "wiki-batch-ingest-interactive",
-      name: this.commandT("\u4EA4\u4E92\u5F0F\u6279\u91CF\u5BFC\u5165 wiki", "Batch ingest (interactive mode)"),
+      name: this.commandT("\u4EA4\u4E92\u5F0F\u6279\u91CF\u5BFC\u5165\u77E5\u8BC6\u5E93", "Batch ingest (interactive mode)"),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528\u77E5\u8BC6\u5E93\u529F\u80FD");
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -8178,10 +8178,10 @@ Correction rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
     });
     this.addCommand({
       id: "wiki-stats",
-      name: this.commandT("\u663E\u793A wiki \u7EDF\u8BA1", "Show wiki stats"),
+      name: this.commandT("\u663E\u793A\u77E5\u8BC6\u5E93\u7EDF\u8BA1", "Show wiki stats"),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528\u77E5\u8BC6\u5E93\u529F\u80FD");
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -8189,12 +8189,12 @@ Correction rate: ${(stats.correctionRate * 100).toFixed(1)}%`,
           return;
         }
         if (!wikiServices.wikiService.isInitialized()) {
-          new import_obsidian20.Notice("Wiki \u5C1A\u672A\u521D\u59CB\u5316");
+          new import_obsidian20.Notice("\u77E5\u8BC6\u5E93\u5C1A\u672A\u521D\u59CB\u5316");
           return;
         }
         const stats = await wikiServices.wikiService.getStats();
         new import_obsidian20.Notice(
-          `wiki \u7EDF\u8BA1:
+          `\u77E5\u8BC6\u5E93\u7EDF\u8BA1:
 FAQ: ${stats.faq}
 Meta: ${stats.meta}
 \u5173\u7CFB: ${stats.relations}
@@ -8210,10 +8210,10 @@ Meta: ${stats.meta}
     });
     this.addCommand({
       id: "wiki-browse",
-      name: this.commandT("\u6D4F\u89C8 wiki", "Browse wiki"),
+      name: this.commandT("\u6D4F\u89C8\u77E5\u8BC6\u5E93", "Browse wiki"),
       callback: () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528\u77E5\u8BC6\u5E93\u529F\u80FD");
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -8221,7 +8221,7 @@ Meta: ${stats.meta}
           return;
         }
         if (!wikiServices.wikiService.isInitialized()) {
-          new import_obsidian20.Notice("\u8BF7\u5148\u521D\u59CB\u5316 Wiki");
+          new import_obsidian20.Notice("\u8BF7\u5148\u521D\u59CB\u5316\u77E5\u8BC6\u5E93");
           return;
         }
         new WikiBrowserModal(
@@ -8235,10 +8235,10 @@ Meta: ${stats.meta}
     });
     this.addCommand({
       id: "wiki-generate-summary",
-      name: this.commandT("\u751F\u6210 wiki \u603B\u7ED3", "Generate wiki summary"),
+      name: this.commandT("\u751F\u6210\u77E5\u8BC6\u5E93\u603B\u7ED3", "Generate wiki summary"),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528\u77E5\u8BC6\u5E93\u529F\u80FD");
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -8250,7 +8250,7 @@ Meta: ${stats.meta}
           return;
         }
         if (!wikiServices.wikiService.isInitialized()) {
-          new import_obsidian20.Notice("\u8BF7\u5148\u521D\u59CB\u5316 Wiki");
+          new import_obsidian20.Notice("\u8BF7\u5148\u521D\u59CB\u5316\u77E5\u8BC6\u5E93");
           return;
         }
         const topic = await this.promptForInput("\u8BF7\u8F93\u5165\u4E3B\u9898\u540D\u79F0");
@@ -8270,10 +8270,10 @@ Meta: ${stats.meta}
     });
     this.addCommand({
       id: "wiki-audit",
-      name: this.commandT("\u5BA1\u8BA1 wiki", "Audit wiki"),
+      name: this.commandT("\u5BA1\u8BA1\u77E5\u8BC6\u5E93", "Audit wiki"),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528\u77E5\u8BC6\u5E93\u529F\u80FD");
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -8285,11 +8285,11 @@ Meta: ${stats.meta}
           return;
         }
         if (!wikiServices.wikiService.isInitialized()) {
-          new import_obsidian20.Notice("\u8BF7\u5148\u521D\u59CB\u5316 Wiki");
+          new import_obsidian20.Notice("\u8BF7\u5148\u521D\u59CB\u5316\u77E5\u8BC6\u5E93");
           return;
         }
         try {
-          new import_obsidian20.Notice("\u6B63\u5728\u5BA1\u8BA1 Wiki...");
+          new import_obsidian20.Notice("\u6B63\u5728\u5BA1\u8BA1\u77E5\u8BC6\u5E93...");
           const httpClient = new OpenAiCompatibleHttpClient(
             this.settings.apiBaseUrl,
             this.settings.apiKey
@@ -8322,7 +8322,7 @@ Meta: ${stats.meta}
       name: this.commandT("\u81EA\u52A8\u4FEE\u590D\u5B64\u7ACB\u9875\u9762", "Auto-fix orphan pages"),
       callback: async () => {
         if (!this.settings.enableWiki) {
-          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+          new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528\u77E5\u8BC6\u5E93\u529F\u80FD");
           return;
         }
         const wikiServices = this.getWikiServices();
@@ -8334,7 +8334,7 @@ Meta: ${stats.meta}
           return;
         }
         if (!wikiServices.wikiService.isInitialized()) {
-          new import_obsidian20.Notice("\u8BF7\u5148\u521D\u59CB\u5316 Wiki");
+          new import_obsidian20.Notice("\u8BF7\u5148\u521D\u59CB\u5316\u77E5\u8BC6\u5E93");
           return;
         }
         try {
@@ -8440,7 +8440,7 @@ Meta: ${stats.meta}
   }
   async ingestNoteWithFeedback(filePath, force) {
     if (!this.settings.enableWiki) {
-      new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528 Wiki \u529F\u80FD");
+      new import_obsidian20.Notice("\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u542F\u7528\u77E5\u8BC6\u5E93\u529F\u80FD");
       return;
     }
     const wikiServices = this.getWikiServices();
@@ -8616,16 +8616,16 @@ Meta: ${stats.meta}
       "show-user-pattern-stats": this.commandT("\u663E\u793A\u7528\u6237\u63D0\u95EE\u6A21\u5F0F\u7EDF\u8BA1", "Show user pattern stats"),
       "show-eval-metrics": this.commandT("\u663E\u793A\u8BC4\u6D4B\u6307\u6807", "Show evaluation metrics"),
       "show-query-logs": this.commandT("\u663E\u793A\u6700\u8FD1\u67E5\u8BE2\u65E5\u5FD7", "Show recent query logs"),
-      "init-wiki": this.commandT("\u521D\u59CB\u5316 Wiki", "Initialize wiki"),
-      "wiki-query": this.commandT("\u67E5\u8BE2 wiki", "Query wiki"),
-      "wiki-ingest-current": this.commandT("\u5BFC\u5165\u5F53\u524D\u7B14\u8BB0\u5230 wiki", "Ingest current note to wiki"),
-      "wiki-reingest-current": this.commandT("\u91CD\u65B0\u5BFC\u5165\u5F53\u524D\u7B14\u8BB0\u5230 wiki", "Re-ingest current note to wiki"),
-      "wiki-batch-ingest": this.commandT("\u4E00\u952E\u5BFC\u5165\u5168\u90E8\u7B14\u8BB0\u5230 wiki", "Batch ingest all notes to wiki"),
-      "wiki-batch-ingest-interactive": this.commandT("\u4EA4\u4E92\u5F0F\u6279\u91CF\u5BFC\u5165 wiki", "Batch ingest (interactive mode)"),
-      "wiki-stats": this.commandT("\u663E\u793A wiki \u7EDF\u8BA1", "Show wiki stats"),
-      "wiki-browse": this.commandT("\u6D4F\u89C8 wiki", "Browse wiki"),
-      "wiki-generate-summary": this.commandT("\u751F\u6210 wiki \u603B\u7ED3", "Generate wiki summary"),
-      "wiki-audit": this.commandT("\u5BA1\u8BA1 wiki", "Audit wiki"),
+      "init-wiki": this.commandT("\u521D\u59CB\u5316\u77E5\u8BC6\u5E93", "Initialize wiki"),
+      "wiki-query": this.commandT("\u67E5\u8BE2\u77E5\u8BC6\u5E93", "Query wiki"),
+      "wiki-ingest-current": this.commandT("\u5BFC\u5165\u5F53\u524D\u7B14\u8BB0\u5230\u77E5\u8BC6\u5E93", "Ingest current note to wiki"),
+      "wiki-reingest-current": this.commandT("\u91CD\u65B0\u5BFC\u5165\u5F53\u524D\u7B14\u8BB0\u5230\u77E5\u8BC6\u5E93", "Re-ingest current note to wiki"),
+      "wiki-batch-ingest": this.commandT("\u4E00\u952E\u5BFC\u5165\u5168\u90E8\u7B14\u8BB0\u5230\u77E5\u8BC6\u5E93", "Batch ingest all notes to wiki"),
+      "wiki-batch-ingest-interactive": this.commandT("\u4EA4\u4E92\u5F0F\u6279\u91CF\u5BFC\u5165\u77E5\u8BC6\u5E93", "Batch ingest (interactive mode)"),
+      "wiki-stats": this.commandT("\u663E\u793A\u77E5\u8BC6\u5E93\u7EDF\u8BA1", "Show wiki stats"),
+      "wiki-browse": this.commandT("\u6D4F\u89C8\u77E5\u8BC6\u5E93", "Browse wiki"),
+      "wiki-generate-summary": this.commandT("\u751F\u6210\u77E5\u8BC6\u5E93\u603B\u7ED3", "Generate wiki summary"),
+      "wiki-audit": this.commandT("\u5BA1\u8BA1\u77E5\u8BC6\u5E93", "Audit wiki"),
       "wiki-auto-fix-orphans": this.commandT("\u81EA\u52A8\u4FEE\u590D\u5B64\u7ACB\u9875\u9762", "Auto-fix orphan pages"),
       "generate-feedback-tuning-report": this.commandT("\u751F\u6210\u53CD\u9988\u8C03\u53C2\u62A5\u544A", "Generate feedback tuning report")
     };

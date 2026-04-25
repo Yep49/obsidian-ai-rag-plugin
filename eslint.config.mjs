@@ -42,16 +42,10 @@ export default defineConfig([
     },
     rules: {
       'obsidianmd/ui/sentence-case': [
-        'warn',
+        'error',
         {
-          acronyms: ['AI', 'API', 'FAQ', 'LLM', 'RAG', 'URL'],
-          brands: ['OpenAI', 'ZhipuAI', 'SiliconFlow', 'Wiki', 'Meta'],
           ignoreRegex: [
-            '^https://',
-            '^sk-',
-            '^gpt-',
-            '^BAAI/',
-            '^_wiki$'
+            '^https?://'
           ]
         }
       ]

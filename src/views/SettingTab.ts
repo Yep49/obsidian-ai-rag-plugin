@@ -219,7 +219,7 @@ export class AiRagSettingTab extends PluginSettingTab {
       .setName(t.apiKey)
       .setDesc(t.apiKeyDesc)
       .addText(text => text
-        .setPlaceholder('sk-...')
+        .setPlaceholder('API key')
         .setValue(this.plugin.settings.apiKey)
         .onChange((value) => {
           this.plugin.settings.apiKey = value.trim();
@@ -261,7 +261,7 @@ export class AiRagSettingTab extends PluginSettingTab {
         .setName(t.customChatModel)
         .setDesc(t.chatModelDesc)
         .addText(text => text
-          .setPlaceholder('gpt-3.5-turbo')
+          .setPlaceholder('Model ID')
           .setValue(this.plugin.settings.chatModel)
           .onChange((value) => {
             this.plugin.settings.chatModel = value.trim();
@@ -340,7 +340,7 @@ export class AiRagSettingTab extends PluginSettingTab {
       .setName(t.embeddingApiKey)
       .setDesc(t.embeddingApiKeyDesc)
       .addText(text => text
-        .setPlaceholder('sk-...')
+        .setPlaceholder('Embedding API key')
         .setValue(this.plugin.settings.embeddingApiKey || '')
         .onChange((value) => {
           this.plugin.settings.embeddingApiKey = value.trim();
@@ -382,7 +382,7 @@ export class AiRagSettingTab extends PluginSettingTab {
         .setName(t.customEmbeddingModel)
         .setDesc(t.embeddingModelDesc)
         .addText(text => text
-          .setPlaceholder('BAAI/bge-m3')
+          .setPlaceholder('Embedding model ID')
           .setValue(this.plugin.settings.embeddingModel)
           .onChange((value) => {
             this.plugin.settings.embeddingModel = value.trim();
